@@ -9,13 +9,13 @@
   <title>Docker与K8S | Gary&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="[TOC] 1、Docker的历史由来2010年，几个搞it的年轻人在美国成立了以加“dotCloud”的公司。 该公司主要提供基于Paas的云计算技术服务。具体来说，是和LXC有关的容器技术。 后来，dotCloud公司将自己的容器技术进行了简化和标准化，并命名为Docker Docker技术诞生之后，并没有引起行业的关注。而dotCloud公司，作为以加小型创业企业，在激烈的竞争之下，也步履维">
-<meta name="keywords" content="it">
+<meta name="keywords" content="容器">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Docker与K8S">
 <meta property="og:url" content="http://yoursite.com/2019/06/05/DockerAndK8S/index.html">
 <meta property="og:site_name" content="Gary&#39;s Blog">
 <meta property="og:description" content="[TOC] 1、Docker的历史由来2010年，几个搞it的年轻人在美国成立了以加“dotCloud”的公司。 该公司主要提供基于Paas的云计算技术服务。具体来说，是和LXC有关的容器技术。 后来，dotCloud公司将自己的容器技术进行了简化和标准化，并命名为Docker Docker技术诞生之后，并没有引起行业的关注。而dotCloud公司，作为以加小型创业企业，在激烈的竞争之下，也步履维">
-<meta property="og:locale" content="zh-Hans">
+<meta property="og:locale" content="default">
 <meta property="og:image" content="en-resource://database/1720:1">
 <meta property="og:image" content="en-resource://database/1722:1">
 <meta property="og:image" content="en-resource://database/1724:1">
@@ -23,11 +23,13 @@
 <meta property="og:image" content="en-resource://database/1728:1">
 <meta property="og:image" content="en-resource://database/1730:1">
 <meta property="og:image" content="en-resource://database/1732:1">
-<meta property="og:updated_time" content="2019-06-05T06:01:58.375Z">
+<meta property="og:updated_time" content="2019-06-05T06:11:15.880Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Docker与K8S">
 <meta name="twitter:description" content="[TOC] 1、Docker的历史由来2010年，几个搞it的年轻人在美国成立了以加“dotCloud”的公司。 该公司主要提供基于Paas的云计算技术服务。具体来说，是和LXC有关的容器技术。 后来，dotCloud公司将自己的容器技术进行了简化和标准化，并命名为Docker Docker技术诞生之后，并没有引起行业的关注。而dotCloud公司，作为以加小型创业企业，在激烈的竞争之下，也步履维">
 <meta name="twitter:image" content="en-resource://database/1720:1">
+  
+    <link rel="alternative" href="/atom.xml" title="Gary&#39;s Blog" type="application/atom+xml">
   
   
     <link rel="icon" href="/favicon.png">
@@ -67,8 +69,6 @@
 			<ul>
 			
 				<li><a href="/">主页</a></li>
-	        
-				<li><a href="/tags/">标签云</a></li>
 	        
 				<li><a href="/about/">关于我</a></li>
 	        
@@ -128,8 +128,6 @@
 			
 				
 			
-				
-			
 			
 			
 			<nav class="header-nav">
@@ -145,14 +143,12 @@
 			</nav>
 
 			<nav class="header-menu js-header-menu">
-				<ul style="width: 70%">
+				<ul style="width: 50%">
 				
 				
-					<li style="width: 33.333333333333336%"><a href="/">主页</a></li>
+					<li style="width: 50%"><a href="/">主页</a></li>
 		        
-					<li style="width: 33.333333333333336%"><a href="/tags/">标签云</a></li>
-		        
-					<li style="width: 33.333333333333336%"><a href="/about/">关于我</a></li>
+					<li style="width: 50%"><a href="/about/">关于我</a></li>
 		        
 				</ul>
 			</nav>
@@ -299,7 +295,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">it</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">容器</a>
         		</li>
       		
 		</ul>
@@ -380,6 +376,19 @@
             </div>
         </div>
         
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1、Docker的历史由来"><span class="toc-number">1.</span> <span class="toc-text">1、Docker的历史由来</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2、Docker为什么火爆"><span class="toc-number">2.</span> <span class="toc-text">2、Docker为什么火爆</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3、Docker容器和虚拟机对比"><span class="toc-number">3.</span> <span class="toc-text">3、Docker容器和虚拟机对比</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4、Docker"><span class="toc-number">4.</span> <span class="toc-text">4、Docker</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5、K8S"><span class="toc-number">5.</span> <span class="toc-text">5、K8S</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-1、K8S架构"><span class="toc-number">6.</span> <span class="toc-text">5.1、K8S架构</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
         
     </div>
 </aside>
@@ -487,7 +496,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">it</a>
+                <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
             
             <div class="clearfix"></div>
