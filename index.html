@@ -159,19 +159,19 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-first-hexo" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Docker与K8S" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/06/05/first-hexo/">first hexo</a>
+      <a class="article-title" href="/2019/06/05/Docker与K8S/">Docker与K8S</a>
     </h1>
   
 
         
-        <a href="/2019/06/05/first-hexo/" class="archive-article-date">
+        <a href="/2019/06/05/Docker与K8S/" class="archive-article-date">
   	<time datetime="2019-06-04T16:48:37.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-05</time>
 </a>
         
@@ -179,8 +179,85 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="fisrt-start"><a href="#fisrt-start" class="headerlink" title="fisrt start"></a>fisrt start</h2><p>hello</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Excerpt</span> <span class="attr">in</span> <span class="attr">index</span> | 首页摘要&gt;</span> </span><br><span class="line"><span class="comment">&lt;!-- more --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">The</span> <span class="attr">rest</span> <span class="attr">of</span> <span class="attr">contents</span> | 余下全文&gt;</span></span><br></pre></td></tr></table></figure>
+        <p>[TOC]</p>
+<h2 id="1、Docker的历史由来"><a href="#1、Docker的历史由来" class="headerlink" title="1、Docker的历史由来"></a>1、Docker的历史由来</h2><p>2010年，几个搞it的年轻人在美国成立了以加“dotCloud”的公司。</p>
+<p>该公司主要提供基于Paas的云计算技术服务。具体来说，是和LXC有关的容器技术。<br><img src="en-resource://database/1720:1" alt="e09c7ff44e083b6909d438ccda88c60a.png"></p>
+<p>后来，dotCloud公司将自己的容器技术进行了简化和标准化，并命名为Docker<br><img src="en-resource://database/1722:1" alt="12e012aa851ca6ad39b891f8329ef0db.png"></p>
+<p>Docker技术诞生之后，并没有引起行业的关注。而dotCloud公司，作为以加小型创业企业，在激烈的竞争之下，也步履维艰。</p>
+<p>快坚持不下去的时候，他们提出开源的想法。</p>
+<p>什么是“开源”？就是开放源代码，也就是将原来内部保密的程序源代码开放给所有人，让大家一起参与进来，贡献代码和意见。</p>
+<p>之后越来越多的it工程师发现了Docker的优点，然后蜂拥而至，加入Docker开源社区。<br>Docker人气迅速攀升，速度很快。</p>
+<p>此时Docker已经成为行业里人气最火爆的开源技术。dotCloud公司干脆把公司名称改成Docker inc.</p>
+<h2 id="2、Docker为什么火爆"><a href="#2、Docker为什么火爆" class="headerlink" title="2、Docker为什么火爆"></a>2、Docker为什么火爆</h2><p>首先，Docker和容器技术很“轻”。</p>
+<p>在容器技术之前，业界的网红是虚拟机。而虚拟机的代表则是VMWare和OpenStack。</p>
+<p>虚拟机就是在我们的操作系统里面，装一个软件，然后通过这个软件模拟出多台“子电脑出来”。<br><img src="en-resource://database/1724:1" alt="e16051e6f0027232e3430db5c6ec94b0.png"><br>子电脑子电脑之间相互隔离，互不影响</p>
+<p>虚拟机属于虚拟化技术，而Docker这样的容器技术，也是虚拟化技术，属于轻量级的虚拟化。</p>
+<p>虚拟机虽然可以隔离出很多子电脑，但是占用空间更大，启动更慢，虚拟机软件可能还要花钱。而容器技术不需要模拟出整个操作系统，只需要模拟一个小规模的环境，类似沙箱。<br><img src="en-resource://database/1726:1" alt="48cd3e81a41eedcf44035dd01c9ea925.png"></p>
+<p>它启动速度很快，几秒钟就能完成，而且它对资源的利用率很高（一台主机可以同时运行几千个Docker容器）。此外，它占的空间很小，虚拟机一般要几GB到几十GB的空间，而容器只需要MB甚至KB级别。</p>
+<h2 id="3、Docker容器和虚拟机对比"><a href="#3、Docker容器和虚拟机对比" class="headerlink" title="3、Docker容器和虚拟机对比"></a>3、Docker容器和虚拟机对比</h2><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>虚拟机</th>
+<th>容器</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>隔离级别</td>
+<td>操作系统级</td>
+<td>进程级</td>
+</tr>
+<tr>
+<td>隔离策略</td>
+<td>Hypervisor</td>
+<td>CGroups</td>
+</tr>
+<tr>
+<td>系统资源</td>
+<td>5-15%</td>
+<td>0-5%</td>
+</tr>
+<tr>
+<td>启动时间</td>
+<td>分钟级别</td>
+<td>秒级</td>
+</tr>
+<tr>
+<td>镜像存储</td>
+<td>GB-TB</td>
+<td>KM-MB</td>
+</tr>
+<tr>
+<td>集群规模</td>
+<td>上百</td>
+<td>上千</td>
+</tr>
+<tr>
+<td>高可用策咯</td>
+<td>备份、容灾、迁移</td>
+<td>弹性、负载、动态</td>
+</tr>
+</tbody></table>
+<h2 id="4、Docker"><a href="#4、Docker" class="headerlink" title="4、Docker"></a>4、Docker</h2><p>Docker本身不是容器，它是创建容器的工具，是应用容器引擎。<br>理解Docker记住两句口号：<br>第一句：“Build，Ship and Run”搭建发送运行<br>举例子：<br>来到一片空地，想建个房子，于是我石头、砍木头、画图纸等终于盖好了。</p>
+<p>但是住了一段时间，想搬到另外一片空地去，那这时候只能去另外一片空间重新建，很麻烦。</p>
+<p>此时来了个老巫婆，交给我们一个可以把盖好的房子复制一份，做成<u>“镜像”</u>，放在我的<u>背包</u>里面。等到了另外一片空间，就用这个镜像复制一套房子摆在那里。</p>
+<p>第二句话：“Build once，Run anywhere”搭建一次，到处能用。</p>
+<p>Docker技术的三大核心概念，分别是：<br>镜像（Image）<br>容器（Container）<br>仓库（Repository）<br>刚才例子中，我们放在包里的“镜像”，就是Docker镜像，而我们背包是Docker仓库。我们在空地上，用魔法建造好的房子，就是Docker容器。</p>
+<p>说白了，这个Docker镜像，是一个特殊的文件系统。它除了提供容器运行时所需要的程序、库、资源、配置等文件外，还包含了一些为运行时准备的一些配置参数。镜像不包含任何动态数据，其内容在构建之后也不会被改变。意味着每次编出的房子是一样的。</p>
+<p>所以有了这种技术，我们可以做很多镜像，别墅、四合院、茅草屋等等，我们还可以交换镜像，你用我的，我用你的，岂不是美哉？</p>
+<p>于是这就变成了一个大的公共仓库。负责对Dcoker镜像进行管理的是Docker Registry服务。Docker Registry 服务对镜像的管理是非常严格的，不是谁造的镜像都是合法的。</p>
+<p>最长使用的Regsitry公开服务，是官方的Docker Hub，也是默认的Registry，并拥有大量的高质量的官方镜像。</p>
+<h2 id="5、K8S"><a href="#5、K8S" class="headerlink" title="5、K8S"></a>5、K8S</h2><p>由于将Docker应用于具体的业务实现，是存在困难的-编排、管理和调度等方法，都不容易。于是，人们迫切需要一套管理系统，对Docker以及容器进行更高级更灵活的管理。</p>
+<p>这时候K8S出现了，他是基于容器的集群管理平台。</p>
+<h2 id="5-1、K8S架构"><a href="#5-1、K8S架构" class="headerlink" title="5.1、K8S架构"></a>5.1、K8S架构</h2><p>一个K8S系统，通常称为一个K8S集群，这个集群主要包括：一个Master节点，一群Node节点。<br><img src="en-resource://database/1728:1" alt="4a116be07f109e97359f34ec1de2d5a8.png"></p>
+<p>可以看出，Master节点主要还是负责管理和控制。Node节点是工作负载节点，里面是具体的容器。</p>
+<ul>
+<li><p>Master节点<br><img src="en-resource://database/1730:1" alt="8a75afb80db13a3b4037bddce835ac83.png"><br>Master节点包括API Server、Scheduler、Controller manager、etcd。<br>API Server是整个系统的对外接口，供客户端和其它组件调用，相当于“营业厅”。Scheduler负责对集群内部的资源进行调度，相当于“调度室”。<br>Controller manager负责管理控制器，相当于“大总管”。</p>
+</li>
+<li><p>Node节点<br><img src="en-resource://database/1732:1" alt="82b40626d374a57168eb0b3e68e24da9.png"><br>Node节点包括Docker、kubelet、kube-proxy、Fluentd、kube-dns（可选），还有就是Pod。<br>Pod是Kubernetes最基本的操作单元。一个Pod代表着集群中运行的一个进程，它内部封装了一个或多个紧密相关的容器。除了Pod之外，K8S还有一个Service的概念，一个Service可以看作一组提供相同服务的Pod的对外访问接口。<br>Docker，不用说了，创建容器的。<br>Kubelet，主要负责监视指派到它所在Node上的Pod，包括创建、修改、监控、删除等。Kube-proxy，主要负责为Pod对象提供代理。<br>Fluentd，主要负责日志收集、存储与查询。</p>
+</li>
+</ul>
+
       
 
       
@@ -193,7 +270,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">first</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">容器</a>
         		</li>
       		
 		</ul>
@@ -203,7 +280,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/06/05/first-hexo/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/06/05/Docker与K8S/">展开全文 >></a>
         </p>
       
 
@@ -326,7 +403,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">first</a>
+                <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
             
             <div class="clearfix"></div>
