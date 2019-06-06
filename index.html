@@ -180,7 +180,9 @@
 <p>该公司主要提供基于Paas的云计算技术服务。具体来说，是和LXC有关的容器技术。</p>
 <img src="/2019/06/06/Docker和k8s/1.png" title="This is an example image">
 
-<p>后来，dotCloud公司将自己的容器技术进行了简化和标准化，并命名为Docker<br><img src="en-resource://database/1722:1" alt="12e012aa851ca6ad39b891f8329ef0db.png"></p>
+<p>后来，dotCloud公司将自己的容器技术进行了简化和标准化，并命名为Docker</p>
+<img src="/2019/06/06/Docker和k8s/2.png" title="This is an example image">
+
 <p>Docker技术诞生之后，并没有引起行业的关注。而dotCloud公司，作为以加小型创业企业，在激烈的竞争之下，也步履维艰。</p>
 <p>快坚持不下去的时候，他们提出开源的想法。</p>
 <p>什么是“开源”？就是开放源代码，也就是将原来内部保密的程序源代码开放给所有人，让大家一起参与进来，贡献代码和意见。</p>
@@ -188,9 +190,13 @@
 <p>此时Docker已经成为行业里人气最火爆的开源技术。dotCloud公司干脆把公司名称改成Docker inc.</p>
 <h2 id="2、Docker为什么火爆"><a href="#2、Docker为什么火爆" class="headerlink" title="2、Docker为什么火爆"></a>2、Docker为什么火爆</h2><p>首先，Docker和容器技术很“轻”。</p>
 <p>在容器技术之前，业界的网红是虚拟机。而虚拟机的代表则是VMWare和OpenStack。</p>
-<p>虚拟机就是在我们的操作系统里面，装一个软件，然后通过这个软件模拟出多台“子电脑出来”。<br><img src="en-resource://database/1724:1" alt="e16051e6f0027232e3430db5c6ec94b0.png"><br>子电脑子电脑之间相互隔离，互不影响</p>
+<p>虚拟机就是在我们的操作系统里面，装一个软件，然后通过这个软件模拟出多台“子电脑出来”。</p>
+<img src="/2019/06/06/Docker和k8s/3.png" title="This is an example image">
+<p>子电脑子电脑之间相互隔离，互不影响</p>
 <p>虚拟机属于虚拟化技术，而Docker这样的容器技术，也是虚拟化技术，属于轻量级的虚拟化。</p>
-<p>虚拟机虽然可以隔离出很多子电脑，但是占用空间更大，启动更慢，虚拟机软件可能还要花钱。而容器技术不需要模拟出整个操作系统，只需要模拟一个小规模的环境，类似沙箱。<br><img src="en-resource://database/1726:1" alt="48cd3e81a41eedcf44035dd01c9ea925.png"></p>
+<p>虚拟机虽然可以隔离出很多子电脑，但是占用空间更大，启动更慢，虚拟机软件可能还要花钱。而容器技术不需要模拟出整个操作系统，只需要模拟一个小规模的环境，类似沙箱。</p>
+<img src="/2019/06/06/Docker和k8s/4.png" title="This is an example image">
+
 <p>它启动速度很快，几秒钟就能完成，而且它对资源的利用率很高（一台主机可以同时运行几千个Docker容器）。此外，它占的空间很小，虚拟机一般要几GB到几十GB的空间，而容器只需要MB甚至KB级别。</p>
 <h2 id="3、Docker容器和虚拟机对比"><a href="#3、Docker容器和虚拟机对比" class="headerlink" title="3、Docker容器和虚拟机对比"></a>3、Docker容器和虚拟机对比</h2><table>
 <thead>
@@ -247,12 +253,18 @@
 <p>最长使用的Regsitry公开服务，是官方的Docker Hub，也是默认的Registry，并拥有大量的高质量的官方镜像。</p>
 <h2 id="5、K8S"><a href="#5、K8S" class="headerlink" title="5、K8S"></a>5、K8S</h2><p>由于将Docker应用于具体的业务实现，是存在困难的-编排、管理和调度等方法，都不容易。于是，人们迫切需要一套管理系统，对Docker以及容器进行更高级更灵活的管理。</p>
 <p>这时候K8S出现了，他是基于容器的集群管理平台。</p>
-<h2 id="5-1、K8S架构"><a href="#5-1、K8S架构" class="headerlink" title="5.1、K8S架构"></a>5.1、K8S架构</h2><p>一个K8S系统，通常称为一个K8S集群，这个集群主要包括：一个Master节点，一群Node节点。<br><img src="en-resource://database/1728:1" alt="4a116be07f109e97359f34ec1de2d5a8.png"></p>
+<h2 id="5-1、K8S架构"><a href="#5-1、K8S架构" class="headerlink" title="5.1、K8S架构"></a>5.1、K8S架构</h2><p>一个K8S系统，通常称为一个K8S集群，这个集群主要包括：一个Master节点，一群Node节点。</p>
+<img src="/2019/06/06/Docker和k8s/5.png" title="This is an example image">
+
 <p>可以看出，Master节点主要还是负责管理和控制。Node节点是工作负载节点，里面是具体的容器。</p>
 <ul>
-<li><p>Master节点<br><img src="en-resource://database/1730:1" alt="8a75afb80db13a3b4037bddce835ac83.png"><br>Master节点包括API Server、Scheduler、Controller manager、etcd。<br>API Server是整个系统的对外接口，供客户端和其它组件调用，相当于“营业厅”。Scheduler负责对集群内部的资源进行调度，相当于“调度室”。<br>Controller manager负责管理控制器，相当于“大总管”。</p>
+<li><p>Master节点</p>
+<img src="/2019/06/06/Docker和k8s/6.png" title="This is an example image">
+<p>Master节点包括API Server、Scheduler、Controller manager、etcd。<br>API Server是整个系统的对外接口，供客户端和其它组件调用，相当于“营业厅”。Scheduler负责对集群内部的资源进行调度，相当于“调度室”。<br>Controller manager负责管理控制器，相当于“大总管”。</p>
 </li>
-<li><p>Node节点<br><img src="en-resource://database/1732:1" alt="82b40626d374a57168eb0b3e68e24da9.png"><br>Node节点包括Docker、kubelet、kube-proxy、Fluentd、kube-dns（可选），还有就是Pod。<br>Pod是Kubernetes最基本的操作单元。一个Pod代表着集群中运行的一个进程，它内部封装了一个或多个紧密相关的容器。除了Pod之外，K8S还有一个Service的概念，一个Service可以看作一组提供相同服务的Pod的对外访问接口。<br>Docker，不用说了，创建容器的。<br>Kubelet，主要负责监视指派到它所在Node上的Pod，包括创建、修改、监控、删除等。Kube-proxy，主要负责为Pod对象提供代理。<br>Fluentd，主要负责日志收集、存储与查询。</p>
+<li><p>Node节点</p>
+<img src="/2019/06/06/Docker和k8s/7.png" title="This is an example image">
+<p>Node节点包括Docker、kubelet、kube-proxy、Fluentd、kube-dns（可选），还有就是Pod。<br>Pod是Kubernetes最基本的操作单元。一个Pod代表着集群中运行的一个进程，它内部封装了一个或多个紧密相关的容器。除了Pod之外，K8S还有一个Service的概念，一个Service可以看作一组提供相同服务的Pod的对外访问接口。<br>Docker，不用说了，创建容器的。<br>Kubelet，主要负责监视指派到它所在Node上的Pod，包括创建、修改、监控、删除等。Kube-proxy，主要负责为Pod对象提供代理。<br>Fluentd，主要负责日志收集、存储与查询。</p>
 </li>
 </ul>
 
