@@ -155,6 +155,163 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-深入理解JVM" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/14/深入理解JVM/">深入理解JVM</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/14/深入理解JVM/" class="archive-article-date">
+  	<time datetime="2019-07-14T15:31:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Person.class文件 java person –&gt; 运行（jvm：一定将这个文件加载到jvm中进行运行）</p>
+<p>JVM Architecture</p>
+<img src="/2019/07/14/深入理解JVM/1561897426853.png" title="This is an example image">
+
+<p>方法区：（线程共享）已经被虚拟机加载的类信息、常量、静态变量、即使编译器编译后的代码。oome</p>
+<img src="/2019/07/14/深入理解JVM/1561901860688.png" title="This is an example image">
+
+<p>堆：（线程共享）Class对象，堆中包含方法区（非堆），oome</p>
+<p>堆–&gt; 方法区–&gt;运行时常量区</p>
+<p>运行时数据区：</p>
+<img src="/2019/07/14/深入理解JVM/1561901332179.png" title="This is an example image">
+
+<img src="/2019/07/14/深入理解JVM/1212121212.png" title="This is an example image">
+
+<p>问题：new Person对象 去哪了？ –空间 300m</p>
+<p>eden 够 存下</p>
+<p>​    不够 存不下</p>
+<p>​        垃圾回收</p>
+<p>​            回收后发现空间够了 存</p>
+<p>​            回收后还不够，有些对象没有被回收</p>
+<p>​                移动这些对象到s区，so和s1 在某个只会有一个区域有数据</p>
+<p>​                    把eden还存在的对象复制到so区域，清理eden区</p>
+<p>​                    so区域存活的对象年龄+1，年龄达到一定程度 移到老年区，没到一定程度移动到s1区域（交换位置）</p>
+<p>​                        old区到一定程度 fullgc</p>
+<p>​                            old还没有足够用空间-&gt;oome</p>
+<img src="/2019/07/14/深入理解JVM/1561903172672.png" title="This is an example image">
+
+<p>虚拟机栈：一个线程对应一个虚拟机栈，先进后出</p>
+<img src="/2019/07/14/深入理解JVM/1561899938661.png" title="This is an example image">
+
+<img src="/2019/07/14/深入理解JVM/1561899958970.png" title="This is an example image">
+
+<p>Each Java Virtual Machine thread has a private <em>Java Virtual Machine stack</em>, created at the same time as the thread. A Java Virtual Machine stack stores frames (<a href="https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-2.html#jvms-2.6" target="_blank" rel="noopener">§2.6</a>). </p>
+<p>Thread –&gt; 虚拟机栈</p>
+<p>method –&gt; 栈帧</p>
+<img src="/2019/07/14/深入理解JVM/1561901957157.png" title="This is an example image">
+
+<p>超过虚拟机栈帧最大值后 StackOverflowError</p>
+<p>-Xss 128k 设置最大栈帧</p>
+<p>问题：最好如何设置栈帧最大？</p>
+<p>​    如果太大：</p>
+<p>​        Threads</p>
+<p>​        栈的数量 变少</p>
+<p>​    如果太小：</p>
+<p>​        很容易 method 10 stackoverflow</p>
+<p>​    通过jinfo -flag Xss PID – &gt; 查询默认大小 看应用程序不够用就调大 够用就调小点。</p>
+<p>本地方法栈：native 方法</p>
+<p>程序计数器：</p>
+<img src="/2019/07/14/深入理解JVM/1561900326159.png" title="This is an example image">
+
+<p>记录当前线程执行的位置，下一次就可以直接在这个位置继续了。</p>
+<p>普及：JVM - HotSpot</p>
+<p>Kotlin XXX语言 经过编译 javac –&gt; class format –&gt; 交给jvm虚拟机运行</p>
+<p>类加载机制：把class文件加载到jvm虚拟机中的过程</p>
+<p>三个核心步骤：</p>
+<ul>
+<li>装载<ul>
+<li>Java类装载器 装载class文件<ul>
+<li>定位到class文件全路径</li>
+<li>文件中的静态的结构 转换为jvm虚拟机中 动态的结构</li>
+<li>class文件—&gt;Class对象 Class<person></person></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<img src="/2019/07/14/深入理解JVM/1561898362543.png" title="This is an example image">
+
+<p>Classloader.loadClasss(com.gary.Person) –.&gt; 不能都用一个类加载器加载 有一些默认的</p>
+<p>Bootstap ClassLoader ： 负责加载Java_home/jre/lib class文件</p>
+<p>Extension ClassLoader： Java_home/jre/lib/ext class文件</p>
+<p>App ClassLoader：classpath class文件</p>
+<img src="/2019/07/14/深入理解JVM/1561898781801.png" title="This is an example image">
+
+<p>class String {</p>
+<p>}</p>
+<p>会加载吗？交给classpath加载 交给父亲 再交给父亲 （先让最顶层的加载，保证只能有一个String类,即保证XZX类只能加载一次）</p>
+<p>打破这个机制？可以覆写loadclass（不让其交给父加载）</p>
+<p>双亲委派机制</p>
+<p>（delegation-hierarchy）</p>
+<p>javap -c Person.class 反编译</p>
+<img src="/2019/07/14/深入理解JVM/1561900770631.png" title="This is an example image">
+
+<p>查Javap 指令查看</p>
+<img src="/2019/07/14/深入理解JVM/1561901075904.png" title="This is an example image">
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JVM</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/14/深入理解JVM/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-MySQL索引优化与底层数据结构" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -600,11 +757,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">容器</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">容器</a>
+                <a href="javascript:void(0)" class="js-tag color4">JVM</a>
               </li>
             
             <div class="clearfix"></div>
