@@ -155,6 +155,193 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-MySQL索引优化与底层数据结构" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/14/MySQL索引优化与底层数据结构/">MySQL索引优化与底层数据结构</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/14/MySQL索引优化与底层数据结构/" class="archive-article-date">
+  	<time datetime="2019-07-14T14:51:41.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="一、索引的本质"><a href="#一、索引的本质" class="headerlink" title="一、索引的本质"></a>一、索引的本质</h2><ul>
+<li>索引是帮助MySQL高效获取数据的排好序的数据结构</li>
+<li>索引存储在文件里</li>
+<li>索引结构<ul>
+<li>二叉树</li>
+<li>红黑树</li>
+<li>HASH</li>
+<li>BTREE</li>
+</ul>
+</li>
+</ul>
+<img src="/2019/07/14/MySQL索引优化与底层数据结构/1563106609130.png" title="This is an example image">
+
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Select</span> * <span class="keyword">from</span> t <span class="keyword">Where</span> clo2 = <span class="number">89</span>;</span><br></pre></td></tr></table></figure>
+
+<p>如果没有索引 则会一个一个往下找。由于表、索引都在文件（磁盘），每次都需要IO操作，若数据是百万级的，那么查找磁盘，即IO操作要百万次，性能是非常低下的。</p>
+<p>col2加索引后，把数据放在二叉树中，每个结点会有对应行的指针和数据。从二叉树开始查找，找到后定位其指针指向的行数据。性能快很多。</p>
+<figure class="highlight n1ql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">Select</span> * <span class="keyword">from</span> t <span class="keyword">Where</span> clo1 = <span class="number">6</span>;</span><br></pre></td></tr></table></figure>
+
+<p>若像col1这样的一边递增的话，如果也用二叉树，那么性能也是有问题的。</p>
+<img src="/2019/07/14/MySQL索引优化与底层数据结构/1563107649493.png" title="This is an example image">
+
+<p>col1加索引后，把数据放在红黑树中，树的高度较二叉树减少，可以看出效率提高了。</p>
+<blockquote>
+<p>一个数据结构动态显示的网站：<a href="https://www.cs.usfca.edu/~galles/visualization/" target="_blank" rel="noopener">https://www.cs.usfca.edu/~galles/visualization/</a></p>
+</blockquote>
+<p>但是MySQL底层还不是使用的红黑树。</p>
+<p>当数据很大的时候，这个红黑树的高度仍旧高，若恰好查找的元素在最底层，那么是最坏的查找次数。</p>
+<p>我们想要将树的高度控制在一定的高度中，那么效率会更好。</p>
+<p>如何改造这个树？</p>
+<p>一个节点放大，存储多个索引，每个索引又有分叉。（B树），每次将一个结点取出到内存，然后在内存中比对这些数据，这样比每个数据都磁盘IO取出对比好太多。</p>
+<p>但是MySQL底层还不是使用的B树，而是B+树。</p>
+<h2 id="二、索引底层数据结构与算法"><a href="#二、索引底层数据结构与算法" class="headerlink" title="二、索引底层数据结构与算法"></a>二、索引底层数据结构与算法</h2><ul>
+<li><p>B-Tree</p>
+<ul>
+<li>度（Degree）-结点的数据存储个数</li>
+<li>叶节点具有相同的深度</li>
+<li>叶节点的指针为空</li>
+<li>节点中的数据key从左到右递增排列</li>
+</ul>
+<img src="/2019/07/14/MySQL索引优化与底层数据结构/1563108381002.png" title="This is an example image">
+</li>
+<li><p>B+Tree(B-Tree变种)</p>
+<ul>
+<li>非叶子节点不存储data，只存储key，可以增大度</li>
+<li>叶子节点不存储指针</li>
+<li>顺序访问指针，提高区间访问性能</li>
+</ul>
+<img src="/2019/07/14/MySQL索引优化与底层数据结构/1563108936191.png" title="This is an example image">
+
+</li>
+</ul>
+<p>默认一结点的大小约16KB。</p>
+<p>存储千万数据，我们希望高度2-4。</p>
+<blockquote>
+<blockquote>
+<p>子节点之间双向指针联系，为什么？</p>
+</blockquote>
+</blockquote>
+<ul>
+<li>HASH<ul>
+<li>数据做HASH（把数值打散算出一个值）计算，与指针绑定存储在Hash表里面</li>
+<li>查找数据只需要一次计算hash值后就可以找到对应的行的指针</li>
+<li>尽管效率很高，但是大部分场景使用的是B树索引，为什么<ul>
+<li>假设select * from where col1 &gt; 6,那么这个HASH就没办法了，每次只能定位一行</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>假设select * from where col1 &gt; 6 那么子节点之间双向指针就派上用场了，解决了范围查找问题。</p>
+<img src="/2019/07/14/MySQL索引优化与底层数据结构/1563110244418.png" title="This is an example image">
+
+<p>MyISAM引擎：</p>
+<p>frm：（form）表定义文件</p>
+<p>MYD：（data）表的数据</p>
+<p>MYI：（index）表的索引，b+树构成</p>
+<p>InnoDB引擎：</p>
+<p>frm：表定义文件</p>
+<p>ibd：表的索引和数据</p>
+<ul>
+<li><p>MyISAM存储引擎索引实现（非聚集）</p>
+<ul>
+<li>索引文件和数据文件是分离的</li>
+</ul>
+<img src="/2019/07/14/MySQL索引优化与底层数据结构/1563110346751.png" title="This is an example image">
+
+</li>
+</ul>
+<p>查找col1 = 20，从MYI找到相应的元素对应的叶子节点（有对应行数据的指针），定位到这行数据。</p>
+<ul>
+<li><p>InnoDB存储引擎索引实现（聚集）</p>
+<ul>
+<li>表数据文件本身是按B+Tree组织的一个索引结构文件</li>
+<li>聚集索引-叶节点包含了完整的数据记录</li>
+<li>为什么InnoDB表必须有主键，并且推荐使用整形的自增主键？<ul>
+<li>若没有主键，会默认建</li>
+<li>还在用UUID？字符串比大小快还是int比大小快？字符串首先要ASCII然后比大小很麻烦，而且长占用很多存储空间。</li>
+<li>为啥自增？反例：UUID不是递增的，插入一行后，导致其插入之前已经排好的之间，而一个结点大小是固定的（存储的数量有限），如果满了以后只能往后推，可能会破坏原来的结点（分裂新的结点后加入）。如果是递增，则只需要往后存储就好。</li>
+</ul>
+</li>
+<li>为什么非主键索引结构叶子节点存储的是主键值？（一致性和节省存储空间）</li>
+</ul>
+<img src="/2019/07/14/MySQL索引优化与底层数据结构/1563110665776.png" title="This is an example image">
+
+</li>
+</ul>
+<h2 id="三、索引最左前缀原理"><a href="#三、索引最左前缀原理" class="headerlink" title="三、索引最左前缀原理"></a>三、索引最左前缀原理</h2><ul>
+<li><p>联合索引的底层存储结构（（a,b,c）建一个索引）。</p>
+<img src="/2019/07/14/MySQL索引优化与底层数据结构/1563114160092.png" title="This is an example image">
+
+</li>
+</ul>
+<h2 id="三、优化"><a href="#三、优化" class="headerlink" title="三、优化"></a>三、优化</h2><p>Explain详解与索引最佳实践</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">MySQL</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/14/MySQL索引优化与底层数据结构/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Docker和k8s" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -411,6 +598,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
+              </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">容器</a>
