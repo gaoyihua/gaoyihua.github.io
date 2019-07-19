@@ -903,8 +903,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="一、为什么分布式？"><a href="#一、为什么分布式？" class="headerlink" title="一、为什么分布式？"></a>一、为什么分布式？</h2><p>在之前的文章（<a href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247484335&idx=1&sn=a871bf871fcaffda0be40e1388a69d7d&chksm=ebd742aedca0cbb8e22138fa7488cb80ee09a5b5d7aa065679904005c609e92a0d9ad755a913&token=620000779&lang=zh_CN&scene=21#wechat_redirect" target="_blank" rel="noopener">外行人都能看懂的SpringCloud，错过了血亏！</a>）也提过为什么要分布式：</p>
-<ul>
+        <h2 id="一、为什么分布式？"><a href="#一、为什么分布式？" class="headerlink" title="一、为什么分布式？"></a>一、为什么分布式？</h2><ul>
 <li>模块之间独立，各做各的事，<strong>便于扩展，复用性高</strong></li>
 <li><strong>高吞吐量</strong>。某个任务需要一个机器运行10个小时，将该任务用10台机器的分布式跑(将这个任务拆分成10个小任务)，可能2个小时就跑完了</li>
 </ul>
@@ -935,14 +934,14 @@
 <li>比如说，一个用户请求过来，负载均衡器指派这个请求到服务器A。另一个用户请求过来，负载均衡器指派这个请求到服务器B。这样就<strong>平摊</strong>了请求— 这种方式就叫做<strong>轮询</strong></li>
 <li>…策略还有很多种，就看你想怎么实现了，反正这个逻辑的代码放在负载均衡器上。</li>
 </ul>
-<p>而Session的问题，我之前写<a href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247485230&idx=1&sn=7c32a09e4b4b72a3565bfa05ae899d92&chksm=ebd7462fdca0cf39c2282dfd02b3f9d4dc3984c3103645ab5b112755cd89e8ee577eb35062e6&token=1230572157&lang=zh_CN&scene=21#wechat_redirect" target="_blank" rel="noopener">什么是单点登录(SSO)</a>已经讲过了，一般来说我们可以将Session保存在Redis上就行了。</p>
+<p>而Session的问题，我之前写sso已经讲过了，一般来说我们可以将Session保存在Redis上就行了。</p>
 <img src="/2019/07/19/为什么分布式/sso.png" title="This is an example image">
 
 <p>随着业务的发展，我们的数据量和访问量都在增长，现在有不少的业务都是<strong>读多写少</strong>的，对于这种业务也是会直接反应到<strong>数据库</strong>上。</p>
 <p>于是，我们可以增加一个<strong>读库</strong>。写入的操作走服务器C的MySQL，读取的操作走服务器D的MySQL。这样就实现了<strong>读写分离</strong>。</p>
 <img src="/2019/07/19/为什么分布式/读写分离架构.png" title="This is an example image">
 
-<p>一般来说，我们的写库也叫做主库，读库也叫做从库，在互联网架构中，这叫做<strong>主从架构</strong>，比如常见的架构：<strong>一主多从</strong>（详细的参考资料：<a href="https://mp.weixin.qq.com/s/VF1_Ehat8GXkb9EqLUn6lg" target="_blank" rel="noopener">如何给老婆解释什么是 Master-Slave</a>）</p>
+<p>一般来说，我们的写库也叫做主库，读库也叫做从库，在互联网架构中，这叫做<strong>主从架构</strong>，比如常见的架构：<strong>一主多从</strong></p>
 <img src="/2019/07/19/为什么分布式/主从架构.png" title="This is an example image">
 
 <p>针对读多写少的业务，我们还有优化策略，引入<strong>搜索引擎和缓存</strong>。</p>
