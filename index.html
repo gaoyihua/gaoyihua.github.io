@@ -155,6 +155,86 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-中台" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="中台"><a href="#中台" class="headerlink" title="中台"></a>中台</h1><h2 id="什么是中台"><a href="#什么是中台" class="headerlink" title="什么是中台"></a>什么是中台</h2><p>引用王健老师在《当我们谈中台时，我们在谈些什么| 白话中台战略》一文中提到的关于中台的一些理解</p>
+<blockquote>
+<p> 在有些人眼里：中台就是技术平台，像微服务开发框架、Devops平台、PaaS平台，容器云之类的，人们都叫它<strong>“技术中台”</strong>。
+在有些人眼里：中台就是微服务业务平台，像最常见的什么用户中心，订单中心，各种微服务集散地，人们都叫它<strong>“业务中台”</strong>。
+在有些人眼里：中台应该是组织的事情，在释放潜能：类似于企业内部资源调度中心和内部创新孵化组织，人们叫它<strong>“组织中台”</strong>。</p>
+</blockquote>
+<p>这些理解都对，但也都有不够准确或不够完整的部分。</p>
+<p>在查阅了大量资料，目前行业内对于中台讨论的视角还是多偏于战略或组织架构层面，而*<em>中台更多是因为公司业务在发展到某一阶段时，遇到瓶颈与障碍后，为解决实际问题而提出的解决方案。  *</em></p>
+<h2 id="为什么需要中台"><a href="#为什么需要中台" class="headerlink" title="为什么需要中台"></a>为什么需要中台</h2><p><strong>中台的产生，并非完全是自顶向下的战略设计，也并非是为了追随某种行业风口，而是随着公司业务高速发展、组织不断膨胀的过程中暴露的种种问题需要被解决。</strong>而这时，中台的概念恰好对应了这个问题，所以大家接受了中台。</p>
+<p>过去几年中，借着移动互联网的红利，许多公司都高速发展，进行大规模业务拓展，业务拓展的速度足够快，对公司自然是好事，但是随着而来的问题就是，公司内部出现了大量的重复建设和资源浪费的现象。</p>
+<p>阿里的共享服务部发展历程就是如此。</p>
+<p>公司刚开始只有淘宝，后来意识到B2C模式的业务也会是电商领域重要的组成部门，所以出现了天猫，随着天猫的不断发展，逐渐独立成一个部门，但是这两套都包含订单、商品、库存、价格、仓储、物流等基本业务系统。这两个系统互相独立，各自运行。</p>
+<p>等到10年左右，阿里开始上线1688、聚划算等业务的时候发现，这些业务针对的领域虽然各不相同，但是他需要用到的系统功能也高度类似，主要也是订单、商品、库存、价格、仓储、物流等系统。如果这些新业务的系统也都要全部重新开发一遍，这无疑是很大的资源浪费。明明既有的系统调整一下就可以满足新业务的需求，为什么还要继续开发新系统呐？</p>
+<p>在这个大的背景之下，阿里内部将共享服务部的职权不断提升，统一将各个业务业务部门重复使用，反复建设的功能和系统统一规划和管理。</p>
+<p>滴滴在15年末开始启动自己的中台战略，这与滴滴当时的业务发展阶段也是相关的。</p>
+<p>2015 年末，滴滴在短时间内形成了包括快车、出租车、专车、顺风车、代驾等多业务的垂直化架构。</p>
+<p>这些业务虽然会有一些差别，但是核心系统和流程都是类似的。如果各自独立开发，也会出现各种各样的问题。</p>
+<p>比如说，开发成本过高，滴滴旗下的每个业务，其实都是可以单独支撑起一家公司的，如果每个业务都独立做到极致，那么开发成本和人力成本就会非常巨大，而如果为了控制成本，就把系统的建设放缓，则意味着，无论是核心系统本身的质量，还是对外的用户体验都不太好。</p>
+<p>在这样的背景下，滴滴也开始考虑将诸多业务，以及各个城市的系统统一规划，统一建设，提升服务前台的能力。</p>
+<p>许多正在实践中台业务的公司，都有类似的问题，这些问题，大约会是两类——</p>
+<p><strong>一类是，许多业务需求或功能需求高度类似、通用化程度很高，但是由于没有专门的团队负责规划和开发，大量的系统重复开发、重复建设，导致复用性低、效率低、产研资源浪费、用户体验不统一。</strong></p>
+<p>另一类是，早期业务发展过程中，为了解决一些当下的业务问题，垂直的、个性化的业务逻辑与基础系统耦合太深，<strong>由于没有平台性质的规划，横向系统之间、上下游系统之间的交叉逻辑也非常多，这样导致在新业务、新市场的拓展过程中，系统没法直接复用，甚至没法快速迭代。</strong></p>
+<p>这两类问题，在软件开发领域，有专门的名称，叫做“重复造轮子”和“烟囱式架构”。这两类问题本质上是企业在发展过程当中，为了解决当下的业务问题，快速上线了很多功能，而欠下了许多技术债，当企业进入成熟期之后，发现这些问题的存在，严重影响了企业的运行效率和运营成本。</p>
+<p>现阶段，大多数提出中台战略或是建设大中台的公司，大多都有类似的困境。业务高速发展多年，许多问题积重难返或者大量在解决“重复造轮子”的问题，中台这个概念，很多情况下是因为契合了大公司业务的发展的情况，而被大家广泛认可。</p>
+<h2 id="中台能解决什么问题"><a href="#中台能解决什么问题" class="headerlink" title="中台能解决什么问题"></a>中台能解决什么问题</h2><p>前面的内容，我们大致介绍了中台要解决的问题。这给我们一种感觉是，中台是只有大公司才能做的事情，因为毕竟只有大公司在会有这种多条业务线，需要大量通用功能的场景，也只有只有大公司有能力拿出如此大的资源打造个中台。</p>
+<p>现实情况也如我们所说，<strong>很多公司的中台业务，实际业务发展到一定阶段，进入一个瓶颈之后，为了能够应对接下来的问题，才一点一点从内部开始推动解决之前的问题。</strong></p>
+<p>中台作为一种产品设计思路，或者系统架构思路，并不受限于公司的规模，理论上讲，任何一家即将或者正在面临业务高速增长的状态时，都很值得利用和借鉴中台的思路，将目前业务当中大量可复用的功能和场景进行梳理，为业务的高速增长做好准备。</p>
+<p>这在中小公司当中，是有现实意义的。</p>
+<p>对于很多中小公司，当他们走出生存困境，进入到高速发展阶段时，会遇到很多的问题，但大概率会遇到的一个问题是，<strong>过往的业务模型，产品能力很有可能没法完全承接住大规模用户增长带来的压力。</strong></p>
+<p>而当你具体到每个用户的时候，你又能发现，他们遇到的问题你之前都遇到过，只不过，因为一下来的太多，你没法像过去一样提供达预期，甚至超预期的服务时，对方就会产生不满。</p>
+<p>这也是为什么许多公司会生于拉新，死于留存的一个原因。</p>
+<p>很多公司在这个阶段的选择都是为了临时解决一个问题，快速上线一个功能，也不是不可以，只不过，很有可能你的解决方案会不断带来新的问题，最后陷入到功能太过复杂，以至于积重难返的地步。</p>
+<p>所以，在有可能的情况下，公司将一些大概率长期有价值的功能，专门模块化，进行开发和优化，确保即使业务规模进一步扩大，也能够满足业务需求。甚至，随着能力或方法论的不断优化，甚至有可能某一天成为整个行业的方法论。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/19/中台/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-深入理解JVM" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -499,6 +579,253 @@
 
 
   
+    <article id="post-RocketMQ" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/06/RocketMQ/">RocketMQ</a>
+    </h1>
+  
+
+        
+        <a href="/2019/06/06/RocketMQ/" class="archive-article-date">
+  	<time datetime="2019-06-06T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="RocketMQ"><a href="#RocketMQ" class="headerlink" title="RocketMQ"></a>RocketMQ</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>RocketMQ是从阿里内部的MetaQ演化而来</p>
+<h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><ul>
+<li>高吞吐低延迟</li>
+<li>抗海量消息堆积</li>
+<li>简单的横向扩容</li>
+<li>顺序消息</li>
+<li>定时消息</li>
+<li>服务端消息过滤</li>
+<li>消费组消费</li>
+<li>多种方式消息查询</li>
+<li>消息回溯</li>
+</ul>
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><p>消息中间件典型的作用</p>
+<ul>
+<li>应用解耦<ul>
+<li>上游业务负责生产，下游业务负责消费，俩个业务相互独立</li>
+</ul>
+</li>
+<li>削峰填谷<ul>
+<li>生产高峰时，消费进入队列堆积，避免冲垮消费方</li>
+</ul>
+</li>
+</ul>
+<h3 id="设计原理-总览"><a href="#设计原理-总览" class="headerlink" title="设计原理 - 总览"></a>设计原理 - 总览</h3><ul>
+<li><p>NameServer</p>
+<ul>
+<li>服务注册发现</li>
+<li>Broker列表信息</li>
+<li>Topic列表信息</li>
+</ul>
+</li>
+<li><p>Broker</p>
+<ul>
+<li>消息存储</li>
+</ul>
+</li>
+<li><p>Producer</p>
+<ul>
+<li>消息生产</li>
+</ul>
+</li>
+<li><p>Consumer</p>
+<ul>
+<li>消息消费</li>
+</ul>
+<img src="/2019/06/06/RocketMQ/1561719093338.png" title="This is an example image">
+
+</li>
+</ul>
+<h3 id="设计原理-生产"><a href="#设计原理-生产" class="headerlink" title="设计原理 - 生产"></a>设计原理 - 生产</h3><ul>
+<li><p>Topic</p>
+<ul>
+<li>每个消息都属于一个Topic</li>
+<li>Topic在Broker内部分为MessageQueue</li>
+</ul>
+</li>
+<li><p>MessageQueue</p>
+<ul>
+<li>轮询</li>
+<li>存储消息的索引</li>
+<li>增加消费的并行度</li>
+</ul>
+<img src="/2019/06/06/RocketMQ/1561719211228.png" title="This is an example image">
+
+</li>
+</ul>
+<h3 id="设计原理-消费"><a href="#设计原理-消费" class="headerlink" title="设计原理 - 消费"></a>设计原理 - 消费</h3><ul>
+<li>消费组ConsumerGroup<ul>
+<li>一群Consumer实例</li>
+<li>Consumer实例负载均衡</li>
+<li>Group之间消费进度独立</li>
+</ul>
+</li>
+<li>Rebalance过程<ul>
+<li>MessageQueue列表</li>
+<li>ClientID列表</li>
+</ul>
+</li>
+</ul>
+<p>相关接口：AllocateMessageQueueStrategy</p>
+<h3 id="设计原理-消费线程模型"><a href="#设计原理-消费线程模型" class="headerlink" title="设计原理 - 消费线程模型"></a>设计原理 - 消费线程模型</h3><p>单线程Pull，多线程Consume</p>
+<img src="/2019/06/06/RocketMQ/1561719985145.png" title="This is an example image">
+
+<h3 id="设计原理-消息ACK"><a href="#设计原理-消息ACK" class="headerlink" title="设计原理 - 消息ACK"></a>设计原理 - 消息ACK</h3><p>Consumer何时更新本地内存里的Offset？</p>
+<p>Listener处理有以下四种情况：</p>
+<ul>
+<li>返回CONSUME_SUSSESS<ul>
+<li>认为这批已经正常消费完毕，并更新进度。</li>
+</ul>
+</li>
+<li>返回RECONSUME_LATER<ul>
+<li>认为这批消息处理失败，会被送回Broker，并更新进度。</li>
+</ul>
+</li>
+<li>返回null<ul>
+<li>打印日志，状态置为RECONSUMER_LATER,后续同上</li>
+</ul>
+</li>
+<li>抛异常<ul>
+<li>打印日志，状态置为RECONSUME_LATER,后续同上</li>
+</ul>
+</li>
+<li>Hang主不反悔<ul>
+<li>Consume线程一直被Block</li>
+</ul>
+</li>
+</ul>
+<p>多线程并行消费（消息处理）时，如何保证消息ACK准确？</p>
+<img src="/2019/06/06/RocketMQ/1561720295748.png" title="This is an example image">
+
+<p>Consumer何时提交Offset到Broker？</p>
+<ul>
+<li>Consumer本地维护的Offset数据结构</li>
+</ul>
+<img src="/2019/06/06/RocketMQ/1561720411103.png" title="This is an example image">
+
+<ul>
+<li>Offset提交节点<ul>
+<li>周期性任务（默认5s）</li>
+<li>shutdown</li>
+<li>Rebalence发现Queue不再分配给自身时</li>
+</ul>
+</li>
+</ul>
+<p>消费组ACK - &gt; 消费组Offset提交行为</p>
+<p>Broker端通过管理消费组的Offset，来控制消费组的消费进度</p>
+<p>Broker端消费进度文件结构如下：</p>
+<img src="/2019/06/06/RocketMQ/1561720763037.png" title="This is an example image">
+
+<h3 id="设计原理-Broker-HA"><a href="#设计原理-Broker-HA" class="headerlink" title="设计原理 - Broker HA"></a>设计原理 - Broker HA</h3><p>Master/Slave模型</p>
+<ul>
+<li>Master和Master不同心</li>
+<li>Master向Slave写数据</li>
+<li>同步复制/异步复制</li>
+<li>Master宕机后Slave只读不写</li>
+<li>多Master保证生产不停</li>
+</ul>
+<img src="/2019/06/06/RocketMQ/1561720891179.png" title="This is an example image">
+
+<h3 id="其他特性"><a href="#其他特性" class="headerlink" title="其他特性"></a>其他特性</h3><ul>
+<li>延时消息<ul>
+<li>Producer在生产消息时，可以给Message设定一个DelayTimeLevel。设定后，消息只有到时间后才会被投递给消费者</li>
+<li>目前RocketMQ支持的DelayLevel为[1,18]</li>
+</ul>
+</li>
+<li>消息过滤<ul>
+<li>Producer构建Message时，指定消息的Tag</li>
+<li>Consumer订阅Topic时，设定感兴趣的Tag</li>
+</ul>
+</li>
+<li>消息查询<ul>
+<li>Producer构建Message时，指定唯一的Key</li>
+<li>消息内容、消费状态</li>
+</ul>
+</li>
+</ul>
+<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><p>RocketMQ会丢消息吗？消息会重复消费么？</p>
+<p>Broker丢消息的场景：</p>
+<ul>
+<li>消息还未消费，存放消息的磁盘发生不可逆损坏</li>
+<li>消息在系统PageCache内，且未被消费，服务器发生断电</li>
+</ul>
+<p>分别解决方案：</p>
+<ul>
+<li>启用同步复制 - &gt; Master和Slave磁盘同事发生不可逆损坏</li>
+<li>启用同步刷盘</li>
+</ul>
+<p>消息重复消费的场景：</p>
+<ul>
+<li>直接终止Consumer进程，消费进度未被提交到Broker时</li>
+<li>有Consumer重启，Group内发生Rebalance时，部分消息消费进度未提交时</li>
+<li>生产者发送了多次同一消息时</li>
+</ul>
+<p>待续……</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">消息队列</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/06/06/RocketMQ/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Docker和k8s" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -664,6 +991,695 @@
 
 
   
+    <article id="post-为什么分布式" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/06/为什么分布式/">为什么分布式</a>
+    </h1>
+  
+
+        
+        <a href="/2019/06/06/为什么分布式/" class="archive-article-date">
+  	<time datetime="2019-06-06T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="一、为什么分布式？"><a href="#一、为什么分布式？" class="headerlink" title="一、为什么分布式？"></a>一、为什么分布式？</h2><p>在之前的文章（<a href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247484335&idx=1&sn=a871bf871fcaffda0be40e1388a69d7d&chksm=ebd742aedca0cbb8e22138fa7488cb80ee09a5b5d7aa065679904005c609e92a0d9ad755a913&token=620000779&lang=zh_CN&scene=21#wechat_redirect" target="_blank" rel="noopener">外行人都能看懂的SpringCloud，错过了血亏！</a>）也提过为什么要分布式：</p>
+<ul>
+<li>模块之间独立，各做各的事，<strong>便于扩展，复用性高</strong></li>
+<li><strong>高吞吐量</strong>。某个任务需要一个机器运行10个小时，将该任务用10台机器的分布式跑(将这个任务拆分成10个小任务)，可能2个小时就跑完了</li>
+</ul>
+<p>在书上给出的观点：</p>
+<ul>
+<li>升级单机的处理能力的性价比越来越低，单机的处理能力存在瓶颈</li>
+<li>分布式系统<strong>更加稳定和可用</strong>（单机挂了就挂了，分布式挂了一般还有备用/不至于整个链路全挂）</li>
+</ul>
+<h2 id="二、大型网站架构演进过程"><a href="#二、大型网站架构演进过程" class="headerlink" title="二、大型网站架构演进过程"></a>二、大型网站架构演进过程</h2><p>其实在没接触过分布式之前，在逛论坛的时候，经常会出现一些<strong>看起来</strong>很牛逼的词，诸如”读写分离“、”分库分表“、”主从架构“、”负载均衡“、”单点故障“等等名词，就觉得很高大上。下面我就稍微顺着”大型网站架构演进过程“来讲解一下这些词</p>
+<p>在我们最开始接触Java项目的时候，一般来说是单机的（数据库、Web服务器都是同一台机器）</p>
+<img src="/2019/06/06/为什么分布式/单机架构.png" title="This is an example image">
+
+<p>网站对外开放以后，访问量增大，服务器的压力也随之提高。此时，我们最简单的做法就是可以将<strong>数据库和应用分开</strong>，这样可以缓解一下当前系统的压力</p>
+<img src="/2019/06/06/为什么分布式/数据库应用分开架构.png" title="This is an example image">
+
+<p>应用服务器的压力继续增大，我们可以把应用服务器做成集群（说白了，就是加了台机器）</p>
+<img src="/2019/06/06/为什么分布式/服务器集群架构.png" title="This is an example image">
+
+<p>加了台应用服务器以后，就出现<strong>新的</strong>问题了：</p>
+<ul>
+<li>用户请求的时候，走哪台服务器啊？</li>
+<li>Session是依赖单台服务器的，那Session怎么搞？</li>
+</ul>
+<img src="/2019/06/06/为什么分布式/集群session.png" title="This is an example image">
+
+<p>解决用户走哪台服务器，我们就在用户请求到达应用服务器之前，加了一个”负载均衡器“，这个”负载均衡器“说白了就写了<strong>用户请求会到哪台应用服务器的逻辑</strong></p>
+<ul>
+<li>比如说，一个用户请求过来，负载均衡器指派这个请求到服务器A。另一个用户请求过来，负载均衡器指派这个请求到服务器B。这样就<strong>平摊</strong>了请求— 这种方式就叫做<strong>轮询</strong></li>
+<li>…策略还有很多种，就看你想怎么实现了，反正这个逻辑的代码放在负载均衡器上。</li>
+</ul>
+<p>而Session的问题，我之前写<a href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247485230&idx=1&sn=7c32a09e4b4b72a3565bfa05ae899d92&chksm=ebd7462fdca0cf39c2282dfd02b3f9d4dc3984c3103645ab5b112755cd89e8ee577eb35062e6&token=1230572157&lang=zh_CN&scene=21#wechat_redirect" target="_blank" rel="noopener">什么是单点登录(SSO)</a>已经讲过了，一般来说我们可以将Session保存在Redis上就行了。</p>
+<img src="/2019/06/06/为什么分布式/sso.png" title="This is an example image">
+
+<p>随着业务的发展，我们的数据量和访问量都在增长，现在有不少的业务都是<strong>读多写少</strong>的，对于这种业务也是会直接反应到<strong>数据库</strong>上。</p>
+<p>于是，我们可以增加一个<strong>读库</strong>。写入的操作走服务器C的MySQL，读取的操作走服务器D的MySQL。这样就实现了<strong>读写分离</strong>。</p>
+<img src="/2019/06/06/为什么分布式/读写分离架构.png" title="This is an example image">
+
+<p>一般来说，我们的写库也叫做主库，读库也叫做从库，在互联网架构中，这叫做<strong>主从架构</strong>，比如常见的架构：<strong>一主多从</strong>（详细的参考资料：<a href="https://mp.weixin.qq.com/s/VF1_Ehat8GXkb9EqLUn6lg" target="_blank" rel="noopener">如何给老婆解释什么是 Master-Slave</a>）</p>
+<img src="/2019/06/06/为什么分布式/主从架构.png" title="This is an example image">
+
+<p>针对读多写少的业务，我们还有优化策略，引入<strong>搜索引擎和缓存</strong>。</p>
+<ul>
+<li>搜索引擎也相当于一个读库，使用搜索引擎的<strong>倒排表</strong>方式，能够大大提升检索的速度</li>
+<li>缓存则将<strong>热数据</strong>放入内存中，如果查询的数据在缓存中存在，则直接返回</li>
+</ul>
+<img src="/2019/06/06/为什么分布式/加搜索引擎和缓存架构.png" title="This is an example image">
+
+<p>搜索引擎和缓存的参考资料：</p>
+<ul>
+<li><a href="https://mp.weixin.qq.com/s/3Fmv7h5p2QDtLxc9n1dp5A" target="_blank" rel="noopener">Redis合集</a></li>
+<li><a href="https://mp.weixin.qq.com/s/PaVymD_93afWM5XVB3nGfA" target="_blank" rel="noopener">什么是Lucene</a></li>
+<li><a href="https://mp.weixin.qq.com/s/3IIRObB6BAIJnnGXhnPM3Q" target="_blank" rel="noopener">Elasticsearch入门</a></li>
+</ul>
+<p><strong>注</strong>：这里说的索引和缓存就未必特指ES和Redis，比如缓存我也可以用本地缓存而不一定是Redis的。这里用Redis和ES只是我画图方便。</p>
+<p>继读写分离之后，数据库还是遇到了瓶颈，此时我们就可以采用<strong>分库分表</strong>策略了：</p>
+<ul>
+<li>垂直拆分— 不同的业务数据分到不同的数据库</li>
+<li>水平拆分— 将同一张表的数据拆分到不同的数据库中（原因是这张表的数据量/更新量太大了）</li>
+</ul>
+<img src="/2019/06/06/为什么分布式/垂直拆分架构.png" title="This is an example image">
+
+<p>注：单表行数<strong>超过500万行或者单表容量超过2GB</strong>才推荐进行<strong>分库分表</strong>(如果预计三年都达不到这个数据量，不要在创建表的时候就分库分表!) —《阿里巴巴 Java开发手册》</p>
+<p>在数据存储方面，除了关系型数据库之外，如果有别的业务场景，可能还需要引入<strong>分布式存储系统</strong></p>
+<ul>
+<li>分布式文件系统</li>
+<li>分布式Key-Value系统</li>
+<li>分布式数据库</li>
+</ul>
+<hr>
+<p>数据库问题解决之后，应用也面临着挑战（应用的功能会越做越多，应用也随之越做越大），为了不让应用持续变大，这就需要<strong>把应用拆开</strong>，从一个应用变为两个/多个应用。</p>
+<img src="/2019/06/06/为什么分布式/服务拆分架构.png" title="This is an example image">
+
+<p>不同功能/模块之间的调用不再单纯通过本机调用，引入了<strong>远程的服务调用</strong>。</p>
+<p>某个应用只有一台机器上运行着，如果这台机器上出现了问题，导致这个应用无法运行，这就叫<strong>单点故障</strong>。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">分布式</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/06/06/为什么分布式/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-数据库读写分离" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/06/数据库读写分离/">数据库读写分离</a>
+    </h1>
+  
+
+        
+        <a href="/2019/06/06/数据库读写分离/" class="archive-article-date">
+  	<time datetime="2019-06-06T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="1、数据库读写分离"><a href="#1、数据库读写分离" class="headerlink" title="1、数据库读写分离"></a>1、数据库读写分离</h2><p>一般来说，写库有叫主库，读库也叫从库，即主从架构，比如常见的架构：一主多从。</p>
+<h3 id="1-1、主从"><a href="#1-1、主从" class="headerlink" title="1.1、主从"></a>1.1、主从</h3><img src="/2019/06/06/数据库读写分离/主从.png" title="This is an example image">
+
+<p>当数据写入Master时，需要把数据同步给Slave，即 <strong>主从复制</strong> 。</p>
+<p>主从复制期间，Slave的数据会和Master不一致，即 <strong>主从延迟</strong> 。</p>
+<p>由于主从延迟的存在，当Master宕机时，需要优先保证数据强一致性还是服务可用性，这就是 <strong>主从切换</strong> 时要考虑的问题了。</p>
+<h3 id="1-2、为什么要主从"><a href="#1-2、为什么要主从" class="headerlink" title="1.2、为什么要主从"></a>1.2、为什么要主从</h3><ul>
+<li>防止SPOF（single point of failure）</li>
+<li>读写分离</li>
+</ul>
+<h3 id="1-3、主从复制"><a href="#1-3、主从复制" class="headerlink" title="1.3、主从复制"></a>1.3、主从复制</h3><p>Master写入数据后，需要把数据同步给Slave。</p>
+<p>由于不同系统的功能不同，他们用于存储数据的数据结构也不同，所以，她们之间的复制方式也各有差异。</p>
+<p>如Redis，发的就是RDB或者AOF文件，而MySQL，则发的是bin log。bin log也三种格式：statement/row/mixed。</p>
+<p>MySQL用了三个线程，来实现这个过程，一个在Master，两个在Slave：</p>
+<ul>
+<li>Binlog dump thread：负责把bin log发给slave</li>
+<li>Slave I/O thread：负责接收master发过来的bin log，并把它暂时存在在一个叫relay log的日志文件</li>
+<li>Slave SQL thread：负责读取relay log，执行里面的内容。</li>
+</ul>
+<p>MySQL这样设计，有点像消息中间件处理消息的过程。</p>
+<h3 id="1-4、主从延迟"><a href="#1-4、主从延迟" class="headerlink" title="1.4、主从延迟"></a>1.4、主从延迟</h3><p>有主从的系统，都会有延迟，在Master写入后，Slave马上同步发生变化的事情，不存在的。</p>
+<p>原因：Slave机器性能、查询业务过多放于Slave、Slave执行时间长的事务。</p>
+<h3 id="1-5、主从切换"><a href="#1-5、主从切换" class="headerlink" title="1.5、主从切换"></a>1.5、主从切换</h3><img src="/2019/06/06/数据库读写分离/主从切换.png" title="This is an example image">
+
+<p>当Master宕机时，我们在一致性和可用性之间寻求优先级的纠结。</p>
+<p>也就是CAP理论，在P（分区容忍性）必须满足的情况下，到底是选择C（强一致性）还是A（可用性）。</p>
+<p>如果要保证强一致性，那么切换就有这几个步骤：</p>
+<ul>
+<li>把原来的Master，设置为read-only = true，这个时刻记为time1；</li>
+<li>等待Slave执行完Master发给它的bin log，直至Slave和Master一致，这个时刻记为time2；</li>
+<li>现在一致了，可以把slave设为read-only = false，即可写入</li>
+</ul>
+<p>在这个过程中，从time1到time2的时间，系统是无法被写入的，即不可用。</p>
+<p>这个不可用时间取决于切换的时，Slave和Master的延迟时间。</p>
+<p>保证强一致性就会牺牲可用性。如果想保证可用性那必须牺牲强一致性，必须在Slave和Master还没有完全同步时，就把Slave切换成Master。</p>
+<h3 id="1-6、何时分库分表"><a href="#1-6、何时分库分表" class="headerlink" title="1.6、何时分库分表"></a>1.6、何时分库分表</h3><p>MySQL单表数据不超过500行？</p>
+<p>这个数值和实际记录的条数无关，而与 MySQL 的配置以及机器的硬件有关。因为，MySQL 为了提高性能，会将表的索引装载到内存中。InnoDB buffer size 足够的情况下，其能完成全加载进内存，查询不会有问题。但是，当单表数据库到达某个量级的上限时，导致内存无法存储其索引，使得之后的 SQL 查询会产生磁盘 IO，从而导致性能下降。当然，这个还有具体的表结构的设计有关，最终导致的问题都是内存限制。这里，增加硬件配置，可能会带来立竿见影的性能提升哈。</p>
+<p>我对于分库分表的观点是，需要结合实际需求，不宜过度设计，在项目一开始不采用分库与分表设计，而是随着业务的增长，在无法继续优化的情况下，再考虑分库与分表提高系统的性能。对此，阿里巴巴《Java 开发手册》补充到：如果预计三年后的数据量根本达不到这个级别，请不要在创建表时就分库分表。那么，回到一开始的问题，你觉得这个数值多少才合适呢？我的建议是，根据自身的机器的情况综合评估，如果心里没有标准，那么暂时以 500 万行作为一个统一的标准，相对而言算是一个比较折中的数值。</p>
+<h2 id="2、分布式数据库中间件"><a href="#2、分布式数据库中间件" class="headerlink" title="2、分布式数据库中间件"></a>2、分布式数据库中间件</h2><h3 id="2-1、MyCat"><a href="#2-1、MyCat" class="headerlink" title="2.1、MyCat"></a>2.1、MyCat</h3><p>MyCat 是一个开源的分布式数据库中间件，它实现了 MySQL 协议，在开发者眼里，他就是一个数据库代理，我们甚至可以使用 MySQL 的客户端工具以及命令行来访问 MyCat。</p>
+<p>MyCat 现在已经不仅仅只支持 MySQL 了，同时也支持 MSSQL、Oracle、DB2、以及 PostgreSQL等主流数据库。甚至像 MongoDB 这种 NoSQL 也支持。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/06/06/数据库读写分离/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-JavaSPI机制的优点与缺点" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/06/JavaSPI机制的优点与缺点/">JavaSPI机制的优点与缺点</a>
+    </h1>
+  
+
+        
+        <a href="/2019/06/06/JavaSPI机制的优点与缺点/" class="archive-article-date">
+  	<time datetime="2019-06-06T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-SPI是什么"><a href="#1-SPI是什么" class="headerlink" title="1 SPI是什么"></a>1 SPI是什么</h1><p>SPI全称Service Provider Interface，是Java提供的一套用来被第三方实现或者扩展的API，它可以用来启用框架扩展和替换组件。</p>
+<p>整体机制图如下： </p>
+<img src="/2019/06/06/JavaSPI机制的优点与缺点/spi机制.png" title="This is an example image">
+
+<p>Java SPI 实际上是“<strong>基于接口的编程＋策略模式＋配置文件</strong>”组合实现的动态加载机制。</p>
+<p>系统设计的各个抽象，往往有很多不同的实现方案，在面向的对象的设计里，一般推荐模块之间基于接口编程，模块之间不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可拔插的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候能不在程序里动态指明，这就需要一种服务发现机制。 Java SPI就是提供这样的一个机制：为某个接口寻找服务实现的机制。有点类似IOC的思想，就是将装配的控制权移到程序之外，在模块化设计中这个机制尤其重要。所以SPI的核心思想就是<strong>解耦</strong>。</p>
+<h1 id="2-使用场景"><a href="#2-使用场景" class="headerlink" title="2 使用场景"></a>2 使用场景</h1><p>概括地说，适用于：<strong>调用者根据实际使用需要，启用、扩展、或者替换框架的实现策略</strong></p>
+<p>比较常见的例子：</p>
+<ul>
+<li>数据库驱动加载接口实现类的加载 JDBC加载不同类型数据库的驱动</li>
+<li>日志门面接口实现类加载 SLF4J加载不同提供商的日志实现类</li>
+<li>Spring Spring中大量使用了SPI,比如：对servlet3.0规范对ServletContainerInitializer的实现、自动类型转换Type Conversion SPI(Converter SPI、Formatter SPI)等</li>
+<li>Dubbo Dubbo中也大量使用SPI的方式实现框架的扩展, 不过它对Java提供的原生SPI做了封装，允许用户扩展实现Filter接口</li>
+</ul>
+<h1 id="3-使用介绍"><a href="#3-使用介绍" class="headerlink" title="3 使用介绍"></a>3 使用介绍</h1><p>要使用Java SPI，需要遵循如下约定：</p>
+<ul>
+<li>1、当服务提供者提供了接口的一种具体实现后，在jar包的META-INF/services目录下创建一个以“接口全限定名”为命名的文件，内容为实现类的全限定名；</li>
+<li>2、接口实现类所在的jar包放在主程序的classpath中；</li>
+<li>3、主程序通过java.util.ServiceLoder动态装载实现模块，它通过扫描META-INF/services目录下的配置文件找到实现类的全限定名，把类加载到JVM；</li>
+<li>4、SPI的实现类必须携带一个不带参数的构造方法；</li>
+</ul>
+<h2 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h2><p><strong>步骤1</strong>、定义一组接口 (假设是org.foo.demo.IShout)，并写出接口的一个或多个实现，(假设是org.foo.demo.animal.Dog、org.foo.demo.animal.Cat)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="keyword">implements</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"miao miao"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> <span class="keyword">implements</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"wang wang"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤2</strong>、在 src/main/resources/ 下建立 /META-INF/services 目录， 新增一个以接口命名的文件 (org.foo.demo.IShout文件)，内容是要应用的实现类（这里是org.foo.demo.animal.Dog和org.foo.demo.animal.Cat，每行一个类）。</p>
+<p>文件位置</p>
+<figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-<span class="ruby"> src</span></span><br><span class="line"><span class="ruby">    -main</span></span><br><span class="line"><span class="ruby">        -resources</span></span><br><span class="line"><span class="ruby">            - META-INF</span></span><br><span class="line"><span class="ruby">                - services</span></span><br><span class="line"><span class="ruby">                    - org.foo.demo.IShout</span></span><br><span class="line"><span class="ruby">复制代码</span></span><br></pre></td></tr></table></figure>
+
+<p>文件内容</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">org<span class="selector-class">.foo</span><span class="selector-class">.demo</span><span class="selector-class">.animal</span><span class="selector-class">.Dog</span></span><br><span class="line">org<span class="selector-class">.foo</span><span class="selector-class">.demo</span><span class="selector-class">.animal</span><span class="selector-class">.Cat</span></span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤3</strong>、使用 ServiceLoader 来加载配置文件中指定的实现。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SPIMain</span> &#123;</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] args) &#123;</span><br><span class="line">        ServiceLoader&lt;IShout&gt; shouts = ServiceLoader.load(IShout.<span class="keyword">class</span>);</span><br><span class="line">        <span class="keyword">for</span> (IShout <span class="string">s :</span> shouts) &#123;</span><br><span class="line">            s.shout();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>代码输出：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">wang</span> wang</span><br><span class="line"><span class="keyword">miao </span><span class="keyword">miao</span></span><br><span class="line"><span class="keyword">复制代码</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="4-原理解析"><a href="#4-原理解析" class="headerlink" title="4 原理解析"></a>4 原理解析</h1><p>首先看ServiceLoader类的签名类的成员变量：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceLoader</span>&lt;<span class="title">S</span>&gt; <span class="keyword">implements</span> <span class="title">Iterable</span>&lt;<span class="title">S</span>&gt;</span>&#123;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PREFIX = <span class="string">"META-INF/services/"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 代表被加载的类或者接口</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;S&gt; service;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用于定位，加载和实例化providers的类加载器</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ClassLoader loader;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建ServiceLoader时采用的访问控制上下文</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AccessControlContext acc;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 缓存providers，按实例化的顺序排列</span></span><br><span class="line">    <span class="keyword">private</span> LinkedHashMap&lt;String,S&gt; providers = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 懒查找迭代器</span></span><br><span class="line">    <span class="keyword">private</span> LazyIterator lookupIterator;</span><br><span class="line">  </span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>参考具体ServiceLoader具体源码，代码量不多，加上注释一共587行，梳理了一下，实现的流程如下：</p>
+<ul>
+<li>1 应用程序调用ServiceLoader.load方法 ServiceLoader.load方法内先创建一个新的ServiceLoader，并实例化该类中的成员变量，包括：<ul>
+<li>loader(ClassLoader类型，类加载器)</li>
+<li>acc(AccessControlContext类型，访问控制器)</li>
+<li>providers(LinkedHashMap&lt;String,S&gt;类型，用于缓存加载成功的类)</li>
+<li>lookupIterator(实现迭代器功能)</li>
+</ul>
+</li>
+<li>2 应用程序通过迭代器接口获取对象实例 ServiceLoader先判断成员变量providers对象中(LinkedHashMap&lt;String,S&gt;类型)是否有缓存实例对象，如果有缓存，直接返回。 如果没有缓存，执行类的装载，实现如下：</li>
+<li>(1) 读取META-INF/services/下的配置文件，获得所有能被实例化的类的名称，值得注意的是，ServiceLoader<strong>可以跨越jar包获取META-INF下的配置文件</strong>，具体加载配置的实现代码如下：</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">        try &#123;</span><br><span class="line">            String fullName =<span class="built_in"> PREFIX </span>+ service.getName();</span><br><span class="line">            <span class="keyword">if</span> (loader == <span class="literal">null</span>)</span><br><span class="line">                configs = ClassLoader.getSystemResources(fullName);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                configs = loader.getResources(fullName);</span><br><span class="line">        &#125; catch (IOException x) &#123;</span><br><span class="line">            fail(service, <span class="string">"Error locating configuration files"</span>, x);</span><br><span class="line">        &#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>(2) 通过反射方法Class.forName()加载类对象，并用instance()方法将类实例化。</li>
+<li>(3) 把实例化后的类缓存到providers对象中，(LinkedHashMap&lt;String,S&gt;类型） 然后返回实例对象。</li>
+</ul>
+<h1 id="5-总结"><a href="#5-总结" class="headerlink" title="5 总结"></a>5 总结</h1><p><strong>优点</strong>： 使用Java SPI机制的优势是实现解耦，使得第三方服务模块的装配控制的逻辑与调用者的业务代码分离，而不是耦合在一起。应用程序可以根据实际业务情况启用框架扩展或替换框架组件。</p>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>虽然ServiceLoader也算是使用的延迟加载，但是基本只能通过遍历全部获取，也就是接口的实现类全部加载并实例化一遍。如果你并不想用某些实现类，它也被加载并实例化了，这就造成了浪费。获取某个实现类的方式不够灵活，只能通过Iterator形式获取，不能根据某个参数来获取对应的实现类。</li>
+<li>多个并发多线程使用ServiceLoader类的实例是不安全的。</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">SPI</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/06/06/JavaSPI机制的优点与缺点/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-消息队列常见问题示例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/06/消息队列常见问题示例/">消息队列常见问题示例</a>
+    </h1>
+  
+
+        
+        <a href="/2019/06/06/消息队列常见问题示例/" class="archive-article-date">
+  	<time datetime="2019-06-06T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="一、如何解决消息队列数据丢失问题？"><a href="#一、如何解决消息队列数据丢失问题？" class="headerlink" title="一、如何解决消息队列数据丢失问题？"></a>一、如何解决消息队列数据丢失问题？</h2><p>面试官心理剖析：<br>生产上肯定会出现数据丢失问题，面试官主要是想看看你是否了解？有没有做过相应的措施来解决这个问题？如果你不知道有这个问题，那么你生产环境可能存在数据丢失问题。如果你的MQ用在核心场景下，如订单，扣费等，那么数据是万万不能丢的。</p>
+<p>回答：</p>
+<h3 id="为什么会出现数据丢失？"><a href="#为什么会出现数据丢失？" class="headerlink" title="为什么会出现数据丢失？"></a>为什么会出现数据丢失？</h3><p>分析：</p>
+<img src="/2019/06/06/消息队列常见问题示例/mq消息丢失问题.png" title="This is an example image">
+
+<p>丢数据一般会有3种情况：<br>1）生产者往MQ写数据丢失了<br>可能因为网络原因数据传输丢失。<br>2）MQ本身数据丢失了<br>数据放在内存中，MQ机器宕机了，那么内存中的数据丢失了。<br>3）消费者消费的时候丢失了<br>消费者接受到消息，马上给MQ返回已经接受到消息的回复，消费者接着处理逻辑，在处理过程中，消费者宕机了；下次重启的时候消费者会获取到下一条数据消费，这样数据就丢失了。</p>
+<p>问题解决：</p>
+<h3 id="1、解决rabbitmq生产者丢数据"><a href="#1、解决rabbitmq生产者丢数据" class="headerlink" title="1、解决rabbitmq生产者丢数据"></a>1、解决rabbitmq生产者丢数据</h3><p>1）事务机制<br>在生产者发送消息的时候，加上事务，以下是伪代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">channel.txSelect</span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="comment">//发送消息 如果MQ接收失败会抛异常，那么对事务进行回滚</span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">channel.txRollback</span><br><span class="line">&#125;</span><br><span class="line">channel.txCommit</span><br></pre></td></tr></table></figure>
+
+<p>改方案完全保证发送消息时成功的，但是缺点是：使用了事务之后，消息变成同步了，影响吞吐量。比较耗性能。</p>
+<p>2）confirm模式<br>在生产者开启confirm模式，每个消息分配唯一id；生产者发送完消息之后就不用管了，rabbitmq如果成功接收到消息，那么会调用生产者的ack(String messageId)方法；rabbitmq如果接收失败，那么会调用生产者nack(String messageId)方法，生产者根据情况判断是否要重试；</p>
+<p>小结：一般情况下，使用confirm模式，性能、吞吐量都要比事务机制高。confirm是异步的，不会阻塞。</p>
+<h3 id="2、解决rabbitmq弄丢了数据"><a href="#2、解决rabbitmq弄丢了数据" class="headerlink" title="2、解决rabbitmq弄丢了数据"></a>2、解决rabbitmq弄丢了数据</h3><p>就是开启持久化，把内存中的数据刷到磁盘中。如果在写入磁盘的时候挂了，这样的话还是会有数据丢失，但是概率很小，你可以等数据持久化到磁盘，在通知生产者ack方法，如果没有持久化成功，生产者长时间没收到消息可以尝试在重试一次。</p>
+<h3 id="3、解决rabbitmq消费端弄丢了数据"><a href="#3、解决rabbitmq消费端弄丢了数据" class="headerlink" title="3、解决rabbitmq消费端弄丢了数据"></a>3、解决rabbitmq消费端弄丢了数据</h3><p>在消费端这边，需要关闭autoAck，等自己处理完之后在发送ack给MQ。</p>
+<p>其他的MQ，无外乎也都是这些原因，只要在各自端进行一些配置就可以解决数据丢失问题。</p>
+<h2 id="二、在消息队列里面有一批数据需要顺序执行，如何来保证？"><a href="#二、在消息队列里面有一批数据需要顺序执行，如何来保证？" class="headerlink" title="二、在消息队列里面有一批数据需要顺序执行，如何来保证？"></a>二、在消息队列里面有一批数据需要顺序执行，如何来保证？</h2><p>面试官心理剖析：<br>主要看你有没有思考过这个问题？这个是常见的问题，看你有没有解决思路？</p>
+<p>回答：<br>这里讲讲几个MQ是如何来保证消息的顺序性的。</p>
+<h3 id="1、rabbitMq"><a href="#1、rabbitMq" class="headerlink" title="1、rabbitMq"></a>1、rabbitMq</h3><ul>
+<li>问题分析：</li>
+<li><img src="/2019/06/06/消息队列常见问题示例/rabbitmq消息顺序.png" title="This is an example image">
+如图，data1和data2是有顺序的，必须data1先执行，data2后执行；这两个数据被不同的消费者消费到了，可能data2先执行，data1后执行，这样原来的顺序就错乱了。</li>
+<li>解决方案：</li>
+<li><img src="/2019/06/06/消息队列常见问题示例/rabbitmq消息顺序问题解决.png" title="This is an example image">
+如图，在MQ里面创建多个queue，同一规则的数据（对唯一标识进行hash），有顺序的放入MQ的queue里面，消费者只取一个queue里面获取数据消费，这样执行的顺序是有序的。或者还是只有一个queue但是对应一个消费者，然后这个消费者内部用内存队列做排队，然后分发给底层不同的worker来处理。</li>
+</ul>
+<h3 id="2、kafka"><a href="#2、kafka" class="headerlink" title="2、kafka"></a>2、kafka</h3><p>问题分析：</p>
+<img src="/2019/06/06/消息队列常见问题示例/kafka正常流程.png" title="This is an example image">
+<p>如图，在kafka中，你对数据指定某个key，那么这些数据会到同一个partition里面，在partition里面这些数据是有顺序的。从这里看没啥问题，插入到数据库的数据都是有序的。</p>
+<p>但是，我们在消费端可能会使用多线程来处理，因为单线程的处理速度慢，为了加快处理时间和吞吐量，会使用thread来处理。在消费端加入线程之后，就会出现顺序不一致的情况。</p>
+<img src="/2019/06/06/消息队列常见问题示例/kafka顺序不一致情况.png" title="This is an example image">
+<p>如图，就是使用了多线程之后，数据顺序不一致情况。</p>
+<p>在使用了多线程之后，如何来解决数据顺序问题？</p>
+<img src="/2019/06/06/消息队列常见问题示例/kafaka顺序问题解决.png" title="This is an example image">
+<p>如图，在消费端使用内存队列，队列里的数据使用hash进行分发，每个线程对应一个队列，这样可以保证数据的顺序。</p>
+<h3 id="3、rocketMq"><a href="#3、rocketMq" class="headerlink" title="3、rocketMq"></a>3、rocketMq</h3><img src="/2019/06/06/消息队列常见问题示例/rocketmq消息书匈奴.png" title="This is an example image">
+
+<p>如图，生产者中把orderId进行取模，把相同模的数据放到messagequeue里面，消费者消费同一个messagequeue，只要消费者这边有序消费，那么可以保证数据被顺序消费。</p>
+<h3 id="4、activeMq"><a href="#4、activeMq" class="headerlink" title="4、activeMq"></a>4、activeMq</h3><img src="/2019/06/06/消息队列常见问题示例/activemq消息顺序.png" title="This is an example image">
+<p>如图，activeMq里面有messageGroups属性，可以指定JMSXGroupID，消费者会消费指定的JMSXGroupID。即保证了顺序性，又解决负载均衡的问题。</p>
+<h2 id="三、如何保证消息队列的幂等性？"><a href="#三、如何保证消息队列的幂等性？" class="headerlink" title="三、如何保证消息队列的幂等性？"></a>三、如何保证消息队列的幂等性？</h2><p>面试官心理剖析：<br>主要是看你对消息队列数据重复消费的问题，是否有了解，是否知道怎么解决？如果这块不知道，那么面试官会觉得如果交给你做功能，可能会出现多次消费的情况。</p>
+<p>回答：</p>
+<p>为什么会出现重复消费？<br>分析：</p>
+<img src="/2019/06/06/消息队列常见问题示例/kafaka重复消费场景.png" title="This is an example image">
+<p>如图，在什么场景会出现消息重复消费？比如说消费端已经消费了offset=2，offset=3，offset=4的三条数据，正准备把这个offset的值传给kafka，这时候消费端机器宕机了，这个数据没传过去；重启之后，消费端同步kafka，kafka那边消费的记录offset还是1，那么kafka会认为之前的2、3、4都没有消费过，会把这几个数据在传给消费端；这样消费端这边就重复对这几条数据进行消费了。在数据库里面可能就多了很多重复的数据。<br>像其他的MQ，也是一样，消费端再返回给MQ的时候，当机了或者重启了，那么都会出现重复消费的问题。</p>
+<p>问题解决：</p>
+<h3 id="幂等性：一个请求，不管重复来多少次，结果是不会改变的。"><a href="#幂等性：一个请求，不管重复来多少次，结果是不会改变的。" class="headerlink" title="幂等性：一个请求，不管重复来多少次，结果是不会改变的。"></a>幂等性：一个请求，不管重复来多少次，结果是不会改变的。</h3><p>每个消息都会有唯一的消息id。</p>
+<h4 id="1、先查再保存"><a href="#1、先查再保存" class="headerlink" title="1、先查再保存"></a>1、先查再保存</h4><p>每次保存数据的时候，都先查一下，如果数据存在了那么就不保存。这个情况是并发不高的情况。</p>
+<h4 id="2、业务表添加约束条件"><a href="#2、业务表添加约束条件" class="headerlink" title="2、业务表添加约束条件"></a>2、业务表添加约束条件</h4><p>如果你的数据库将来都不会分库分表，那么可以在业务表字段加上唯一约束条件（UNIQUE），这样相同的数据就不会保存为多份。</p>
+<h4 id="3、添加消息表"><a href="#3、添加消息表" class="headerlink" title="3、添加消息表"></a>3、添加消息表</h4><p>再数据库里面，添加一张消息消费记录表，表字段加上唯一约束条件（UNIQUE），消费完之后就往表里插入一条数据。因为加了唯一约束条件，第二次保存的时候，mysql就会报错，就插入不进去；通过数据库可以限制重复消费。</p>
+<h4 id="4、redis"><a href="#4、redis" class="headerlink" title="4、redis"></a>4、redis</h4><p>如果你的系统是分布式的，又做了分库分表，那么可以使用redis来做记录，把消息id存在redis里，下次再有重复消息id在消费的时候，如果发现redis里面有了就不能进行消费。</p>
+<h4 id="5、高并发"><a href="#5、高并发" class="headerlink" title="5、高并发"></a>5、高并发</h4><p>如果你的系统并发很高，那么可以使用redis或者zookeeper的分布式对消息id加锁，然后使用上面的几个方法进行幂等性控制。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">消息队列</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/06/06/消息队列常见问题示例/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-MongoDB" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/06/06/MongoDB/">MongoDB</a>
+    </h1>
+  
+
+        
+        <a href="/2019/06/06/MongoDB/" class="archive-article-date">
+  	<time datetime="2019-06-06T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-06</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="MongoDB索引"><a href="#MongoDB索引" class="headerlink" title="MongoDB索引"></a>MongoDB索引</h3><p>索引能够极大的提高查询的效率，如果没有索引，MongoDB在读取数据时必须扫描集合中的每个文件并选取那些符合查询条件的记录。这种扫描全集合的查询效率是非常低的，特别是处理大量的数据时，查询可以要胡斐几十秒甚至几分钟，这对网站的性能是非常致命的。</p>
+<p>索引是特殊的数据结构，索引存储在一个易于遍历读取的数据集合中，索引是对数据库表中一列或多列的值进行排序的一种结构。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db<span class="selector-class">.collection</span><span class="selector-class">.createIndex</span>(keys, options)</span><br></pre></td></tr></table></figure>
+
+<p>语法中 Key 值为你要创建的索引字段，1 为指定按升序创建索引，如果你想按降序来创建索引指定为 -1 即可。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db<span class="selector-class">.col</span><span class="selector-class">.createIndex</span>(&#123;<span class="string">"title"</span>:<span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<h3 id="MongoDB聚合"><a href="#MongoDB聚合" class="headerlink" title="MongoDB聚合"></a>MongoDB聚合</h3><p>用于处理数据（统计平均值，求和等），并返回计算后的结果，类似sql中的count(*)等聚合函数。</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db<span class="selector-class">.COLLECTION_NAME</span><span class="selector-class">.aggregate</span>(AGGREGATE_OPERATION)</span><br></pre></td></tr></table></figure>
+
+<h4 id="管道的概念"><a href="#管道的概念" class="headerlink" title="管道的概念"></a>管道的概念</h4><p>MongoDB的聚合管道将MongoDB文档在一个管道处理完毕后将结果传递给下一个管道处理。管道操作是可以重复的。</p>
+<p>表达式：处理输入文档并输出。表达式是无状态的，只能用于计算当前聚合管道的文档，不能处理其它的文档。</p>
+<p>这里我们介绍一下聚合框架中常用的几个操作：</p>
+<ul>
+<li>$project：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。</li>
+<li>$match：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。</li>
+<li>$limit：用来限制MongoDB聚合管道返回的文档数。</li>
+<li>$skip：在聚合管道中跳过指定数量的文档，并返回余下的文档。</li>
+<li>$unwind：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。</li>
+<li>$group：将集合中的文档分组，可用于统计结果。</li>
+<li>$sort：将输入文档排序后输出。</li>
+<li>$geoNear：输出接近某一地理位置的有序文档。</li>
+</ul>
+<h3 id="MongoDB复制"><a href="#MongoDB复制" class="headerlink" title="MongoDB复制"></a>MongoDB复制</h3><p>MongoDB复制是将数据同步在多个服务器的过程。</p>
+<p>复制提供了数据的冗余备份，并在多个服务器上存储数据副本，提高了数据的可用性，并可以保证数据的安全性。</p>
+<p>复制还运行从硬件故障和服务终端中恢复数据</p>
+<h4 id="什么是复制"><a href="#什么是复制" class="headerlink" title="什么是复制"></a>什么是复制</h4><ul>
+<li>保障数据的安全性</li>
+<li>数据高可用性</li>
+<li>灾难恢复</li>
+<li>无需停机维护</li>
+<li>分布式读取数据</li>
+</ul>
+<h4 id="MongoDB复制原理"><a href="#MongoDB复制原理" class="headerlink" title="MongoDB复制原理"></a>MongoDB复制原理</h4><p>MongoDB的复制至少需要俩个节点。其中一个是主节点，负责处理客户端请求，其余的都是从节点，负责复制主节点上的数据。</p>
+<p>MongoDB各个节点常见的搭配方式为：一主一从、一主多从。</p>
+<p>主节点记录在其上的所有操作oplog，从节点定期轮询主节点获取这些操作，然后读自己的数据副本指向这些操作，从而保证从节点的数据与主节点一直。</p>
+<p>MongoDB的复制结构图：</p>
+<img src="/2019/06/06/MongoDB/1561449599163.png" title="This is an example image">
+
+<p>从上结构图可以看出，客户端从主节点读取数据，在客户端写入数据到主节点时，主节点与从节点进行数据交互保障数据的一致性。</p>
+<p>副本集特征：</p>
+<ul>
+<li>N个节点的集群</li>
+<li>任何节点可作为主节点</li>
+<li>所有写入操作都在主节点上</li>
+<li>自动故障转移</li>
+<li>自动恢复</li>
+</ul>
+<h3 id="MongoDB分片"><a href="#MongoDB分片" class="headerlink" title="MongoDB分片"></a>MongoDB分片</h3><h4 id="分片"><a href="#分片" class="headerlink" title="分片"></a>分片</h4><p>在MongoDB中存在另外一种集群，就是分片技术，可以满足MongoDB数据量大量增长的需求。</p>
+<p>当MongoDB存储海量的数据时，一台机器可能不足以存储数据，也可能不足以提供可接受的读写吞吐量。这时，我们就可以通过在多台机器上分割数据，使得数据库系统能存储和处理更多的数据。</p>
+<h4 id="为什么分片"><a href="#为什么分片" class="headerlink" title="为什么分片"></a>为什么分片</h4><ul>
+<li>复制所有的写入操作到主节点</li>
+<li>延迟的敏感数据会在主节点查询</li>
+<li>单个副本集限制在12个节点</li>
+<li>当请求量巨大时会出现内存不足。</li>
+<li>本地磁盘不足</li>
+<li>垂直扩展价格昂贵</li>
+</ul>
+<h4 id="MongoDB分片-1"><a href="#MongoDB分片-1" class="headerlink" title="MongoDB分片"></a>MongoDB分片</h4><p>下图为MongoDB中使用分片集群结构分布：</p>
+<img src="/2019/06/06/MongoDB/1561450415384.png" title="This is an example image">
+
+<p>三个组件：</p>
+<ul>
+<li>Shard：用于存储实际的数据库，实际生产环境中一个shard server角色可由几台机器组成一个replica set承担，防止主机单点故障</li>
+<li>Config Server：mongodb实例，存储了整个ClusterMetadata，其中包括chunk信息。</li>
+<li>Query Routers：前端路由，客户端由此接入，且让整个集群看上去像单一数据库，前端应用可以透明使用。</li>
+</ul>
+<p>实例：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Shard<span class="built_in"> Server </span>1：27020</span><br><span class="line">Shard<span class="built_in"> Server </span>2：27021</span><br><span class="line">Shard<span class="built_in"> Server </span>3：27022</span><br><span class="line">Shard<span class="built_in"> Server </span>4：27023</span><br><span class="line">Config<span class="built_in"> Server </span>：27100</span><br><span class="line">Route Process：40000</span><br></pre></td></tr></table></figure>
+
+<p>步骤一：启动Shard Server</p>
+<p>步骤二：启动Config Server</p>
+<p>步骤三：启动Route Process</p>
+<p>步骤四：配置Sharding（添加Shard节点）</p>
+<p>步骤五：按照连接普通的mongo数据库一样，接入接口40000</p>
+<h3 id="MongoDB备份"><a href="#MongoDB备份" class="headerlink" title="MongoDB备份"></a>MongoDB备份</h3><p>在Mongodb中我们使用mongodump命令来备份MongoDB数据。该命令可以导出所有数据到指定目录中。</p>
+<p>mongodump命令可以通过参数指定导出的数据量级转存的服务器。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash">mongodump -h dbhost -d dbname -o dbdirectory</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="MongoDB数据恢复"><a href="#MongoDB数据恢复" class="headerlink" title="MongoDB数据恢复"></a>MongoDB数据恢复</h3><p>mongodb使用 mongorestore 命令来恢复备份的数据。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;mongorestore -h <span class="tag">&lt;<span class="name">hostname</span>&gt;</span><span class="tag">&lt;<span class="name">:port</span>&gt;</span> -d dbname <span class="tag">&lt;<span class="name">path</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>MongoDB监控</p>
+<p>MongoDB中提供了mongostat 和 mongotop 两个命令来监控MongoDB的运行情况。</p>
+<h4 id="mongostat-命令"><a href="#mongostat-命令" class="headerlink" title="mongostat 命令"></a>mongostat 命令</h4><p>mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。</p>
+<p>启动你的Mongod服务，进入到你安装的MongoDB目录下的bin目录， 然后输入mongostat命令。</p>
+<h4 id="mongotop-命令"><a href="#mongotop-命令" class="headerlink" title="mongotop 命令"></a>mongotop 命令</h4><p>mongotop也是mongodb下的一个内置工具，mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看哪些大量的时间花费在读取和写入数据。 mongotop提供每个集合的水平的统计数据。默认情况下，mongotop返回值的每一秒。</p>
+<p>启动你的Mongod服务，进入到你安装的MongoDB目录下的bin目录， 然后输入mongotop命令。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/06/06/MongoDB/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    </nav>
   
 
 
@@ -761,11 +1777,43 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">SPI</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">数据库</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">消息队列</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">分布式</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JVM</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">事件总线</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Java8</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Zookeeper</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">feed</a>
               </li>
             
             <div class="clearfix"></div>
