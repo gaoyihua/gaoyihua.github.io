@@ -155,6 +155,951 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-文件和目录管理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/19/文件和目录管理/">文件和目录管理</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/19/文件和目录管理/" class="archive-article-date">
+  	<time datetime="2019-07-19T14:57:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="文件及目录管理"><a href="#文件及目录管理" class="headerlink" title="文件及目录管理"></a>文件及目录管理</h1><p>Linux系统中一切皆文件，不仅程序和数据是以文件的形式保存的，目录和各种设备也都被当作文件来使用。</p>
+<p>系统IO接口提供了不带缓冲区的IO操作，而标准io接口提供了带缓冲区的io操作。</p>
+<h2 id="1、文件和I-O操作分类"><a href="#1、文件和I-O操作分类" class="headerlink" title="1、文件和I/O操作分类"></a>1、文件和I/O操作分类</h2><h3 id="1-1、文件概念"><a href="#1-1、文件概念" class="headerlink" title="1.1、文件概念"></a>1.1、文件概念</h3><p>大多数应用中，文件是一个核心成分，除了实时应用和一些特殊的应用外，应用程序的输入都是通过文件来实现的。实际上所有应用程序的输出都保存在文件中，这便于信息的长期存储以及用户或应用程序将来的访问。</p>
+<p>文件可认为是具有标识符的一组相关联信息项的有序集合，一般体现在磁盘上的文件。</p>
+<p>对于文件的管理，</p>
+<p>从Linux内核的角度来看，处理文件的部分是文件系统，linux内核通过文件系统对文件存储空间进行组织和分配，负责文件存储并对存入的文件进行保护和检索。</p>
+<p>具体来说，文件系统负责为用户建立文件，存入、读出、修改、转储文件、控制文件的存取，当用户不再使用时候撤销文件等。</p>
+<p>从 用户的角度来看，文件的管理是通过Linux操作系统提供的一系列接口完成的，比如系统IO、标准IO、字符命令和图形接口来完成文件的管理</p>
+<h3 id="1-2、文件操作分类"><a href="#1-2、文件操作分类" class="headerlink" title="1.2、文件操作分类"></a>1.2、文件操作分类</h3><p>对文件的访问分不带缓冲区的文件操作和带缓冲区的文件操作</p>
+<p>1、不带缓冲区的文件操作：属于低级文件操作，需要用户自己在自己的程序中为每个文件设置缓冲区。遵循POSIX标准的系统IO使用的就是这个，系统IO接口也称为IO系统调用，如open、read、write和lseek等。</p>
+<p>2、带缓冲区的文件操作：属于高级文件操作，系统将在用户空间中自动为正在使用的文件开辟内存缓冲区。数据在从文件读到程序数据区和从程序数据区输出到文件过程中，将会经过一个系统管理的输入或者输出缓冲区进行缓冲。遵循ANSI标准的IO操作使用的就是缓冲区的文件操作，标准IO接口也称为IO库函数，如fopen、fread、fwrite、flush和fseek</p>
+<p>调用系统调用会陷入Linux内核，而调用库函数不会陷入Linux内核。</p>
+<p>如果<strong><em>采用非缓冲区</em></strong>的文件访问方式，每次在对文件进行任何一次读写操作，分别使用读文件的系统调用read来处理读操作，或使用写文件的系统调用write来处理写操作。</p>
+<p>如果用户程序需要访问磁盘空间中的某个文件，read或者write是以一个数据单元为单位进行读写操作，因此，一个文件的读写操作可能需要多次调用read或write系统调用完成。</p>
+<p>一个文件长度可能被分成多个数据单元，每访问一个数据单元都需要执行一次系统调用，执行系统调用会有一次用户态到内核态的切换，系统调用完后还会有内核态到用户态的转换，这俩次态式转换将要涉及CPU状态的切换、用户态进程和系统进程的上下文转换，这将消耗一定的CPU时间。对磁盘读写操作是一个机械运动，相对CPU处理速度来说，是一个缓慢的过程，频繁的磁盘访问对程序执行效率会造成较大的影响。</p>
+<p>故 通过多次调用read或者write系统调用完成大文件数据的读写，从效率讲是比较低效的。</p>
+<p>如果<strong><em>采用带缓冲区</em></strong>的的文件访问方式，ANSI标准IO库函数建立在底层系统调用上，在对文件函数库的实现中使用了低级文件IO系统调用。为了减少使用系统调用的次数以及提高效率。对磁盘文件进行读写操作时，可以一次性地从文件中读取大量的数据到缓冲区中。以后对这部分数据的访问就不需要再使用系统调用了，因为数据可以直接从输入文件缓冲区或者输出文件缓冲区中获得，即整个读写操作只需要少量的CPU状态的切换和磁盘的读写机械访问次数。在对磁盘写文件进行操作时，可以先讲内容存储在文件缓冲区中，充满后，或者确实需要更新的时候再调用系统调用，讲文件一次性写入到磁盘。</p>
+<p>ANSI标准C库函数为了实现这一特性，采用的流的概念，因为数据的输入输出像流动的水一样。</p>
+<p>在流的实现中，缓冲区是最重要的单元。根据需求不同可以选择全缓冲区、行缓冲区和无缓冲区等来处理读写操作。</p>
+<h2 id="2、Linux文件系统概述"><a href="#2、Linux文件系统概述" class="headerlink" title="2、Linux文件系统概述"></a>2、Linux文件系统概述</h2><h3 id="2-1、文件结构"><a href="#2-1、文件结构" class="headerlink" title="2.1、文件结构"></a>2.1、文件结构</h3><p>根目录下目录：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/bin</td>
+<td>存放普通用户可执行命令</td>
+</tr>
+<tr>
+<td>/boot</td>
+<td>Linux内核以及启动系统所需要的文件</td>
+</tr>
+<tr>
+<td>/dev</td>
+<td>设备文件的存储目录</td>
+</tr>
+<tr>
+<td>/etc</td>
+<td>系统配置文件</td>
+</tr>
+<tr>
+<td>/home</td>
+<td>普通用户主目录，每个用户在该目录下都有一个与用户同名的目录</td>
+</tr>
+<tr>
+<td>/lib</td>
+<td>各种库文件</td>
+</tr>
+<tr>
+<td>/proc</td>
+<td>虚拟文件系统</td>
+</tr>
+<tr>
+<td>/root</td>
+<td>超级用户root的主目录</td>
+</tr>
+<tr>
+<td>/sbin</td>
+<td>存放的是用于管理系统的命令</td>
+</tr>
+<tr>
+<td>/tmp</td>
+<td>临时文件</td>
+</tr>
+<tr>
+<td>/usr</td>
+<td>系统应用程序以及相关文件</td>
+</tr>
+<tr>
+<td>/var</td>
+<td>系统中经常编号的文件</td>
+</tr>
+</tbody></table>
+<h3 id="2-2、文件系统模型"><a href="#2-2、文件系统模型" class="headerlink" title="2.2、文件系统模型"></a>2.2、文件系统模型</h3><p>文件的本质是长期存储在物理磁盘上的数据，擦欧总系统通过文件系统功能可以方便地对磁盘上的文件进行管理。</p>
+<p>对物理磁盘的访问都是通过设备驱动程序进行的。</p>
+<p>对设备驱动访问则俩种：1、通过设备驱动提供的接口。2、通过虚拟文件系统</p>
+<p>从硬盘的构造可知，访问物理磁盘的最小单位是位于某个盘面上某个磁道的一个扇区，即使用户只需访问1个字节的数据，实际读写时都需要先将该字节所在的扇区读入到内存，然后再选择指定的数据进行访问。</p>
+<h3 id="2-3、目录、索引结点和文件描述符"><a href="#2-3、目录、索引结点和文件描述符" class="headerlink" title="2.3、目录、索引结点和文件描述符"></a>2.3、目录、索引结点和文件描述符</h3><p>1、目录和索引结点</p>
+<p><strong><em>为了能对一个文件进行正确的读取，必须为文件设置用户描述和控制文件的数据结构</em></strong>，称为文件控制块（File Control Block，FCB），文件管理程序（内核）可借助文件控制块中的信息对文件以各种操作。</p>
+<p>每个文件都有一个FCB用于描述文件的各种属性信息，FCB的有序集称为文件目录。一个FCB也称为一个目录项，为了实现对文件目录的管理，通常将文件目录以文件的形式保存在外存上，这个文件就成为目录文件。</p>
+<p>FCB一般包含三类信息：</p>
+<ul>
+<li>基本信息，如文件名、文件物理位置、文件逻辑结构和文件物理结构</li>
+<li>存取控制信息，如文件所有者存取权限、所在组<del>、其他用户</del></li>
+<li>信息类，如文件建立日期、上一次修改日期、当前使用信息项（已经打开该文件的进程数，是否被其他进程锁住）</li>
+</ul>
+<p>现在操作系统中，一般为了加快文件的检索速度，将除文件名之外的一些属性信息，如文件创建/修改日期、文件访问权限、文件长度和文件在磁盘的存放位置等信息存储在一个特殊的索引结点inode数据库中，因此每个文件都有一个inode。</p>
+<p>Linux的文件系统把所有的inode组织成一个数组，给每个inode分配一个号码，也就是该inode在数组中的索引号，称索引结点编号。</p>
+<p>Linux将FCB（对应内核的dentry结构体）组织为“文件名，索引结点编号”这样的结构。如下表：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>.</td>
+<td>2</td>
+</tr>
+<tr>
+<td>bin</td>
+<td>3407873</td>
+</tr>
+</tbody></table>
+<p>表中每一行对应一个文件的FCB，通过索引结点编号，内核可以找到文件对应的索引结点inode，通过inode可以了解文件的许多属性。</p>
+<p>Linux一切皆文件，每个文件都对应一个索引结点。</p>
+<p><strong><em>文件-&gt;FCB-&gt;文件名-&gt;索引结点编号-&gt;索引结点inode-&gt;属性</em></strong></p>
+<p>2、文件描述符</p>
+<p>操作系统中，一个处于运行状态的程序，称为进程，为了描述和控制进程的运行，内核定义了一个称为进程控制块PCB（Process Control Block)的数据结构，PCB中记录了内核所需的、用户描述进程当前情况以及控制进程运行的全部信息，在Linux中，这个数据结构为task_struct。</p>
+<p>文件描述符是一个非负整数，对于内核，所有打开的文件都是通过文件描述符引用。</p>
+<p>当用户需要访问文件，内核通过open、create等系统调用向用户程序返回一个文件描述符，随后在用户程序中所有对该文件的访问都使用该文件描述符。</p>
+<p>内核中打开的文件是用file结构体表示的，每个结构体会有一个指针指向它，这些指针统一存放在fd_array的数组，而这个数组被存放在以恶搞称为files_struct的结构体，改结构体是进程控制块task_struck中的重要组成部分。</p>
+<p><strong><em>task_struct-&gt;其中的file_struct-&gt; 其中的fd_array[]-&gt;其中的指针-&gt;file结构体-&gt;其中的f_dentry-&gt;i_node-&gt;inode_文件在磁盘上的物理位置</em></strong></p>
+<h3 id="2-4、文件的分类"><a href="#2-4、文件的分类" class="headerlink" title="2.4、文件的分类"></a>2.4、文件的分类</h3><p>1、普通文件（-）</p>
+<p>2、目录文件（d）</p>
+<p>3、字符特殊文件（c）：系统字符类型的设备，如键盘，鼠标</p>
+<p>4、块特殊文件（b）：块类型设备，如硬盘、光驱，对这些设备上的数据的访问通常以块方式进行，即一次至少读写一块。</p>
+<p>5、FIFO（p）：这种类型文件用于进程间的通信，也称为命名管道。</p>
+<p>6、套接字（s）：用于网络通信，套接字也可以用于一台主机上的进程之间的通信。</p>
+<p>7、符号链接（l）：指向另一个文件，是另一个文件的引用。</p>
+<h3 id="2-5、文件访问权限控制"><a href="#2-5、文件访问权限控制" class="headerlink" title="2.5、文件访问权限控制"></a>2.5、文件访问权限控制</h3><h4 id="2-5-1、访问权限控制"><a href="#2-5-1、访问权限控制" class="headerlink" title="2.5.1、访问权限控制"></a>2.5.1、访问权限控制</h4><p>ls -l后</p>
+<p><strong><em>从左往右是 类型 + 所有者访问权限 + 同组访问权限 + 其他用户访问权限 + 链接数 + 文件所有者 + 所在组 + 文件大小 + 时间 + 时间</em></strong></p>
+<h4 id="2-5-2、访问权限在系统中的表示"><a href="#2-5-2、访问权限在系统中的表示" class="headerlink" title="2.5.2、访问权限在系统中的表示"></a>2.5.2、访问权限在系统中的表示</h4><p>1、st_mode结构：</p>
+<p>文件类型与访问权限被定义在一个名为st_mode的内核数据结构中，st_mode实质是一个无符号16位短整型数，文件类型和权限被编码在这个数中。</p>
+<img src="/2019/07/19/文件和目录管理/1562515228634.png" title="This is an example image">
+
+<p>中间三位是文件的特殊属性：1代表有，0代表没有</p>
+<ul>
+<li>suid：1，任何用户在执行该文件时候均会获得该文件所有者的临时授权，即其有效UID将等于文件所有者UID</li>
+<li>sgig：1，任何在该目录下执行的程序均会获得该目录所属组成员的临时授权，即其有效GID将等于该目录所属组成员的GID</li>
+<li>sticky：1，只对目录有效，在当前用户拥有该目录写情况，用户只能删除在本目录下属于自己的文件。</li>
+</ul>
+<p>可以通过chmod命令修改，在读写执行三个数字前加的那个数代表这三个特殊权限。suid 4，sgid 2，sticky 1.</p>
+<p>2、掩码技术：</p>
+<p>通过按位与操作，掩码可以将二进制数中不需要的位置0，需要的不发生变化。</p>
+<p>将8进制的042664的st_mode按位与八进制掩码170000，结果保留了042664的高4位。说明st_mode值对应的文件是一个目录文件。</p>
+<p>3、st_mode中的一些宏定义</p>
+<p>文件类型和特殊位宏定义：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>#define S_IFMT</td>
+<td>00170000</td>
+<td>文件类型掩码</td>
+</tr>
+<tr>
+<td>IFSOCK</td>
+<td>0140000</td>
+<td>文件类型：套接字</td>
+</tr>
+<tr>
+<td>IFLNK</td>
+<td>0120000</td>
+<td>链接</td>
+</tr>
+<tr>
+<td>IFREG</td>
+<td>0100000</td>
+<td>普通文件</td>
+</tr>
+<tr>
+<td>IFBLK</td>
+<td>0060000</td>
+<td>块设备</td>
+</tr>
+<tr>
+<td>IFDIR</td>
+<td>0040000</td>
+<td>目录</td>
+</tr>
+<tr>
+<td>IFCHA</td>
+<td>0020000</td>
+<td>字符设备</td>
+</tr>
+<tr>
+<td>IFIFO</td>
+<td>0010000</td>
+<td>管道</td>
+</tr>
+<tr>
+<td>IFUID</td>
+<td>0004000</td>
+<td>suid</td>
+</tr>
+<tr>
+<td>IFGID</td>
+<td>0002000</td>
+<td>sgid</td>
+</tr>
+<tr>
+<td>ISVTX</td>
+<td>0001000</td>
+<td>文件的粘贴位</td>
+</tr>
+</tbody></table>
+<p>判断文件权限的宏定义：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>#define S_ISLNK(m)</td>
+<td>(((m) &amp; S_IFMT) == S_IFLNK)</td>
+<td>判断是否为链接文件</td>
+</tr>
+<tr>
+<td>ISREG</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISDIR</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISCHA</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISBLK</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISFIFO</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISSOCK</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>文件权限的宏定义：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>#define S_IRWXU</td>
+<td>00700</td>
+<td>所有者权限掩码</td>
+</tr>
+<tr>
+<td>S_IRUSR</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IWUSR</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IXUSR</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IRWXG</td>
+<td></td>
+<td>所属组成员权限掩码</td>
+</tr>
+<tr>
+<td>S_IRGRP</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IWGRP</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IXGRP</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IRWXO</td>
+<td></td>
+<td>其他用户权限掩码</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="2-6、文件的读写"><a href="#2-6、文件的读写" class="headerlink" title="2.6、文件的读写"></a>2.6、文件的读写</h3><h3 id="2-7、文件属性以及相关系统调用"><a href="#2-7、文件属性以及相关系统调用" class="headerlink" title="2.7、文件属性以及相关系统调用"></a>2.7、文件属性以及相关系统调用</h3><h3 id="2-8、目录操作"><a href="#2-8、目录操作" class="headerlink" title="2.8、目录操作"></a>2.8、目录操作</h3>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/19/文件和目录管理/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-Linux基础知识" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/19/Linux基础知识/">Linux基础知识</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/19/Linux基础知识/" class="archive-article-date">
+  	<time datetime="2019-07-19T14:57:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="1-Linux简介"><a href="#1-Linux简介" class="headerlink" title="1 Linux简介"></a>1 Linux简介</h2><p>Linux是一套免费、开源、自由传播的类UNIX操作系统，它遵循POSIX标准和GPL原则，支持多用户、多任务，支持多线程和多CPU。Linux操作系统能够运行大部分UNIX工具软件、应用程序和网络协议，支持32位和64位硬件，是一个性能稳定的多用户网络操作系统。</p>
+<h2 id="1-1-Linux系统发展"><a href="#1-1-Linux系统发展" class="headerlink" title="1.1 Linux系统发展"></a>1.1 Linux系统发展</h2><ul>
+<li>UNIX操作系统：Ken Tompson做游戏运行慢 BCPL-&gt;B语言-&gt;C语言  -&gt; UNIX内核<ul>
+<li>操作系统以时间轮转方式为多个用户提供服务，轮流切换，间隔短，使用户觉得是独享</li>
+<li>成功要素：C语言编写，可移植，可运行于电脑、pc等各种机器</li>
+<li>系统源代码非常有效，容易适应特殊需求</li>
+<li>良好的、通用的、多任务和分时的操作系统</li>
+<li>最终变成一个商业操作系统，需付费。</li>
+</ul>
+</li>
+<li>Linux起源与发展：Linux Torvalds 改造一个用于教学的类UNIX的Minix操作系统，公布源代码<ul>
+<li>开源思想，世界各地爱好者积极对Linux系统进行修改加强。</li>
+<li>广泛应用于服务器领域、桌面领域、移动窃入式以及云计算大数据领域，并且依然保持着强劲的发展趋势。</li>
+</ul>
+</li>
+</ul>
+<h2 id="1-2-Linux相关知识"><a href="#1-2-Linux相关知识" class="headerlink" title="1.2 Linux相关知识"></a>1.2 Linux相关知识</h2><h3 id="1-2-1-Linux内核"><a href="#1-2-1-Linux内核" class="headerlink" title="1.2.1 Linux内核"></a>1.2.1 Linux内核</h3><p>操作系统：是管理和控制计算机硬件与软件资源的计算机 <strong><em>程序</em></strong> ，是直接运行在“裸机”上的最基本的 <strong><em>系统软件</em></strong>，其他任何软件都必须在操作系统的支持下才能运行。</p>
+<p>操作系统从处理机状态的角度分为俩部分，一部分是<strong><em>内核</em></strong>，另一部分是<strong><em>其他程序</em></strong>。</p>
+<p>内核：操作系统核心，是基于硬件的第一层软件扩充，提供操作系统的最基本的功能，是操作系统工作的基础。负责管理系统的进程、内存、设备驱动程序、文件和网络系统，决定系统的性能和稳定性。现在操作系统中，为了减少系统本身的开销，往往将一些与硬件紧密相关的（中断处理程序、设备驱动程序等）、基本的、公共的、运行频率较高的模块（时钟管理、进程调度等）以及关键性结构独立开来，使之常驻内存，并对他们进行保护，通常把这一部分称之为操作系统的<strong><em>内核</em></strong>。“内核”指的是一个提供硬件抽象层、磁盘以及文件系统控制、多任务等功能的<strong><em>系统软件</em></strong>。</p>
+<p>Linux内核是操作系统的核心程序文件，页通过与其他程序文件组合，Linux又构成许多版本。而内核提供了进程调度、进程通信、虚拟文件系统、网络管理、内存管理、设备驱动以及系统调用。用户的应用程序通过系统调用或库函数实现对计算机资源的管理和使用。</p>
+<h3 id="1-2-2-Linux内核态和用户态"><a href="#1-2-2-Linux内核态和用户态" class="headerlink" title="1.2.2 Linux内核态和用户态"></a>1.2.2 Linux内核态和用户态</h3><p>计算机系统中运行两类程序：系统程序和用户程序。</p>
+<p>为保证系统程序不被应用程序有意无意破坏，Linux操作系统将计算机系统设置为俩种状态，即内核态和用户态。</p>
+<p>Linux内核程序工作在内核态，内核之外的程序则工作在用户态。</p>
+<p>内核态：操作系统内核程序运行的状态，拥有较高特权级别，可以执行全部指令，可使用所以资源，并具有改变处理机状态的能力。</p>
+<p>用户态：用户程序运行时状态，只可以执行非特权指令，只能使用有限的资源，只能使用用户内存空间，而不能访问操作系统常驻的系统内核空间。</p>
+<h2 id="2-Linux系统编程"><a href="#2-Linux系统编程" class="headerlink" title="2 Linux系统编程"></a>2 Linux系统编程</h2><h3 id="2-1、什么是系统编程"><a href="#2-1、什么是系统编程" class="headerlink" title="2.1、什么是系统编程"></a>2.1、什么是系统编程</h3><p>计算机软件：应用软件、系统软件。</p>
+<p>应用软件：平时使用的工具软件、游戏软件、管理软件等都属于应用软件。</p>
+<p>系统软件：负责管理计算机系统中的各种独立的硬件，使得它们可以协调工作的程序，主要包括操作系统及其补丁、硬件驱动程序和一系列基本的工具，如编译器、数据库管理、网络连接等方面的工具。</p>
+<p>系统编程：就是编写系统软件级别的程序，简单的说，就是用过系统调用接口，使用操作系统提供的功能来设计程序。</p>
+<p>在多用户多任务的计算机系统的情况下，大部分时间会有多个程序运行，争用资源，允许用户程序随意使用系统资源会造成混乱，故需要操作系统内核去控制。而操作系统本身也是一个特殊程序，也在内存中运行。</p>
+<p>在编写系统软件时，我们将操作系统运行的内存空间称为系统空间或内核空间，普通程序运行的内存空间称为用户空间。</p>
+<h3 id="2-2、学习系统编程实例"><a href="#2-2、学习系统编程实例" class="headerlink" title="2.2、学习系统编程实例"></a>2.2、学习系统编程实例</h3><p>ls 命令 是显示当前目录下所有文件名称</p>
+<p>man 命令 查看ls的相关内容介绍</p>
+<p>ls如何实现呢？</p>
+<p>查看man手册 man -k directory 查看与目录文件相关的命令或函数。</p>
+<p>使用grep read 查找与读目录相关的命令、函数或者系统调用，发现readdir函数或者系统调用。</p>
+<p>分别输入man 2 readdir 和 man 3 readdir 。</p>
+<p>由于是设计系统软件，因此选择系统调用readdir(3) opendir 和 closedir :</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;dirent.h&gt;</span></span></span><br><span class="line"><span class="function">struct dirent * <span class="title">readdir</span><span class="params">(DIR * dirp)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;dirent.h&gt;</span></span></span><br><span class="line"><span class="function">DIR * <span class="title">opendir</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> * name)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">closedir</span><span class="params">(DIR * dirp)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">dirent</span> &#123;</span></span><br><span class="line">    <span class="keyword">inot_t</span> d_ino;	<span class="comment">/* inode number */</span></span><br><span class="line">    <span class="keyword">off_t</span> d_off;	<span class="comment">/* not an offset; see notes */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">short</span> d_reclen;	<span class="comment">/* length of this record */</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span> d_type;	<span class="comment">/* type of file;not supported by all filesystem types*/</span></span><br><span class="line">    <span class="keyword">char</span> d_name[<span class="number">256</span>];	<span class="comment">/* filename */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>readdir函数每执行一次，就读出一条文件信息，同时文件读写指针移动到下一个文件信息的起始处。当readdir返回NULL时，标识已读至文件末尾。</p>
+<p>查看三个函数的原型后，就可以确定实现ls命令的程序流程，简单ls命令的实现如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;dirent.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DIR * dir;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">dirent</span> * <span class="title">ptr</span>;</span></span><br><span class="line">    <span class="keyword">if</span> ((dir = opendir(<span class="string">"."</span>)) == null) &#123;</span><br><span class="line">        perror(<span class="string">"opendir"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(EXIT_FAILURE);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> ((ptr = readdir(dir)) != null) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%s\t\t"</span>, ptr-&gt;d_name);</span><br><span class="line">    &#125;</span><br><span class="line">    closedir(dir);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3、系统调用和库函数"><a href="#2-3、系统调用和库函数" class="headerlink" title="2.3、系统调用和库函数"></a>2.3、系统调用和库函数</h3><p>从形式上看：系统调用和库函数都是C函数</p>
+<p>从操作系统的角度看：系统调用和库函数有着非常大的区别</p>
+<ul>
+<li><strong><em>系统调用</em></strong>：是操作系统为用户态运行的进程与硬件设备（如CPU、磁盘、打印机等）进行交互所提供的一组接口。使用系统调用后，该进程状态从用户态切换到内核态。系统调用可以说说操作系统留给用户程序的一个接口。<ul>
+<li>与操作系统直接相关</li>
+<li>不同操作系统的系统调用可能不同，故使用系统调用编写的程序可移植性不高</li>
+<li>系统调用并非ANSI C标准</li>
+</ul>
+</li>
+<li><strong><em>库函数</em></strong>：通常用户完成一些常见的功能，要满足一定的标准。<ul>
+<li>库函数的实现最终也调用系统调用，封装了系统调用的部分操作。</li>
+<li>库函数作为程序设计语言的一部分可以不加修改地应用不同平台，故具有良好的可移植性</li>
+</ul>
+</li>
+</ul>
+<p>为方便 之后将系统调用和库函数统称函数 可以使用man手册进行查询到底是系统调用还是库函数</p>
+<h3 id="2-4、常用工具和命令"><a href="#2-4、常用工具和命令" class="headerlink" title="2.4、常用工具和命令"></a>2.4、常用工具和命令</h3><p>指令名称 [选项] [参数列表]</p>
+<h4 id="2-4-1、常用工具"><a href="#2-4-1、常用工具" class="headerlink" title="2.4.1、常用工具"></a>2.4.1、常用工具</h4><h5 id="2-4-1-1、打包工具"><a href="#2-4-1-1、打包工具" class="headerlink" title="2.4.1.1、打包工具"></a>2.4.1.1、打包工具</h5><p>1、tar ：Linux下常用的打包、压缩和解压工具</p>
+<p>tar [选项] 结果文件名/带打包文件名</p>
+<p>选项：</p>
+<ul>
+<li>-c：创建文件</li>
+<li>-z：是否用gzip压缩</li>
+<li>-x：解压文件</li>
+<li>-v：压缩或者解压过程显示进度</li>
+<li>-f：给新文档命名，f后直接跟新文件名，不再加其他参数</li>
+</ul>
+<p>将当前目录下所有文件作为待压缩文件进行打包或者压缩：</p>
+<ul>
+<li>打包：tar -cvf mytar.tar ./*</li>
+<li>压缩：tar -zcvf mytar.tar.gz ./*</li>
+<li>解包：tar -xvf mytar.tar -C ./my</li>
+<li>解压：tar -zxvf mytar.tar.gz -C ./my</li>
+</ul>
+<p>-C标识将打包文件或者压缩文件解压到指定目录。</p>
+<p>给文件添加后缀区分文件类型，一般文件名加.tar表示该文件为打包文件，加.tar.gz是用gzip压缩的tar文件。</p>
+<p>2、gizp：GNUzip的缩写，是GNU提供的一个文件压缩程序</p>
+<p>3、bzip2：基于Burrows-Wheeler变换的无损压缩软件，自由软件。</p>
+<h5 id="2-4-1-2、文本编辑工具"><a href="#2-4-1-2、文本编辑工具" class="headerlink" title="2.4.1.2、文本编辑工具"></a>2.4.1.2、文本编辑工具</h5><p>1、vi/vim：文本编辑器 vim从vi发展而来的 具有代码补全、编译以及错误跳转等编程功能，程序猿广泛使用</p>
+<p>2、Emacs：Editor MACros（宏编辑器）编程、编译、网络浏览等功能</p>
+<p>3、gedit：是一套自由软件，GNOME桌面环境下兼容UTF-8的文本编辑器，支持gb2313、gbk在内的多种字符编码，使用GTK+编写而成，简单易用，语法高亮、中文支持好。除了是文本编辑器，还可以当集成开发环境使用。</p>
+<h5 id="2-4-1-3、网络工具"><a href="#2-4-1-3、网络工具" class="headerlink" title="2.4.1.3、网络工具"></a>2.4.1.3、网络工具</h5><p>1、ping：测试主机之间网络的连通性。</p>
+<p>ping [参数] [主机名或网络地址]</p>
+<p>基本原理：使用ICMP传输协议，会向指定的主机发出要求回应的信息，若远端主机的网络功能没问题就会回应消息，因而得知该主机运作正常。ping命令每秒发送一个数据包并且为每个接收到响应打印一行输出。</p>
+<p>可以通过防火墙设置禁止ping或在内核参数中禁止ping</p>
+<p>2、ifconfig：类似windows ipconfig，查看和配置网络设备</p>
+<p>ifconifg [网络设备] [参数]</p>
+<p>3、wget：GNU命令行工具，用户从互联网下载文件</p>
+<p>wget [选项] [url地址]</p>
+<p>4、scp：secure copy ，基于ssh登陆进行安全的远程文件复制命令，可以在Linux服务器之间复制文件和目录。和cp命令类似，不过cp命令不能跨主机拷贝。</p>
+<p>scp [参数] [原路径] [目标路径]</p>
+<h5 id="2-4-1-4、系统性能工具"><a href="#2-4-1-4、系统性能工具" class="headerlink" title="2.4.1.4、系统性能工具"></a>2.4.1.4、系统性能工具</h5><p>1、top：常用性能分析工具，能够实时显示系统中各个进程的资源占用状况，包括进行id、内存占用率、cpu占有率等，类似windows任务管理器，提供实时地对系统处理器的状态监视。</p>
+<p>top [选项]</p>
+<p>2、iostat：I/O statistics 对系统的磁盘操作活动进行监视。</p>
+<p>iostat [选项] [时间] [次数]</p>
+<p>3、sar：系统活动情况报告，Linux目前最全面的系统性能分析工具之一，多方面对系统活动进行报告。包括文件 读写情况、系统调用的使用情况、磁盘IO、CPU效率、内存使用情况、进程活动以及IPC有关的活动。</p>
+<p>sar [选项] [-A] [-o 文件名] 采用间隔 [采样次数]</p>
+<p>4、free：监控工具中最常用的命令之一。</p>
+<p>free [参数]</p>
+<h4 id="2-4-2、常用命令"><a href="#2-4-2、常用命令" class="headerlink" title="2.4.2、常用命令"></a>2.4.2、常用命令</h4><p>常用系统命令：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>login</td>
+<td>系统中进建立一个新的会话</td>
+</tr>
+<tr>
+<td>shutdown</td>
+<td>暂停、关闭或重启系统</td>
+</tr>
+<tr>
+<td>hostname</td>
+<td>修改或查看主机名</td>
+</tr>
+<tr>
+<td>uname</td>
+<td>显示系统以及版本信息</td>
+</tr>
+<tr>
+<td>df</td>
+<td>检查磁盘空间占用情况</td>
+</tr>
+<tr>
+<td>who</td>
+<td>显示当前系统所登陆的用户以及所登陆的控制台</td>
+</tr>
+<tr>
+<td>adduser</td>
+<td>在系统中添加一个新的用户组</td>
+</tr>
+<tr>
+<td>passwd</td>
+<td>所有用户都这样用此修改账户密码</td>
+</tr>
+<tr>
+<td>su</td>
+<td>更改用户id或称为超级用户</td>
+</tr>
+<tr>
+<td>sudo</td>
+<td>以其他用户的身份执行命令，默认为root用户</td>
+</tr>
+</tbody></table>
+<p>常用基本命令：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>exit</td>
+<td>退出当前Shell</td>
+</tr>
+<tr>
+<td>clear</td>
+<td>清屏</td>
+</tr>
+<tr>
+<td>ls</td>
+<td>显示文件或目录及其属性</td>
+</tr>
+<tr>
+<td>cd</td>
+<td>进入指定目录</td>
+</tr>
+<tr>
+<td>pwd</td>
+<td>显示当前工作目录的绝对路径名</td>
+</tr>
+<tr>
+<td>mkdir</td>
+<td>创建目录文件</td>
+</tr>
+<tr>
+<td>rmdir</td>
+<td>删除空的目录文件</td>
+</tr>
+<tr>
+<td>touch</td>
+<td>创建文件或修改文件的时间属性</td>
+</tr>
+<tr>
+<td>cat</td>
+<td>查看文件内容，类似命令还有more、less、head、tail等</td>
+</tr>
+<tr>
+<td>rm</td>
+<td>删除文件，rm -r dir 递归删除目录dir</td>
+</tr>
+<tr>
+<td>nv</td>
+<td>移动文件或者改动文件名称</td>
+</tr>
+<tr>
+<td>rename</td>
+<td>文件重命名，可以用户改变一批文件的名称</td>
+</tr>
+<tr>
+<td>cp</td>
+<td>复制文件</td>
+</tr>
+<tr>
+<td>find</td>
+<td>在一个目录结构中查找文件，类似命令有locate，eg：find ./ -name “*.txt”当前目录下所有以txt结尾的文件</td>
+</tr>
+<tr>
+<td>grep</td>
+<td>显示包含模式串的这行内容</td>
+</tr>
+<tr>
+<td>ln</td>
+<td>建立链接文件，-s选项表示建立符号链接</td>
+</tr>
+<tr>
+<td>wc</td>
+<td>统计指定文件的行数、单词书和字符数</td>
+</tr>
+<tr>
+<td>cmp</td>
+<td>逐位比较俩个文件</td>
+</tr>
+<tr>
+<td>diff</td>
+<td>逐行</td>
+</tr>
+<tr>
+<td>chmod</td>
+<td>修改文件的访问权限</td>
+</tr>
+<tr>
+<td>umask</td>
+<td>设置创建文件时的权限掩码</td>
+</tr>
+<tr>
+<td>mount</td>
+<td>加载文件系统</td>
+</tr>
+<tr>
+<td>umount</td>
+<td>卸载文件系统</td>
+</tr>
+<tr>
+<td>ps</td>
+<td>显示进程信息</td>
+</tr>
+<tr>
+<td>kill</td>
+<td>向指定进程发送一个信号</td>
+</tr>
+<tr>
+<td>mail</td>
+<td>发送邮件</td>
+</tr>
+<tr>
+<td>date</td>
+<td>显示或设置系统的日期和时间</td>
+</tr>
+</tbody></table>
+<h4 id="2-4-3、获取帮助"><a href="#2-4-3、获取帮助" class="headerlink" title="2.4.3、获取帮助"></a>2.4.3、获取帮助</h4><p>1、在线帮助手册 - man</p>
+<p>2、GUN的超文本帮助系统 - info</p>
+<p>3、查询内部命令 - help</p>
+<p>4、获取错误信息 - errno</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/19/Linux基础知识/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-C编程工具" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/19/C编程工具/">C编程工具</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/19/C编程工具/" class="archive-article-date">
+  	<time datetime="2019-07-19T14:56:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="1、编辑工具"><a href="#1、编辑工具" class="headerlink" title="1、编辑工具"></a>1、编辑工具</h2><h3 id="1-1、编辑工具介绍"><a href="#1-1、编辑工具介绍" class="headerlink" title="1.1、编辑工具介绍"></a>1.1、编辑工具介绍</h3><p>1、vi</p>
+<p>2、vim</p>
+<p>3、Emacs</p>
+<p>4、Nano</p>
+<p>5、Gedit</p>
+<h3 id="1-2、vi和vim程序编辑器"><a href="#1-2、vi和vim程序编辑器" class="headerlink" title="1.2、vi和vim程序编辑器"></a>1.2、vi和vim程序编辑器</h3><img src="/2019/07/19/C编程工具/1562394352786.png" title="This is an example image">
+
+<p>vim常用命令：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>:w</td>
+<td>保持当前文件</td>
+</tr>
+<tr>
+<td>:w filename</td>
+<td>保持当前文件</td>
+</tr>
+<tr>
+<td>:q</td>
+<td>退出正在编辑的文件</td>
+</tr>
+<tr>
+<td>:q!</td>
+<td>强制退出</td>
+</tr>
+<tr>
+<td>:wq</td>
+<td>保存文件并退出</td>
+</tr>
+<tr>
+<td>u</td>
+<td>撤销最近一次操作，按Ctrl+R组合键恢复撤销的操作</td>
+</tr>
+<tr>
+<td>i</td>
+<td>在光标所在的位置前插入字符</td>
+</tr>
+<tr>
+<td>a</td>
+<td>后插入</td>
+</tr>
+<tr>
+<td>o</td>
+<td>在光标所在行的下一行插入新的一行</td>
+</tr>
+<tr>
+<td>O</td>
+<td>上一行插入</td>
+</tr>
+<tr>
+<td>x</td>
+<td>剪贴光标处所在的字符（x前可先按一个数字，则剪切若干个字符）</td>
+</tr>
+<tr>
+<td>dd</td>
+<td>剪贴光标出所在的一行（dd前可先按一个数字，则剪贴若干行）</td>
+</tr>
+<tr>
+<td>yy</td>
+<td>复制光标处所在的一行（yy前~）</td>
+</tr>
+<tr>
+<td>d$</td>
+<td>剪贴光标处（含）开始到行末的所有字符</td>
+</tr>
+<tr>
+<td>d^</td>
+<td>剪贴光标处（不含）开始到行首的所有字符</td>
+</tr>
+<tr>
+<td>y$</td>
+<td>复制光标处（含）开始到行末的所有字符</td>
+</tr>
+<tr>
+<td>y^</td>
+<td>复制光标处（不含）开始到行首的所有字符</td>
+</tr>
+<tr>
+<td>p</td>
+<td>将剪贴板中的资料粘贴到光标所在处</td>
+</tr>
+<tr>
+<td>r</td>
+<td>修改光标所在的字符，r之后跟要修改的字符</td>
+</tr>
+<tr>
+<td>h</td>
+<td>将光标向前移动一个字符</td>
+</tr>
+<tr>
+<td>j</td>
+<td>将光标向下移动一个字符</td>
+</tr>
+<tr>
+<td>k</td>
+<td>将光标向上移动一个字符</td>
+</tr>
+<tr>
+<td>l</td>
+<td>向后~</td>
+</tr>
+<tr>
+<td>gg</td>
+<td>跳到文本的最初一行</td>
+</tr>
+<tr>
+<td>G</td>
+<td>跳到文本的最末一行</td>
+</tr>
+<tr>
+<td>Ctrl+U</td>
+<td>向上up翻页</td>
+</tr>
+<tr>
+<td>Ctrl+D</td>
+<td>向下down翻页</td>
+</tr>
+<tr>
+<td>:%s/old/new</td>
+<td>将文件中所有的old字符串替换成new</td>
+</tr>
+<tr>
+<td>/string</td>
+<td>将光标处往下查找字符串string，输入完药查找的字符串后按回车键，n跳到下一个，N上一个</td>
+</tr>
+<tr>
+<td>?string</td>
+<td>跟上面的是一样的，区别是它从光标出往上查找</td>
+</tr>
+</tbody></table>
+<h2 id="2、gcc编译器"><a href="#2、gcc编译器" class="headerlink" title="2、gcc编译器"></a>2、gcc编译器</h2><p>//TODO</p>
+<h2 id="3、gdb调试器"><a href="#3、gdb调试器" class="headerlink" title="3、gdb调试器"></a>3、gdb调试器</h2><p>//TODO</p>
+<h2 id="4、make和Makefile"><a href="#4、make和Makefile" class="headerlink" title="4、make和Makefile"></a>4、make和Makefile</h2>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/19/C编程工具/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-JavaSPI机制的优点与缺点" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -292,19 +1237,19 @@
 
 
   
-    <article id="post-分布式锁" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Feed流系统设计" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/分布式锁/">分布式锁</a>
+      <a class="article-title" href="/2019/07/19/Feed流系统设计/">Feed流系统设计</a>
     </h1>
   
 
         
-        <a href="/2019/07/19/分布式锁/" class="archive-article-date">
+        <a href="/2019/07/19/Feed流系统设计/" class="archive-article-date">
   	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
 </a>
         
@@ -312,171 +1257,223 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>前言：随着计算机技术和工程架构的发展，微服务变得越来越热。如今，绝大多数服务都处于分布式环境中，其中，数据一致性是我们一直关注的重点。分布式锁到底是什么？经过了哪些发展演进？工程上有哪些实现方案？各种方案的利弊权衡又有哪些？希望这篇文章能够对你有一些帮助。</p>
-<p>▍阅读索引</p>
-<p>[TOC]</p>
-<h2 id="0-名词定义"><a href="#0-名词定义" class="headerlink" title="0. 名词定义"></a>0. 名词定义</h2><p>分布式锁：顾名思义，是指在分布式环境下的锁，重点在锁。所以我们先从锁开始讲起。</p>
-<h2 id="1-问题引入"><a href="#1-问题引入" class="headerlink" title="1. 问题引入"></a>1. 问题引入</h2><p>举个例子：</p>
-<p>某服务记录数据X，当前值为100。A请求需要将X增加200；同时，B请求需要将X减100。 在理想的情况下，A先读取到X=100，然后X增加200，最后写入X=300。B请求接着读取到X=300，减少100，最后写入X=200。 然而在真实情况下，如果不做任何处理，则可能会出现：A和B同时读取到X=100；A写入之前B读取到X；B比A先写入等等情况。</p>
-<p>上面这个例子相信大家都非常熟悉。出现不符合预期的结果本质上是对临界资源没有做好互斥操作。互斥性问题通俗来讲，就是对共享资源的抢占问题。对于共享资源争抢的正确性，锁是最常用的方式，其他的如CAS（compare and swap）等，这里不展开。</p>
-<h2 id="2-分布式环境的特点"><a href="#2-分布式环境的特点" class="headerlink" title="2. 分布式环境的特点"></a>2. 分布式环境的特点</h2><p>我们的绝大部分服务都处于分布式环境中。那么，分布式系统有哪些特点呢？大致如下：</p>
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a><strong>简介</strong></h2><p>差不多十年前，随着功能机的淘汰和智能机的普及，互联网开始进入移动互联网时代，最具代表性的产品就是微博、微信，以及后来的今日头条、快手等。这些移动化联网时代的新产品在过去几年间借着智能手机的风高速成长。</p>
+<p>这些产品都是Feed流类型产品，由于Feed流一般是按照时间“从上往下流动”，非常适合在移动设备端浏览，最终这一类应用就脱颖而出，迅速抢占了上一代产品的市场空间。</p>
+<p>Feed流是Feed + 流，Feed的本意是饲料，Feed流的本意就是有人一直在往一个地方投递新鲜的饲料，如果需要饲料，只需要盯着投递点就可以了，这样就能源源不断获取到新鲜的饲料。在信息学里面，Feed其实是一个信息单元，比如一条朋友圈状态、一条微博、一条咨询或一条短视频等，所以Feed流就是不停更新的信息单元，只要关注某些发布者就能获取到源源不断的新鲜信息，我们的用户也就可以在移动设备上逐条去浏览这些信息单元。</p>
+<p>当前最流行的Feed流产品有微博、微信朋友圈、头条的资讯推荐、快手抖音的视频推荐等，还有一些变种，比如私信、通知等，这些系统都是Feed流系统，接下来我们会介绍如何设计一个Feed流系统架构。</p>
+<h2 id="Feed流系统特点"><a href="#Feed流系统特点" class="headerlink" title="Feed流系统特点"></a><strong>Feed流系统特点</strong></h2><p>Feed流本质上是一个数据流，是将 “N个发布者的信息单元” 通过 “关注关系” 传送给 “M个接收者”。</p>
+<img src="/2019/07/19/Feed流系统设计/关注-粉丝.png" title="This is an example image">
+
+<p>Feed流系统是一个数据流系统，所以我们核心要看数据。从数据层面看，数据分为三类，分别是：</p>
 <ul>
-<li>可扩展性：可通过横向水平扩展提高系统的性能和吞吐量。</li>
-<li>高可靠性：高容错，即使系统中一台或几台故障，系统仍可提供服务。</li>
-<li>高并发性：各机器并行独立处理和计算。</li>
-<li>廉价高效：多台小型机而非单台高性能机。</li>
+<li>发布者的数据：发布者产生数据，然后数据需要按照发布者组织，需要根据发布者查到所有数据，比如微博的个人页面、朋友圈的个人相册等。</li>
+<li>关注关系：系统中个体间的关系，微博中是关注，是单向流，朋友圈是好友，是双向流。不管是单向还是双向，当发布者发布一条信息时，该条信息的流动永远是单向的。</li>
+<li>接收者的数据：从不同发布者那里获取到的数据，然后通过某种顺序（一般为时间）组织在一起，比如微博的首页、朋友圈首页等。这些数据具有时间热度属性，越新的数据越有价值，越新的数据就要排在最前面。</li>
 </ul>
-<h2 id="3-锁"><a href="#3-锁" class="headerlink" title="3.锁"></a>3.锁</h2><p>我们先来看下非分布式情况下的锁方案（多线程和多进程的情况），然后再演进到分布式锁。</p>
-<h3 id="多线程下的锁机制："><a href="#多线程下的锁机制：" class="headerlink" title="多线程下的锁机制："></a>多线程下的锁机制：</h3><p>各种语言有不同的实现方式，比较成熟。比如，go语言中的sync.RWMutex（读写锁）、sync.Mutex（互斥锁）；JAVA中的ReentrantLock、synchronized；在php中没有找到原生的支持锁的方式，只能通过外部来间接实现，比如文件锁，借助外部存储的锁等。</p>
-<h3 id="多进程下的锁机制："><a href="#多进程下的锁机制：" class="headerlink" title="多进程下的锁机制："></a>多进程下的锁机制：</h3><p>对于临界资源的访问已经超出了单个进程的控制范围。在多进程的情况下，主要是利用操作系统层面的进程间通信原理来解决临界资源的抢占问题。比较常见的一种方法便是使用信号量（Semaphores）。</p>
-<p>▍对信号量的操作，主要是P操作（wait）和V操作（signal）：</p>
+<p>针对这三类数据，我们可以有如下定义：</p>
 <ul>
-<li>P操作 ( wait ) ：</li>
+<li>存储库：存储发布者的数据，永久保存。</li>
+<li>关注表：用户关系表，永久保存。</li>
+<li>同步库：存储接收者的时间热度数据，只需要保留最近一段时间的数据即可。</li>
 </ul>
-<p>先检查信号量的大小，若值大于零，则将信号量减1，同时进程获得共享资源的访问权限，继续执行；若小于或者等于零，则该进程被阻塞后，进入等待队列。</p>
 <ul>
-<li>V操作 ( signal ) ：</li>
+<li><p>设计Feed流系统时最核心的是确定清楚产品层面的定义，需要考虑的因素包括：</p>
+</li>
+<li><p>产品用户规模：用户规模在十万、千万、十亿级时，设计难度和侧重点会不同。</p>
+</li>
+<li><p>关注关系（单向、双写）：如果是双向，那么就不会有大V，否则会有大V存在。<br>上述是选择数据存储系统最核心的几个考虑点，除此之外，还有一些需要考虑的：</p>
+</li>
+<li><p>如何实现Meta和Feed内容搜索？</p>
+<p>虽然Feed流系统本身可以不需要搜索，但是一个Feed流产品必须要有搜索，否则信息发现难度会加大，用户留存率会大幅下降。</p>
+</li>
+<li><p>Feed流的顺序是时间还是其他分数，比如个人的喜好程度？</p>
+<p>双向关系时由于关系很紧密，一定是按时间排序，就算一个关系很紧密的人发了一条空消息或者低价值消息，那我们也会需要关注了解的。</p>
+<p>单向关系时，那么可能就会存在大V，大V的粉丝数量理论极限就是整个系统的用户数，有一些产品会让所有用户都默认关注产品负责人，这种产品中，该负责人就是最大的大V，粉丝数就是用户规模。<br>接下来，我们看看整个Feed流系统如何设计。</p>
+</li>
 </ul>
-<p>该操作将信号量的值加1，如果有进程阻塞着等待该信号量，那么其中一个进程将被唤醒。</p>
-<p>可看出，多进程锁方案跟多线程的锁方案实现思路大同小异。</p>
-<p>我们将互斥的级别拉高，分布式环境下不同节点不同进程或线程之间的互斥，就是分布式锁的挑战之一。后面再细讲。</p>
-<p>另外，在传统的基于数据库的架构中，对于数据的抢占问题也可以通过数据库事务（ACID）来保证。在分布式环境中，出于对性能以及一致性敏感度的要求，使得分布式锁成为了一种比较常见而高效的解决方案。</p>
-<p>▍从上面对于多线程和多进程锁的概括，可以总结出锁的抽象条件：</p>
-<p>1）“需要有存储锁的空间，并且锁的空间是可以访问到的”：</p>
-<p>对于多线程就是内存（进程中不同的线程都可以读写），多进程中通过共享内存的方式，也是提供一块地方，供不同进程读写。主要目的是保证不同的进线程改动对于其他进线程可见，进而满足互斥性需求。</p>
-<p>2）“锁需要被唯一标识”：</p>
-<p>不同的共享资源，必然需要用不同的锁进行保护，因此相应的锁必须有唯一的标识。在多线程环境中，锁可以是一个对象，那么对这个对象的引用便是这个唯一标识。多进程下，比如有名信号量，便是用硬盘中的文件名作为唯一标识。</p>
-<p>3）“锁要有至少两种状态”：</p>
-<p>有锁，没锁。存在，不存在等等。很好理解。</p>
-<p>满足上述三个条件就可以实现基础的分布式锁了。但是随着技术的演进，</p>
-<p>▍相应地，对锁也提出了更高级的条件：</p>
-<p>1）可重入：</p>
-<p>外层函数获得锁之后，内层函数还可以获得锁。原因是随着软件复杂性增加，方法嵌套获取锁已经很难避免。但是从代码层面很难分析出这个问题，因此我们要使用可重入锁。导致锁需要支持可重入的场景。对于可重入的思考，每种语言有自己的哲学和取舍，如go就舍弃了支持重入：Recursive locking in Go [ <a href="https://stackoverflow.com/questions/14670979/recursive-locking-in-go" target="_blank" rel="noopener">https://stackoverflow.com/que…</a> ]以后go又会不会认为“可重入真香”呢？哈哈，我们拭目以待。</p>
-<p>2）避免产生惊群效应（Herd Effect）：</p>
-<p>惊群效应指，在有多个请求等待获取锁的时候，一旦占有锁的线程释放之后，所有等待方都同时被唤醒，尝试抢占锁。但是绝大多数的抢占都是不必要的。这种情况在多线程和多进程中开销同样很大。要尽量避免这种情况出现。</p>
-<p>3）公平锁和非公平锁：</p>
-<p>公平锁：优先把锁给等待时间最长的一方；非公平锁：不保证等待线程拿锁的顺序。公平锁的实现成本较高。</p>
-<p>4）阻塞锁和自旋锁：</p>
-<p>主要是效率的考虑。自旋锁适用于临界区操作耗时短的场景；阻塞锁适用于临界区操作耗时长的场景。</p>
-<p>5）锁超时：</p>
-<p>防止释放锁失败，出现死锁的情况。</p>
-<p>6）高效，高可用：</p>
-<p>加锁和解锁需要高效，同时也需要保证高可用防止分布式锁失效，可以增加降级。</p>
-<p>还有很多其他更高要求的条件，不一一列举了。有兴趣的小伙伴可以看看编程史上锁的演进过程。</p>
-<h2 id="4-分布式锁"><a href="#4-分布式锁" class="headerlink" title="4. 分布式锁"></a>4. 分布式锁</h2><p>▍使用分布式锁的必要性：</p>
-<p>1）服务要求：部署的服务本身就处于分布式环境中</p>
-<p>2）效率：使用分布式锁可以避免不同节点重复相同的工作，这些工作会浪费资源。比如用户付了钱之后有可能不同节点会发出多封短信</p>
-<p>3）正确性：跟2）类似。如果两个节点在同一条数据上面操作，比如多个节点机器对同一个订单操作不同的流程有可能会导致该笔订单最后状态出现错误，造成损失</p>
-<p>包括但不限于这些必要性，在强烈地呼唤我们今天的主角—“分布式锁”闪亮登场。</p>
-<h2 id="5-分布式锁实现方案"><a href="#5-分布式锁实现方案" class="headerlink" title="5. 分布式锁实现方案"></a>5. 分布式锁实现方案</h2><p>有了非分布式锁的实现思路，和分布式环境的挑战，我们来看看分布式锁的实现策略。<br>分布式锁本质上还是要实现一个简单的目标—占一个“坑”，当别的节点机器也要来占时，发现已经有人占了，就只好放弃或者稍后再试。</p>
-<p>▍大体分为4种</p>
-<p>1）使用数据库实现<br>2）使用朴素Redis等缓存系统实现<br>3）使用ZooKeeper等分布式协调系统实现<br>4）使用Redisson来实现（本质上基于Redis）</p>
-<p>因为利用mysql实现分布式锁的性能低以及改造大，我们这里重点讲一下下面3种实现分布式锁的方案。</p>
-<h3 id="5-1-朴素Redis实现方案"><a href="#5-1-朴素Redis实现方案" class="headerlink" title="5.1 朴素Redis实现方案"></a>5.1 朴素Redis实现方案</h3><p>我们循序渐进，对比几种实现方式，找出优雅的方式：</p>
-<p>方案1：setnx+delete</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>setnx lock_key lock_value</span><br><span class="line"><span class="symbol">2 </span>// do sth</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
+<h2 id="Feed流系统设计"><a href="#Feed流系统设计" class="headerlink" title="Feed流系统设计"></a><strong>Feed流系统设计</strong></h2><p>上一节，我们提前思考了Feed流系统的几个关键点，接下来，在这一节，我们自顶向下来设计一个Feed流系统。</p>
+<h3 id="1-产品定义"><a href="#1-产品定义" class="headerlink" title="1. 产品定义"></a><strong>1. 产品定义</strong></h3><p>第一步，我们首先需要定义产品，我们要做的产品是哪一种类型，常见的类型有：</p>
+<ul>
+<li>微博类</li>
+<li>朋友圈类</li>
+<li>抖音类</li>
+<li>私信类</li>
+</ul>
+<p>接着，再详细看一下这几类产品的异同：</p>
 
-<p>缺点：一旦服务挂掉，锁无法被删除释放，会导致死锁。硬伤，pass！2</p>
-<p>方案2：setnx + setex</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>setnx lock_key lock_value</span><br><span class="line"><span class="symbol">2 </span>setex lock_key N lock_value  // N s超时</span><br><span class="line"><span class="symbol">3 </span>// do sth</span><br><span class="line"><span class="symbol">4 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
 
-<p>在方案1的基础上设置了超时时间。但是还是会出现跟1一样的问题。如果setnx之后、setex之前服务挂掉，一样会陷入死锁。本质原因是，setnx/setex分为了两个步骤，非原子操作。硬伤，pass！</p>
-<p>方案3：set ex nx</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>SET lock_key lock_value EX N NX //N s超时</span><br><span class="line"><span class="symbol">2 </span>// do sth</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
+<p>上述对比中，只对比各类产品最核心、或者最根本特点，其他次要的不考虑。比如微博中互相关注后就是双向关注了，但是这个不是微博的立命之本，只是补充，无法撼动根本。</p>
+<p>从上面表格可以看出来，主要分为两种区分：</p>
+<ul>
+<li><p>关注关系是单向还是双向：</p>
+<p>如果是单向，那么可能就会存在大V效应，同时时效性可以低一些，比如到分钟级别；</p>
+<p>如果是双向，那就是好友，好友的数量有限，那么就不会有大V，因为每个人的精力有限，他不可能主动加几千万的好友，这时候因为关系更精密，时效性要求会更高，需要都秒级别。</p>
+</li>
+<li><p>排序是时间还是推荐：</p>
+<p>用户对feed流最容易接受的就是时间，目前大部分都是时间。</p>
+<p>但是有一些场景，是从全网数据里面根据用户的喜好给用户推荐和用户喜好度最匹配的内容，这个时候就需要用推荐了，这种情况一般也会省略掉关注了，相对于关注了全网所有用户，比如抖音、头条等。<br>确定了产品类型后，还需要继续确定的是系统设计目标：需要支持的最大用户数是多少？十万、百万、千万还是亿？</p>
+</li>
+</ul>
+<p>用户数很少的时候，就比较简单，这里我们主要考虑 亿级用户 的情况，因为如果系统能支持亿级，那么其他量级也能支持。为了支持亿级规模的用户，主要子系统选型时需要考虑水平扩展能力以及一些子系统的可用性和可靠性了，因为系统大了后，任何一个子系统的不稳定都很容易波及整个系统。</p>
+<h3 id="2-存储"><a href="#2-存储" class="headerlink" title="2. 存储"></a><strong>2. 存储</strong></h3><p>我们先来看看最重要的存储，不管是哪种同步模式，在存储上都是一样的，我们定义用户消息的存储为存储库。存储库主要满足三个需求：</p>
+<ul>
+<li>可靠存储用户发送的消息，不能丢失。否则就找不到自己曾经发布到朋友圈状态了。</li>
+<li>读取某个人发布过的所有消息，比如个人主页等。</li>
+<li>数据永久保存。</li>
+</ul>
+<p>所以，存储库最重要的特征就是两点：</p>
+<ul>
+<li>数据可靠、不丢失。</li>
+<li>由于数据要永久保存，数据会一直增长，所以要易于水平扩展。</li>
+</ul>
+<p>综上，可以选为存储库的系统大概有两类：</p>
 
-<p>将加锁、设置超时两个步骤合并为一个原子操作，从而解决方案1、2的问题。（Redis原生命令支持，Redis version需要&gt;=2.6.12，滴滴生产环境Redis version一般为3.2，所以日常能够使用）。</p>
-<p>优点：此方案目前大多数sdk、Redis部署方案都支持，实现简单<br>缺点：会存在锁被错误的释放，被错误的抢占的情况。如下图：</p>
-<img src="/2019/07/19/分布式锁/朴素redis实现分布式锁.png" title="This is an example image">
 
-<p>这块有2个问题：</p>
-<p>1）GC期间，client1超时时间已到，导致将client2错误地放进来</p>
-<p>2）client1执行完逻辑后会显式调用del，将所有的锁都释放了（正确的情况应该只释放自己的锁，错误地释放了client2的锁）</p>
-<p>方案4：</p>
-<p>在3的基础上，对于问题1，将client的超时时间设置长一些，保证只能通过显式del来释放锁，而超时时间只是作为一种最终兜底的方案。针对问题2，增加对 value 的检查，只解除自己加的锁，为保证原子性，只能需要通过lua脚本实现。</p>
-<p>lua脚本：<a href="https://redis.io/commands/eval" target="_blank" rel="noopener">https://redis.io/commands/eval</a></p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span><span class="keyword">if</span> redis.<span class="keyword">call</span>(<span class="string">"get"</span>,KEYS[<span class="number">1</span>]) == ARGV[<span class="number">1</span>] <span class="keyword">then</span></span><br><span class="line"><span class="symbol">2 </span>  <span class="keyword">return</span> redis.<span class="keyword">call</span>(<span class="string">"del"</span>,KEYS[<span class="number">1</span>])</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">else</span></span><br><span class="line"><span class="symbol">4 </span>  <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="symbol">5 </span><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>对于可靠性，分布式NoSQL的可靠性要高于关系型数据库，这个可能有违很多人的认知。主要是关系型数据库发展很长时间了，且很成熟了，数据放在上面大家放心，而分布式NoSQL数据库发展晚，使用的并不多，不太信任。但是，分布式NoSQL需要存储的数据量更多，对数据可靠性的要求也加严格，所以一般都是存储三份，可靠性会更高。目前在一些云厂商中的关系型数据库因为采用了和分布式NoSQL类似的方式，所以可靠性也得到了大幅提高。</li>
+<li>水平扩展能力：对于分布式NoSQL数据库，数据天然是分布在多台机器上，当一台机器上的数据量增大后，可以通过自动分裂两部分，然后将其中一半的数据迁移到另一台机器上去，这样就做到了线性扩展。而关系型数据库需要在扩容时再次分库分表。</li>
+</ul>
+<p>所以，结论是：</p>
+<ul>
+<li>如果是自建系统，且不具备分布式NoSQL数据库运维能力，且数据规模不大，那么可以使用MySQL，这样可以撑一段时间。</li>
+<li>如果是基于云服务，那么就用分布式NoSQL，比如Tablestore或Bigtable。</li>
+<li>如果数据规模很大，那么也要用分布式NoSQL，否则就是走上一条不归路。</li>
+</ul>
+<p>如果使用Tablestore，那么存储库表设计结构如下：</p>
+<img src="/2019/07/19/Feed流系统设计/Tablestore表设计.png" title="This is an example image">
 
-<p>如果超时时间设置长，只能通过显式的del来释放锁，就不会出现问题2（错误释放掉其他client的锁）。跟滴滴KV store的王斌同学讨论过，目前没有找到方案4优于方案3（只要超时时间设置的长一些）的场景。所以，在我的认知中，方案4跟方案3的优势一样，但是方案3的实现成本明显要低很多。</p>
-<p>朴素Redis方案小结</p>
-<p>方案3用的最多，实现成本小，对于大部分场景，将超时时间设置的长一些，极少出现问题。同时本方案对不同语言的友好度极高。</p>
-<h3 id="5-2-ZooKeeper实现方案"><a href="#5-2-ZooKeeper实现方案" class="headerlink" title="5.2 ZooKeeper实现方案"></a>5.2 ZooKeeper实现方案</h3><p>我们先简要介绍一些ZooKeeper（以下简称ZK）：</p>
-<p>ZooKeeper是一种“分布式协调服务”。所谓分布式协调服务，可以在分布式系统中共享配置，协调锁资源，提供命名服务等。为读多写少的场景所设计，ZK中的节点（以下简称ZNode）非常适合用于存储少量的状态和配置信息。</p>
-<p>对ZK常见的操作：</p>
-<p>create：创建节点<br>delete：删除节点<br>exists：判断一个节点的数据<br>setdata：设置一个节点的数据<br>getchildren：获取节点下的所有子节点</p>
-<p>这其中，exists，getData，getChildren属于读操作。Zookeeper客户端在请求读操作的时候，可以选择是否设置Watch（监听机制）。</p>
-<p>什么是Watch？</p>
-<p>Watch机制是zk中非常有用的功能。我们可以理解成是注册在特定Znode上的触发器。当这个Znode发生改变，也就是调用了create，delete，setData方法的时候，将会触发Znode上注册的对应事件，请求Watch的客户端会接收到异步通知。<br>我们在实现分布式锁的时候，正是通过Watch机制，来通知正在等待的session相关锁释放的信息。</p>
-<p>什么是ZNode？</p>
-<p>ZNode就是ZK中的节点。ZooKeeper节点是有生命周期的，这取决于节点的类型。在 ZooKeeper 中，节点类型可以分为临时节点（EPHEMERAL），时序节点（SEQUENTIAL ），持久节点（PERSISTENT ）。</p>
-<p>临时节点（EPHEMERAL）：</p>
-<p>节点的生命周期跟session绑定，session创建的节点，一旦该session失效，该节点就会被删除。</p>
-<p>临时顺序节点（EPHEMERAL_SEQUENTIAL）：</p>
-<p>在临时节点的基础上增加了顺序。每个父结点会为自己的第一级子节点维护一份时序。在创建子节点的时候，会自动加上数字后缀，越后创建的节点，顺序越大，后缀越大。</p>
-<p>持久节点（PERSISTENT ）：</p>
-<p>节点创建之后就一直存在，不会因为session失效而消失。</p>
-<p>持久顺序节点（PERSISTENT_SEQUENTIAL）：</p>
-<p>与临时顺序节点同理。</p>
-<p>ZNode中的数据结构：</p>
-<p>data（znode存储的数据信息），acl（记录znode的访问权限，即哪些人或哪些ip可以访问本节点），stat（包含znode的各种元数据，比如事务id，版本号，时间戳，大小等等），child（当前节点的子节点引用）。</p>
-<p>利用ZK实现分布式锁，主要得益于ZK保证了数据的强一致性。</p>
-<p>下面说说通过zk简单实现一个保持独占的锁（利用临时节点的特性）：</p>
-<p>我们可以将ZK上的ZNode看成一把锁（类似于Redis方案中的key）。多个session都去创建同一个distribute_lock节点，只会有一个创建成功的session。相当于只有该session获取到锁，其他session没有获取到锁。在该成功获锁的session失效前，锁将会一直阻塞住。session失效时，节点会自动被删除，锁被解除。（类似于Redis方案中的expire）。</p>
-<p>上述实现方案跟Redis方案3的实现效果一样。</p>
-<p>但是，这样的锁有没有改进的地方？当然！</p>
-<p>1）我们可能会有可重入的需求，因此希望能有可重入的锁机制。</p>
-<p>2）有些场景下，在争抢锁的时候，我们既不想一次争抢不到就pass，也不想一直阻塞住直到获取到锁。一个朴素的需求是，我们希望有超时时间来控制是否去上锁。更进一步，我们不想主动的去查到底是否能够加锁，我们希望能够有事件机制来通知是否能够上锁。（这里，你是不是想到了ZK的Watch机制呢？）</p>
-<p>要满足这样的需求就需要控制时序。利用顺序临时节点和Watch机制的特性，来实现：</p>
-<p>我们事先创建/distribute_lock节点，多个session在它下面创建临时有序节点。由于zk的特性，/distribute_lock该节点会维护一份sequence，来保证子节点创建的时序性。</p>
-<p>具体实现如下：</p>
-<p>1）客户端调用create()方法在/distribute_lock节点下创建EPHEMERAL_SEQUENTIAL节点。</p>
-<p>2）客户端调用getChildren(“/distribute_lock”)方法来获取所有已经创建的子节点。</p>
-<p>3）客户端获取到所有子节点path之后，如果发现自己在步骤1中创建的节点序号最小，那么就认为这个客户端获得了锁。</p>
-<p>4）如果在步骤3中发现自己并非所有子节点中最小的，说明自己还没有获取到锁。此时客户端需要找到比自己小的那个节点，然后对其调用exist()方法，同时注册事件监听。需要注意是，只在比自己小一号的节点上注册Watch事件。如果在比自己都小的节点上注册Watch事件，将会出现惊群效应，要避免。</p>
-<p>5）之后当这个被关注的节点被移除了，客户端会收到相应的通知。这个时候客户端需要再次调用getChildren(“/distribute_lock”)方法来获取所有已经创建的子节点，确保自己确实是最小的节点了，然后进入步骤3）。</p>
-<p>Curator框架封装了对ZK的api操作。以Java为例来进行演示：<br>引入依赖：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>&lt;dependency&gt;</span><br><span class="line"><span class="symbol">2 </span>  &lt;groupId&gt;org.apache.curator&lt;/groupId&gt;</span><br><span class="line"><span class="symbol">3 </span>  &lt;artifactId&gt;curator-recipes&lt;/artifactId&gt;</span><br><span class="line"><span class="symbol">4 </span>  &lt;version&gt;<span class="number">2.11.1</span>&lt;/version&gt;</span><br><span class="line"><span class="symbol">5 </span>&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<p>到此，我们确定了存储库的选型，那么系统架构的轮廓有了：</p>
+<img src="/2019/07/19/Feed流系统设计/系统架构.png" title="This is an example image">
 
-<p>使用的时候需要注意Curator框架和ZK的版本兼容问题。<br>以排他锁为例，看看怎么使用：</p>
-<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestLock</span> </span>&#123;</span><br><span class="line"> <span class="number">2</span></span><br><span class="line"> <span class="number">3</span>    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) throws Exception &#123;</span><br><span class="line"> <span class="number">4</span>        <span class="comment">//创建zookeeper的客户端</span></span><br><span class="line"> <span class="number">5</span>        RetryPolicy retryPolicy = <span class="keyword">new</span> <span class="type">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>);</span><br><span class="line"> <span class="number">6</span>        CuratorFramework client = CuratorFrameworkFactory.<span class="keyword">new</span><span class="type">Client</span>(“ip:<span class="type">port</span>", retryPolicy);</span><br><span class="line"> <span class="number">7</span>        client.start();</span><br><span class="line"> <span class="number">8</span></span><br><span class="line"> <span class="number">9</span>        <span class="comment">//创建分布式锁, 锁空间的根节点路径为/sunnyzengqi/curator/lock</span></span><br><span class="line"><span class="number">10</span>        InterProcessMutex mutex = <span class="keyword">new</span> <span class="type">InterProcessMutex</span>(client, <span class="string">"/sunnyzengqi/curator/lock"</span>);</span><br><span class="line"><span class="number">11</span>        mutex.acquire();</span><br><span class="line"><span class="number">12</span>        <span class="comment">//获得了锁, 进行业务流程</span></span><br><span class="line"><span class="number">13</span>        System.out.println(<span class="string">"Enter mutex"</span>);</span><br><span class="line"><span class="number">14</span>        Thread.sleep(<span class="number">10000</span>);</span><br><span class="line"><span class="number">15</span>        <span class="comment">//完成业务流程, 释放锁</span></span><br><span class="line"><span class="number">16</span>        mutex.release();</span><br><span class="line"><span class="number">17</span>        <span class="comment">//关闭客户端</span></span><br><span class="line"><span class="number">18</span>        client.close();</span><br><span class="line"><span class="number">19</span>    &#125;</span><br><span class="line"><span class="number">20</span> &#125;</span><br><span class="line"><span class="number">21</span></span><br></pre></td></tr></table></figure>
+<h3 id="3-同步"><a href="#3-同步" class="headerlink" title="3. 同步"></a><strong>3. 同步</strong></h3><p>系统规模和产品类型，以及存储系统确定后，我们可以确定同步方式，常见的方式有三种：</p>
+<ul>
+<li>推模式（也叫写扩散）：和名字一样，就是一种推的方式，发送者发送了一个消息后，立即将这个消息推送给接收者，但是接收者此时不一定在线，那么就需要有一个地方存储这个数据，这个存储的地方我们称为：同步库。推模式也叫写扩散的原因是，一个消息需要发送个多个粉丝，那么这条消息就会复制多份，写放大，所以也叫写扩散。这种模式下，对同步库的要求就是写入能力极强和稳定。读取的时候因为消息已经发到接收者的收件箱了，只需要读一次自己的收件箱即可，读请求的量极小，所以对读的QPS需求不大。归纳下，推模式中对同步库的要求只有一个：写入能力强。</li>
+<li>拉模式（也叫读扩散）：这种是一种拉的方式，发送者发送了一条消息后，这条消息不会立即推送给粉丝，而是写入自己的发件箱，当粉丝上线后再去自己关注者的发件箱里面去读取，一条消息的写入只有一次，但是读取最多会和粉丝数一样，读会放大，所以也叫读扩散。拉模式的读写比例刚好和写扩散相反，那么对系统的要求是：读取能力强。另外这里还有一个误区，很多人在最开始设计feed流系统时，首先想到的是拉模式，因为这种和用户的使用体感是一样的，但是在系统设计上这种方式有不少痛点，最大的是每个粉丝需要记录自己上次读到了关注者的哪条消息，如果有1000个关注者，那么这个人需要记录1000个位置信息，这个量和关注量成正比的，远比用户数要大的多，这里要特别注意，虽然在产品前期数据量少的时候这种方式可以应付，但是量大了后就会事倍功半，得不偿失，切记切记。</li>
+<li>推拉结合模式：推模式在单向关系中，因为存在大V，那么一条消息可能会扩散几百万次，但是这些用户中可能有一半多是僵尸，永远不会上线，那么就存在资源浪费。而拉模式下，在系统架构上会很复杂，同时需要记录的位置信息是天量，不好解决，尤其是用户量多了后会成为第一个故障点。基于此，所以有了推拉结合模式，大部分用户的消息都是写扩散，只有大V是读扩散，这样既控制了资源浪费，又减少了系统设计复杂度。但是整体设计复杂度还是要比推模式复杂。</li>
+</ul>
+<p>用图表对比：</p>
+<img src="/2019/07/19/Feed流系统设计/推拉模式.png" title="This is an example image">
 
-<p>上面代码在业务执行的过程中，在ZK的/sunnyzengqi/curator/lock路径下，会创建一个临时节点来占位。相同的代码，在两个机器节点上运行，可以看到该路径下创建了两个临时节点：</p>
-<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案1.png" title="This is an example image">
+<p>介绍完同步模式中所有场景和模式后，我们归纳下：</p>
+<ul>
+<li>如果产品中是双向关系，那么就采用推模式。</li>
+<li>如果产品中是单向关系，且用户数少于1000万，那么也采用推模式，足够了。</li>
+<li>如果产品是单向关系，单用户数大于1000万，那么采用推拉结合模式，这时候可以从推模式演进过来，不需要额外重新推翻重做。</li>
+<li>永远不要只用拉模式。</li>
+<li>如果是一个初创企业，先用推模式，快速把系统设计出来，然后让产品去验证、迭代，等客户数大幅上涨到1000万后，再考虑升级为推拉集合模式。</li>
+<li>如果是按推荐排序，那么是另外的考虑了，架构会完全不一样，这个后面专门文章介绍。</li>
+</ul>
+<p>如果选择了Tablestore，那么同步库表设计结构如下：</p>
+<img src="/2019/07/19/Feed流系统设计/同步库表.png" title="This is an example image">
 
-<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案2.png" title="This is an example image">
+<p>确定了同步库的架构如下：</p>
+<img src="/2019/07/19/Feed流系统设计/系统架构2.png" title="This is an example image">
 
-<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案3.png" title="This is an example image">
 
-<p>运行命令echo wchc | nc localhost 2181查看watch信息：</p>
-<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案4.png" title="This is an example image">
 
-<p>可以看到lock1节点的session在监听节点lock0的变动。此时是lock0获取到锁。等到lock0执行完，session会失效，触发Watch机制，通知lock1的session说锁已经被释放了。这时，lock1可以来抢占锁，进而执行自己的操作。</p>
-<p>除了简单的排它锁的实现，还可以利用ZK的特性来实现更高级的锁（比如信号量，读写锁，联锁）等，这里面有很多的玩法。</p>
-<p>ZooKeeper方案小结</p>
-<p>能够实现很多具有更高条件的锁机制，并且由于ZK优越的session和watch机制，适用于复杂的场景。因为有久经检验的Curator框架，集成了很多基于ZK的分布式锁的api，对于Java语言非常友好。对于其他语言，虽然也有一些开源项目封装了它的api，但是稳定性和效率需要自己去实际检验。</p>
-<h3 id="5-3-Redisson实现方案"><a href="#5-3-Redisson实现方案" class="headerlink" title="5.3 Redisson实现方案"></a>5.3 Redisson实现方案</h3><p>我们先简要介绍一下Redisson：</p>
-<p>Redisson是Java语言编写的基于Redis的client端。功能也非常强大，功能包括：分布式对象，分布式集合，分布式锁和同步器，分布式服务等。被大家熟知的场景还是在分布式锁的场景。</p>
-<p>为了解决加锁线程在没有解锁之前崩溃进而出现死锁的问题，不同于朴素Redis中通过设置超时时间来处理。Redisson采用了新的处理方式：Redisson内部提供了一个监控锁的看门狗，它的作用是在Redisson实例被关闭前，不断的延长锁的有效期。<br>跟Zookeeper类似，Redisson也提供了这几种分布式锁：可重入锁，公平锁，联锁，红锁，读写锁等。具体怎么用这里不展开，感兴趣的朋友可以自己去实验。</p>
-<p>Redisson方案小结</p>
-<p>跟ZK一样，都能够实现很多具有更高条件的锁机制，适用于复杂的场景。但对语言非常挑剔，目前只能支持Java语言。</p>
-<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><p>上一节，我们讨论了三种实现的方案：朴素Redis实现方案，ZooKeeper实现方案，Redisson实现方案。由于第1种与第3种都是基于Redis，所以主要是ZK和基于Redis两种。我们不禁想问，在实现分布式锁上，基于ZK与基于Redis的方案，有什么不同呢？</p>
-<p>1）锁的时长设置上：</p>
-<p>得益于ZK的session机制，客户端可以持有锁任意长的时间，这可以确保它做完所有需要的资源访问操作之后再释放锁。避免了基于Redis的锁对于有效时间到底设置多长的两难问题。实际上，基于ZooKeeper的锁是依靠Session（心跳）来维持锁的持有状态的，而Redis不支持Sesion。</p>
-<p>优势：ZK&gt;Redisson&gt;朴素Redis。</p>
-<p>2）监听机制上：</p>
-<p>得益于ZK的watch机制，在获取锁失败之后可以等待锁重新释放的事件。这让客户端对锁的使用更加灵活。避免了Redis方案主要去轮询的方式。</p>
-<p>优势：ZK&gt;Redisson=朴素Redis。</p>
-<p>3）使用便利性上：</p>
-<p>由于生产环境都有稳定的Redis和ZooKeeper集群，有专业的同学维护，这两者差别不大。在语言局限性上，朴素Redis从不挑食。ZK和Redisson都偏向于Java语言。在开发难度上，Redis最简单，几乎不用写什么代码；ZK和Redisson次之，依赖于使用的语言是否有集成的api以及集成稳定性等。</p>
-<p>优势：朴素Redis&gt;ZK&gt;Redisson。</p>
-<p>4）支持锁形式的多样性上：</p>
-<p>上面有提及，ZK和Redisson都支持了各种花样的分布锁。朴素Redis就比较捉急了，在实现更高要求的锁方面，如果自己造轮子，往往费时费力，力不从心。</p>
-<p>优势：ZK=Redisson&gt;Redis。</p>
-<h2 id="7-结束语"><a href="#7-结束语" class="headerlink" title="7. 结束语"></a>7. 结束语</h2><p>分布式锁在日常Coding中已经很常用。但是分布式锁这方面的知识依然非常深奥。2016年，Martin Kleppmann与Antirez两位分布式领域非常有造诣的前辈还针对“Redlock算法”在分布式锁上面的应用炒得沸沸扬扬。</p>
-<p><em>最后借助这场历史闹剧中Martin的话来结束我们今天的分享。与诸君共勉！将学习当成一生的主题！</em></p>
-<p><em>对我来说最重要的一点在于：我并不在乎在这场辩论中谁对谁错 —— 我只关心从其他人的工作中学到的东西，以便我们能够避免重蹈覆辙，并让未来更加美好。前人已经为我们创造出了许多伟大的成果：站在巨人的肩膀上，我们得以构建更棒的软件。</em><br>……<br><em>对于任何想法，务必要详加检验，通过论证以及检查它们是否经得住别人的详细审查。那是学习过程的一部分。但目标应该是为了获得知识，而不应该是为了说服别人相信你自己是对的。有时候，那只不过意味着停下来，好好地想一想。</em></p>
-<p>由于时间仓促，自己水平有限，文中必定存在诸多疏漏与理解不当的地方。非常希望得到各位指正，畅谈技术。</p>
-<p>▍Reference</p>
-<p><a href="https://zookeeper.apache.org/" target="_blank" rel="noopener">0.Apache ZooKeeper</a><br><a href="https://github.com/redisson/redisson" target="_blank" rel="noopener">1.Redisson</a><br><a href="https://redis.io/" target="_blank" rel="noopener">2.Redis</a><br>3.Redis分布式锁进化史<br><a href="https://tech.meituan.com/2016/09/29/distributed-system-mutually-exclusive-idempotence-cerberus-gtis.html" target="_blank" rel="noopener">4.分布式系统互斥性与幂等性问题的分析与解决</a><br>5.浅谈可重入性及其他<br><a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">6.Distributed locks with Redis</a><br><a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">7.How to do distributed locking</a><br><a href="http://antirez.com/news/101" target="_blank" rel="noopener">8.Is Redlock safe?</a><br>9.Note on fencing and distributed locks</p>
+<h3 id="4-元数据"><a href="#4-元数据" class="headerlink" title="4. 元数据"></a><strong>4. 元数据</strong></h3><p>前面介绍了同步和存储后，整个Feed流系统的基础功能完成了，但是对于一个完整Feed流产品而言，还缺元数据部分，接下来，我们看元数据如何处理：</p>
+<p>Feed流系统中的元数据主要包括：</p>
+<ul>
+<li>用户详情和列表。</li>
+<li>关注或好友关系。</li>
+<li>推送session池。</li>
+</ul>
+<p>我们接下来逐一来看。</p>
+<h4 id="4-1-用户详情和列表"><a href="#4-1-用户详情和列表" class="headerlink" title="4.1 用户详情和列表"></a><strong>4.1 用户详情和列表</strong></h4><p>主要是用户的详情，包括用户的各种自定义属性和系统附加的属性，这部分的要求只需要根据用户ID查询到就可以了。</p>
+<p>可以采用的分布式NoSQL系统或者关系型数据库都可以。</p>
+<p>如果使用NoSQL数据库Tablestore，那么用户详情表设计结构如下：</p>
+<img src="/2019/07/19/Feed流系统设计/用户详情表.png" title="This is an example image">
+
+<h4 id="4-2-关注或好友关系"><a href="#4-2-关注或好友关系" class="headerlink" title="4.2 关注或好友关系"></a><strong>4.2 关注或好友关系</strong></h4><p>这部分是存储关系，查询的时候需要支持查询关注列表或者粉丝列表，或者直接好友列表，这里就需要根据多个属性列查询需要索引能力，这里，存储系统也可以采用两类，关系型、分布式NoSQL数据库。</p>
+<ul>
+<li>如果已经有了关系型数据库了，且数据量较少，则选择关系型数据库，比如MySQL等。</li>
+<li>如果数据量比较大，这个时候就有两种选择：</li>
+</ul>
+<ol>
+<li>使用具有索引的系统，比如云上的Tablestore，更简单，吞吐更高，扩容能力也一并解决了。</li>
+<li>需要分布式事务，可以采用支持分布式事务的系统，比如分布式关系型数据库。</li>
+</ol>
+<p>如果使用Tablestore，那么关注关系表设计结构如下：</p>
+<p>Table：user_relation_table</p>
+<img src="/2019/07/19/Feed流系统设计/用户关系表.png" title="This is an example image">
+
+<p>多元索引的索引结构：</p>
+<img src="/2019/07/19/Feed流系统设计/多元索引表.png" title="This is an example image">
+
+<p>查询的时候：</p>
+<ul>
+<li>如果需要查询某个人的粉丝列表：使用TermQuery查询固定user_id，且按照timestamp排序。</li>
+<li>如果需要查询某个人的关注列表：使用TermQuery查询固定follow_user_id，且按照timestamp排序。</li>
+<li>当前数据写入Table后，需要5~10秒钟延迟后会在多元索引中查询到，未来会优化到2秒以内。</li>
+</ul>
+<p>除了使用多元索引外，还可以使用GlobalIndex。</p>
+<h4 id="4-3-推送session池"><a href="#4-3-推送session池" class="headerlink" title="4.3 推送session池"></a><strong>4.3 推送session池</strong></h4><p>思考一个问题，发送者将消息发送后，接收者如何知道自己有新消息来了？客户端周期性去刷新？如果是这样子，那么系统的读请求压力会随着客户端增长而增长，这时候就会有一个风险，比如平时的设备在线率是20%~30%，突然某天平台爆发了一个热点消息，大量休眠设备登陆，这个时候就会出现“查询风暴”，一下子就把系统打垮了，所有的用户都不能用了。</p>
+<p>解决这个问题的一个思路是，在服务端维护一个推送session池，这个里面记录哪些用户在线，然后当用户A发送了一条消息给用户B后，服务端在写入存储库和同步库后，再通知一下session池中的用户B的session，告诉他：你有新消息了。然后session-B再去读消息，然后有消息后将消息推送给客户端。或者有消息后给客户端推送一下有消息了，客户端再去拉。</p>
+<p>这个session池使用在同步中，但是本质还是一个元数据，一般只需要存在于内存中即可，但是考虑到failover情况，那就需要持久化，这部分数据由于只需要指定单Key查询，用分布式NoSQL或关系型数据库都可以，一般复用当前的系统即可。</p>
+<p>如果使用Tablestore，那么session表设计结构如下：</p>
+<img src="/2019/07/19/Feed流系统设计/session表.png" title="This is an example image">
+
+
+
+<h3 id="5-评论"><a href="#5-评论" class="headerlink" title="5. 评论"></a><strong>5. 评论</strong></h3><p>除了私信类型外，其他的feed流类型中，都有评论功能，评论的属性和存储库差不多，但是多了一层关系：被评论的消息，所以只要将评论按照被被评论消息分组组织即可，然后查询时也是一个范围查询就行。这种查询方式很简单，用不到关系型数据库中复杂的事务、join等功能，很适合用分布式NoSQL数据库来存储。</p>
+<p>所以，一般的选择方式就是：</p>
+<ul>
+<li>如果系统中已经有了分布式NoSQL数据库，比如Tablestore、Bigtable等，那么直接用这些即可。</li>
+<li>如果没有上述系统，那么如果有MySQL等关系型数据库，那就选关系型数据库即可。</li>
+<li>如果选择了Tablestore，那么“评论表”设计结构如下：</li>
+</ul>
+<img src="/2019/07/19/Feed流系统设计/评论表.png" title="This is an example image">
+
+<p>如果需要搜索评论内容，那么对这张表建立多元索引即可。</p>
+<h3 id="6-赞"><a href="#6-赞" class="headerlink" title="6. 赞"></a><strong>6. 赞</strong></h3><p>最近几年，“赞”或“like”功能很流行，赞功能的实现和评论类似，只是比评论少了一个内容，所以选择方式和评论一样。</p>
+<p>如果选择了Tablestore，那么“赞表”设计结构同评论表，这里就不再赘述了。</p>
+<p>系统架构中加了元数据系统后的架构如下：</p>
+<img src="/2019/07/19/Feed流系统设计/系统架构4.png" title="This is an example image">
+
+
+
+<h3 id="7-搜索"><a href="#7-搜索" class="headerlink" title="7. 搜索"></a><strong>7. 搜索</strong></h3><p>到此，我们已经介绍完了Feed流系统的主题架构，Feed流系统算是完成了。但是Feed流产品上还未结束，对于所有的feed流产品都需要有搜索能力，比如下面场景：</p>
+<ul>
+<li>微博中的搜索用户。</li>
+<li>搜索微博内容。</li>
+<li>微信中搜索好友等。</li>
+</ul>
+<p>这些内容搜索只需要字符匹配到即可，不需要非常复杂的相关性算法，所以只需要有能支持分词的检索功能即可，所以一般有两种做法：</p>
+<p>使用搜索引擎，将存储库的内容和用户信息表内容推送给搜索系统，搜索的时候直接访问搜索系统。</p>
+<p>使用具备全文检索能力的数据库，比如最新版的MySQL、MongoDB或者Tablestore。</p>
+<p>所以，选择的原则如下：</p>
+<ul>
+<li>如果存储库使用了MySQL或者Tablestore，那么直接选择这两个系统就可以了。</li>
+<li>如果整个系统都没使用MySQL、Tablestore，且已经使用了搜索系统，那么可以直接复用搜索系统，其他场景都不应该再额外加一个搜索系统进来，徒添复杂度。</li>
+</ul>
+<p>如果使用Tablestore，那么只需要在相应表上建立多元索引即可：</p>
+<ul>
+<li>如果需要对用户名支持搜索，那么需要对user_table建立多元索引，其中的nick_name需要是Text类型，且单字分词。</li>
+<li>如果需要对Feed流内容支持搜索，那么需要对存储库表：store_table建立多元索引，这样就能直接对Feed流内容进行各种复杂查询了，包括多条件筛选、全文检索等。</li>
+</ul>
+<p>系统架构中加了搜索功能后的架构如下：</p>
+<img src="/2019/07/19/Feed流系统设计/系统架构5.png" title="This is an example image">
+
+
+
+<h3 id="8-排序"><a href="#8-排序" class="headerlink" title="8. 排序"></a><strong>8. 排序</strong></h3><p>目前的Feed流系统中的排序方式有两种，一种是时间，一种是分数。</p>
+<p>我们常用的微博、朋友圈、私信这些都是时间线类型的，因为这些产品定义中，需要我们主动关注某些人后才会看到这些人发表的内容，这个时候，最重要的是实时性，而不是发布质量，就算关注人发布了一条垃圾信息，我们也会被动看到。这种类型的产品适用于按照时间线排序。这一篇我们介绍的架构都是基于时间类型的。</p>
+<p>另外一种是不需要关注任何人，我们能看到的都是系统希望我们看到的，系统在后台会分析我们的每个人的爱好，然后给每个人推送差异化的、各自喜欢的内容，这一种的架构和基于时间的完全不一样，我们在后续的推荐类型中专门介绍。</p>
+<h3 id="9-删除Feed内容"><a href="#9-删除Feed内容" class="headerlink" title="9. 删除Feed内容"></a><strong>9. 删除Feed内容</strong></h3><p>在Feed流应用中有一个问题，就是如果用户删除了之前发表的内容，系统该如何处理？因为系统里面有写扩散，那么删除的时候是不是也要写扩散一遍？这样的话，删除就不及时了，很难应对法律法规要求的快速删除。</p>
+<p>针对这个问题，我们在之前设计的时候，同步表中只有消息ID，没有消息内容，在用户读取的时候需要到存储库中去读消息内容，那么我们可以直接删除存储库中的这一条消息，这样用户读取的时候使用消息ID是读不到数据的，也就相当于删除的内容，而且删除速度会很快。除了直接删除外，另外一种办法是逻辑删除，对于删除的feed内容，只做标记，当查询到带有标记的数据时就认为删除了。</p>
+<h3 id="10-更新Feed内容"><a href="#10-更新Feed内容" class="headerlink" title="10. 更新Feed内容"></a><strong>10. 更新Feed内容</strong></h3><p>更新和删除Feed处理逻辑一样，如果使用了支持多版本的存储系统，比如Tablestore，那么也可以支持编辑版本，和现在的微博一样。</p>
+<h3 id="11-总结"><a href="#11-总结" class="headerlink" title="11. 总结"></a><strong>11. 总结</strong></h3><p>上面介绍了不同子功能的特点和系统要求，能满足需求的系统主要有两类，一类是阿里云的Tablestore单系统，一类是开源组件组成的组合系统。</p>
+<ul>
+<li><p>开源组件组成的组合系统：包括MySQL、Redis、HBase等，这些系统单个都不能解决Feed流系统中遇到的问题，需要组合在一起，各司其职才能完成一个Feed流系统，适用于热衷开源系统，人多且喜欢运维操作的团队。</p>
+</li>
+<li><p>Tablestore单系统：只使用Tablestore单个系统就能解决上述的所有问题，这时候肯定有人要问？你是不是在吹牛？这里不是吹牛，Tablestore在三年前就已经开始重视Feed流类型业务，之前也发表过多篇文章介绍，功能上也在专门为Feed流系统特别定制设计，所以到今天，只使用Tablestore一款产品，是可以满足上述需求的。选择Tablestore做Feed流系统的用户具有以下一些特征：</p>
+<p>产品设计目标规模大，千万级或亿级。</p>
+<p>不喜欢运维，喜欢专注于开发。</p>
+<p>高效率团队，希望尽快将产品实现落地。</p>
+<p>希望一劳永逸，未来系统随着用户规模增长可以自动扩容。</p>
+<p>希望能按量付费，用户少的时候费用低，等用户增长起来后费用在跟随用户数增长。<br>如果具有上述四个特征的任何一个，那么都是适合于用Tablestore。</p>
+</li>
+</ul>
 
       
 
@@ -490,7 +1487,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">分布式</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">feed</a>
         		</li>
       		
 		</ul>
@@ -500,7 +1497,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/分布式锁/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/07/19/Feed流系统设计/">展开全文 >></a>
         </p>
       
 
@@ -777,112 +1774,6 @@
 
 
   
-    <article id="post-中台" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/中台/">中台</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/19/中台/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="中台"><a href="#中台" class="headerlink" title="中台"></a>中台</h1><h2 id="什么是中台"><a href="#什么是中台" class="headerlink" title="什么是中台"></a>什么是中台</h2><p>引用王健老师在《当我们谈中台时，我们在谈些什么| 白话中台战略》一文中提到的关于中台的一些理解</p>
-<blockquote>
-<p> 在有些人眼里：中台就是技术平台，像微服务开发框架、Devops平台、PaaS平台，容器云之类的，人们都叫它<strong>“技术中台”</strong>。
-在有些人眼里：中台就是微服务业务平台，像最常见的什么用户中心，订单中心，各种微服务集散地，人们都叫它<strong>“业务中台”</strong>。
-在有些人眼里：中台应该是组织的事情，在释放潜能：类似于企业内部资源调度中心和内部创新孵化组织，人们叫它<strong>“组织中台”</strong>。</p>
-</blockquote>
-<p>这些理解都对，但也都有不够准确或不够完整的部分。</p>
-<p>在查阅了大量资料，目前行业内对于中台讨论的视角还是多偏于战略或组织架构层面，而*<em>中台更多是因为公司业务在发展到某一阶段时，遇到瓶颈与障碍后，为解决实际问题而提出的解决方案。  *</em></p>
-<h2 id="为什么需要中台"><a href="#为什么需要中台" class="headerlink" title="为什么需要中台"></a>为什么需要中台</h2><p><strong>中台的产生，并非完全是自顶向下的战略设计，也并非是为了追随某种行业风口，而是随着公司业务高速发展、组织不断膨胀的过程中暴露的种种问题需要被解决。</strong>而这时，中台的概念恰好对应了这个问题，所以大家接受了中台。</p>
-<p>过去几年中，借着移动互联网的红利，许多公司都高速发展，进行大规模业务拓展，业务拓展的速度足够快，对公司自然是好事，但是随着而来的问题就是，公司内部出现了大量的重复建设和资源浪费的现象。</p>
-<p>阿里的共享服务部发展历程就是如此。</p>
-<p>公司刚开始只有淘宝，后来意识到B2C模式的业务也会是电商领域重要的组成部门，所以出现了天猫，随着天猫的不断发展，逐渐独立成一个部门，但是这两套都包含订单、商品、库存、价格、仓储、物流等基本业务系统。这两个系统互相独立，各自运行。</p>
-<p>等到10年左右，阿里开始上线1688、聚划算等业务的时候发现，这些业务针对的领域虽然各不相同，但是他需要用到的系统功能也高度类似，主要也是订单、商品、库存、价格、仓储、物流等系统。如果这些新业务的系统也都要全部重新开发一遍，这无疑是很大的资源浪费。明明既有的系统调整一下就可以满足新业务的需求，为什么还要继续开发新系统呐？</p>
-<p>在这个大的背景之下，阿里内部将共享服务部的职权不断提升，统一将各个业务业务部门重复使用，反复建设的功能和系统统一规划和管理。</p>
-<p>滴滴在15年末开始启动自己的中台战略，这与滴滴当时的业务发展阶段也是相关的。</p>
-<p>2015 年末，滴滴在短时间内形成了包括快车、出租车、专车、顺风车、代驾等多业务的垂直化架构。</p>
-<p>这些业务虽然会有一些差别，但是核心系统和流程都是类似的。如果各自独立开发，也会出现各种各样的问题。</p>
-<p>比如说，开发成本过高，滴滴旗下的每个业务，其实都是可以单独支撑起一家公司的，如果每个业务都独立做到极致，那么开发成本和人力成本就会非常巨大，而如果为了控制成本，就把系统的建设放缓，则意味着，无论是核心系统本身的质量，还是对外的用户体验都不太好。</p>
-<p>在这样的背景下，滴滴也开始考虑将诸多业务，以及各个城市的系统统一规划，统一建设，提升服务前台的能力。</p>
-<p>许多正在实践中台业务的公司，都有类似的问题，这些问题，大约会是两类——</p>
-<p><strong>一类是，许多业务需求或功能需求高度类似、通用化程度很高，但是由于没有专门的团队负责规划和开发，大量的系统重复开发、重复建设，导致复用性低、效率低、产研资源浪费、用户体验不统一。</strong></p>
-<p>另一类是，早期业务发展过程中，为了解决一些当下的业务问题，垂直的、个性化的业务逻辑与基础系统耦合太深，<strong>由于没有平台性质的规划，横向系统之间、上下游系统之间的交叉逻辑也非常多，这样导致在新业务、新市场的拓展过程中，系统没法直接复用，甚至没法快速迭代。</strong></p>
-<p>这两类问题，在软件开发领域，有专门的名称，叫做“重复造轮子”和“烟囱式架构”。这两类问题本质上是企业在发展过程当中，为了解决当下的业务问题，快速上线了很多功能，而欠下了许多技术债，当企业进入成熟期之后，发现这些问题的存在，严重影响了企业的运行效率和运营成本。</p>
-<p>现阶段，大多数提出中台战略或是建设大中台的公司，大多都有类似的困境。业务高速发展多年，许多问题积重难返或者大量在解决“重复造轮子”的问题，中台这个概念，很多情况下是因为契合了大公司业务的发展的情况，而被大家广泛认可。</p>
-<h2 id="中台能解决什么问题"><a href="#中台能解决什么问题" class="headerlink" title="中台能解决什么问题"></a>中台能解决什么问题</h2><p>前面的内容，我们大致介绍了中台要解决的问题。这给我们一种感觉是，中台是只有大公司才能做的事情，因为毕竟只有大公司在会有这种多条业务线，需要大量通用功能的场景，也只有只有大公司有能力拿出如此大的资源打造个中台。</p>
-<p>现实情况也如我们所说，<strong>很多公司的中台业务，实际业务发展到一定阶段，进入一个瓶颈之后，为了能够应对接下来的问题，才一点一点从内部开始推动解决之前的问题。</strong></p>
-<p>中台作为一种产品设计思路，或者系统架构思路，并不受限于公司的规模，理论上讲，任何一家即将或者正在面临业务高速增长的状态时，都很值得利用和借鉴中台的思路，将目前业务当中大量可复用的功能和场景进行梳理，为业务的高速增长做好准备。</p>
-<p>这在中小公司当中，是有现实意义的。</p>
-<p>对于很多中小公司，当他们走出生存困境，进入到高速发展阶段时，会遇到很多的问题，但大概率会遇到的一个问题是，<strong>过往的业务模型，产品能力很有可能没法完全承接住大规模用户增长带来的压力。</strong></p>
-<p>而当你具体到每个用户的时候，你又能发现，他们遇到的问题你之前都遇到过，只不过，因为一下来的太多，你没法像过去一样提供达预期，甚至超预期的服务时，对方就会产生不满。</p>
-<p>这也是为什么许多公司会生于拉新，死于留存的一个原因。</p>
-<p>很多公司在这个阶段的选择都是为了临时解决一个问题，快速上线一个功能，也不是不可以，只不过，很有可能你的解决方案会不断带来新的问题，最后陷入到功能太过复杂，以至于积重难返的地步。</p>
-<p>所以，在有可能的情况下，公司将一些大概率长期有价值的功能，专门模块化，进行开发和优化，确保即使业务规模进一步扩大，也能够满足业务需求。甚至，随着能力或方法论的不断优化，甚至有可能某一天成为整个行业的方法论。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">中台</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/中台/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-为什么分布式" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1031,6 +1922,112 @@
 
 
   
+    <article id="post-中台" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/19/中台/">中台</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/19/中台/" class="archive-article-date">
+  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="中台"><a href="#中台" class="headerlink" title="中台"></a>中台</h1><h2 id="什么是中台"><a href="#什么是中台" class="headerlink" title="什么是中台"></a>什么是中台</h2><p>引用王健老师在《当我们谈中台时，我们在谈些什么| 白话中台战略》一文中提到的关于中台的一些理解</p>
+<blockquote>
+<p> 在有些人眼里：中台就是技术平台，像微服务开发框架、Devops平台、PaaS平台，容器云之类的，人们都叫它<strong>“技术中台”</strong>。
+在有些人眼里：中台就是微服务业务平台，像最常见的什么用户中心，订单中心，各种微服务集散地，人们都叫它<strong>“业务中台”</strong>。
+在有些人眼里：中台应该是组织的事情，在释放潜能：类似于企业内部资源调度中心和内部创新孵化组织，人们叫它<strong>“组织中台”</strong>。</p>
+</blockquote>
+<p>这些理解都对，但也都有不够准确或不够完整的部分。</p>
+<p>在查阅了大量资料，目前行业内对于中台讨论的视角还是多偏于战略或组织架构层面，而*<em>中台更多是因为公司业务在发展到某一阶段时，遇到瓶颈与障碍后，为解决实际问题而提出的解决方案。  *</em></p>
+<h2 id="为什么需要中台"><a href="#为什么需要中台" class="headerlink" title="为什么需要中台"></a>为什么需要中台</h2><p><strong>中台的产生，并非完全是自顶向下的战略设计，也并非是为了追随某种行业风口，而是随着公司业务高速发展、组织不断膨胀的过程中暴露的种种问题需要被解决。</strong>而这时，中台的概念恰好对应了这个问题，所以大家接受了中台。</p>
+<p>过去几年中，借着移动互联网的红利，许多公司都高速发展，进行大规模业务拓展，业务拓展的速度足够快，对公司自然是好事，但是随着而来的问题就是，公司内部出现了大量的重复建设和资源浪费的现象。</p>
+<p>阿里的共享服务部发展历程就是如此。</p>
+<p>公司刚开始只有淘宝，后来意识到B2C模式的业务也会是电商领域重要的组成部门，所以出现了天猫，随着天猫的不断发展，逐渐独立成一个部门，但是这两套都包含订单、商品、库存、价格、仓储、物流等基本业务系统。这两个系统互相独立，各自运行。</p>
+<p>等到10年左右，阿里开始上线1688、聚划算等业务的时候发现，这些业务针对的领域虽然各不相同，但是他需要用到的系统功能也高度类似，主要也是订单、商品、库存、价格、仓储、物流等系统。如果这些新业务的系统也都要全部重新开发一遍，这无疑是很大的资源浪费。明明既有的系统调整一下就可以满足新业务的需求，为什么还要继续开发新系统呐？</p>
+<p>在这个大的背景之下，阿里内部将共享服务部的职权不断提升，统一将各个业务业务部门重复使用，反复建设的功能和系统统一规划和管理。</p>
+<p>滴滴在15年末开始启动自己的中台战略，这与滴滴当时的业务发展阶段也是相关的。</p>
+<p>2015 年末，滴滴在短时间内形成了包括快车、出租车、专车、顺风车、代驾等多业务的垂直化架构。</p>
+<p>这些业务虽然会有一些差别，但是核心系统和流程都是类似的。如果各自独立开发，也会出现各种各样的问题。</p>
+<p>比如说，开发成本过高，滴滴旗下的每个业务，其实都是可以单独支撑起一家公司的，如果每个业务都独立做到极致，那么开发成本和人力成本就会非常巨大，而如果为了控制成本，就把系统的建设放缓，则意味着，无论是核心系统本身的质量，还是对外的用户体验都不太好。</p>
+<p>在这样的背景下，滴滴也开始考虑将诸多业务，以及各个城市的系统统一规划，统一建设，提升服务前台的能力。</p>
+<p>许多正在实践中台业务的公司，都有类似的问题，这些问题，大约会是两类——</p>
+<p><strong>一类是，许多业务需求或功能需求高度类似、通用化程度很高，但是由于没有专门的团队负责规划和开发，大量的系统重复开发、重复建设，导致复用性低、效率低、产研资源浪费、用户体验不统一。</strong></p>
+<p>另一类是，早期业务发展过程中，为了解决一些当下的业务问题，垂直的、个性化的业务逻辑与基础系统耦合太深，<strong>由于没有平台性质的规划，横向系统之间、上下游系统之间的交叉逻辑也非常多，这样导致在新业务、新市场的拓展过程中，系统没法直接复用，甚至没法快速迭代。</strong></p>
+<p>这两类问题，在软件开发领域，有专门的名称，叫做“重复造轮子”和“烟囱式架构”。这两类问题本质上是企业在发展过程当中，为了解决当下的业务问题，快速上线了很多功能，而欠下了许多技术债，当企业进入成熟期之后，发现这些问题的存在，严重影响了企业的运行效率和运营成本。</p>
+<p>现阶段，大多数提出中台战略或是建设大中台的公司，大多都有类似的困境。业务高速发展多年，许多问题积重难返或者大量在解决“重复造轮子”的问题，中台这个概念，很多情况下是因为契合了大公司业务的发展的情况，而被大家广泛认可。</p>
+<h2 id="中台能解决什么问题"><a href="#中台能解决什么问题" class="headerlink" title="中台能解决什么问题"></a>中台能解决什么问题</h2><p>前面的内容，我们大致介绍了中台要解决的问题。这给我们一种感觉是，中台是只有大公司才能做的事情，因为毕竟只有大公司在会有这种多条业务线，需要大量通用功能的场景，也只有只有大公司有能力拿出如此大的资源打造个中台。</p>
+<p>现实情况也如我们所说，<strong>很多公司的中台业务，实际业务发展到一定阶段，进入一个瓶颈之后，为了能够应对接下来的问题，才一点一点从内部开始推动解决之前的问题。</strong></p>
+<p>中台作为一种产品设计思路，或者系统架构思路，并不受限于公司的规模，理论上讲，任何一家即将或者正在面临业务高速增长的状态时，都很值得利用和借鉴中台的思路，将目前业务当中大量可复用的功能和场景进行梳理，为业务的高速增长做好准备。</p>
+<p>这在中小公司当中，是有现实意义的。</p>
+<p>对于很多中小公司，当他们走出生存困境，进入到高速发展阶段时，会遇到很多的问题，但大概率会遇到的一个问题是，<strong>过往的业务模型，产品能力很有可能没法完全承接住大规模用户增长带来的压力。</strong></p>
+<p>而当你具体到每个用户的时候，你又能发现，他们遇到的问题你之前都遇到过，只不过，因为一下来的太多，你没法像过去一样提供达预期，甚至超预期的服务时，对方就会产生不满。</p>
+<p>这也是为什么许多公司会生于拉新，死于留存的一个原因。</p>
+<p>很多公司在这个阶段的选择都是为了临时解决一个问题，快速上线一个功能，也不是不可以，只不过，很有可能你的解决方案会不断带来新的问题，最后陷入到功能太过复杂，以至于积重难返的地步。</p>
+<p>所以，在有可能的情况下，公司将一些大概率长期有价值的功能，专门模块化，进行开发和优化，确保即使业务规模进一步扩大，也能够满足业务需求。甚至，随着能力或方法论的不断优化，甚至有可能某一天成为整个行业的方法论。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">中台</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/19/中台/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-数据库读写分离" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1144,19 +2141,19 @@
 
 
   
-    <article id="post-MongoDB" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-分布式锁" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/MongoDB/">MongoDB</a>
+      <a class="article-title" href="/2019/07/19/分布式锁/">分布式锁</a>
     </h1>
   
 
         
-        <a href="/2019/07/19/MongoDB/" class="archive-article-date">
+        <a href="/2019/07/19/分布式锁/" class="archive-article-date">
   	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
 </a>
         
@@ -1164,94 +2161,171 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="MongoDB索引"><a href="#MongoDB索引" class="headerlink" title="MongoDB索引"></a>MongoDB索引</h3><p>索引能够极大的提高查询的效率，如果没有索引，MongoDB在读取数据时必须扫描集合中的每个文件并选取那些符合查询条件的记录。这种扫描全集合的查询效率是非常低的，特别是处理大量的数据时，查询可以要胡斐几十秒甚至几分钟，这对网站的性能是非常致命的。</p>
-<p>索引是特殊的数据结构，索引存储在一个易于遍历读取的数据集合中，索引是对数据库表中一列或多列的值进行排序的一种结构。</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db<span class="selector-class">.collection</span><span class="selector-class">.createIndex</span>(keys, options)</span><br></pre></td></tr></table></figure>
-
-<p>语法中 Key 值为你要创建的索引字段，1 为指定按升序创建索引，如果你想按降序来创建索引指定为 -1 即可。</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db<span class="selector-class">.col</span><span class="selector-class">.createIndex</span>(&#123;<span class="string">"title"</span>:<span class="number">1</span>&#125;)</span><br></pre></td></tr></table></figure>
-
-<h3 id="MongoDB聚合"><a href="#MongoDB聚合" class="headerlink" title="MongoDB聚合"></a>MongoDB聚合</h3><p>用于处理数据（统计平均值，求和等），并返回计算后的结果，类似sql中的count(*)等聚合函数。</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db<span class="selector-class">.COLLECTION_NAME</span><span class="selector-class">.aggregate</span>(AGGREGATE_OPERATION)</span><br></pre></td></tr></table></figure>
-
-<h4 id="管道的概念"><a href="#管道的概念" class="headerlink" title="管道的概念"></a>管道的概念</h4><p>MongoDB的聚合管道将MongoDB文档在一个管道处理完毕后将结果传递给下一个管道处理。管道操作是可以重复的。</p>
-<p>表达式：处理输入文档并输出。表达式是无状态的，只能用于计算当前聚合管道的文档，不能处理其它的文档。</p>
-<p>这里我们介绍一下聚合框架中常用的几个操作：</p>
+        <p>前言：随着计算机技术和工程架构的发展，微服务变得越来越热。如今，绝大多数服务都处于分布式环境中，其中，数据一致性是我们一直关注的重点。分布式锁到底是什么？经过了哪些发展演进？工程上有哪些实现方案？各种方案的利弊权衡又有哪些？希望这篇文章能够对你有一些帮助。</p>
+<p>▍阅读索引</p>
+<p>[TOC]</p>
+<h2 id="0-名词定义"><a href="#0-名词定义" class="headerlink" title="0. 名词定义"></a>0. 名词定义</h2><p>分布式锁：顾名思义，是指在分布式环境下的锁，重点在锁。所以我们先从锁开始讲起。</p>
+<h2 id="1-问题引入"><a href="#1-问题引入" class="headerlink" title="1. 问题引入"></a>1. 问题引入</h2><p>举个例子：</p>
+<p>某服务记录数据X，当前值为100。A请求需要将X增加200；同时，B请求需要将X减100。 在理想的情况下，A先读取到X=100，然后X增加200，最后写入X=300。B请求接着读取到X=300，减少100，最后写入X=200。 然而在真实情况下，如果不做任何处理，则可能会出现：A和B同时读取到X=100；A写入之前B读取到X；B比A先写入等等情况。</p>
+<p>上面这个例子相信大家都非常熟悉。出现不符合预期的结果本质上是对临界资源没有做好互斥操作。互斥性问题通俗来讲，就是对共享资源的抢占问题。对于共享资源争抢的正确性，锁是最常用的方式，其他的如CAS（compare and swap）等，这里不展开。</p>
+<h2 id="2-分布式环境的特点"><a href="#2-分布式环境的特点" class="headerlink" title="2. 分布式环境的特点"></a>2. 分布式环境的特点</h2><p>我们的绝大部分服务都处于分布式环境中。那么，分布式系统有哪些特点呢？大致如下：</p>
 <ul>
-<li>$project：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。</li>
-<li>$match：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。</li>
-<li>$limit：用来限制MongoDB聚合管道返回的文档数。</li>
-<li>$skip：在聚合管道中跳过指定数量的文档，并返回余下的文档。</li>
-<li>$unwind：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。</li>
-<li>$group：将集合中的文档分组，可用于统计结果。</li>
-<li>$sort：将输入文档排序后输出。</li>
-<li>$geoNear：输出接近某一地理位置的有序文档。</li>
+<li>可扩展性：可通过横向水平扩展提高系统的性能和吞吐量。</li>
+<li>高可靠性：高容错，即使系统中一台或几台故障，系统仍可提供服务。</li>
+<li>高并发性：各机器并行独立处理和计算。</li>
+<li>廉价高效：多台小型机而非单台高性能机。</li>
 </ul>
-<h3 id="MongoDB复制"><a href="#MongoDB复制" class="headerlink" title="MongoDB复制"></a>MongoDB复制</h3><p>MongoDB复制是将数据同步在多个服务器的过程。</p>
-<p>复制提供了数据的冗余备份，并在多个服务器上存储数据副本，提高了数据的可用性，并可以保证数据的安全性。</p>
-<p>复制还运行从硬件故障和服务终端中恢复数据</p>
-<h4 id="什么是复制"><a href="#什么是复制" class="headerlink" title="什么是复制"></a>什么是复制</h4><ul>
-<li>保障数据的安全性</li>
-<li>数据高可用性</li>
-<li>灾难恢复</li>
-<li>无需停机维护</li>
-<li>分布式读取数据</li>
-</ul>
-<h4 id="MongoDB复制原理"><a href="#MongoDB复制原理" class="headerlink" title="MongoDB复制原理"></a>MongoDB复制原理</h4><p>MongoDB的复制至少需要俩个节点。其中一个是主节点，负责处理客户端请求，其余的都是从节点，负责复制主节点上的数据。</p>
-<p>MongoDB各个节点常见的搭配方式为：一主一从、一主多从。</p>
-<p>主节点记录在其上的所有操作oplog，从节点定期轮询主节点获取这些操作，然后读自己的数据副本指向这些操作，从而保证从节点的数据与主节点一直。</p>
-<p>MongoDB的复制结构图：</p>
-<img src="/2019/07/19/MongoDB/1561449599163.png" title="This is an example image">
-
-<p>从上结构图可以看出，客户端从主节点读取数据，在客户端写入数据到主节点时，主节点与从节点进行数据交互保障数据的一致性。</p>
-<p>副本集特征：</p>
+<h2 id="3-锁"><a href="#3-锁" class="headerlink" title="3.锁"></a>3.锁</h2><p>我们先来看下非分布式情况下的锁方案（多线程和多进程的情况），然后再演进到分布式锁。</p>
+<h3 id="多线程下的锁机制："><a href="#多线程下的锁机制：" class="headerlink" title="多线程下的锁机制："></a>多线程下的锁机制：</h3><p>各种语言有不同的实现方式，比较成熟。比如，go语言中的sync.RWMutex（读写锁）、sync.Mutex（互斥锁）；JAVA中的ReentrantLock、synchronized；在php中没有找到原生的支持锁的方式，只能通过外部来间接实现，比如文件锁，借助外部存储的锁等。</p>
+<h3 id="多进程下的锁机制："><a href="#多进程下的锁机制：" class="headerlink" title="多进程下的锁机制："></a>多进程下的锁机制：</h3><p>对于临界资源的访问已经超出了单个进程的控制范围。在多进程的情况下，主要是利用操作系统层面的进程间通信原理来解决临界资源的抢占问题。比较常见的一种方法便是使用信号量（Semaphores）。</p>
+<p>▍对信号量的操作，主要是P操作（wait）和V操作（signal）：</p>
 <ul>
-<li>N个节点的集群</li>
-<li>任何节点可作为主节点</li>
-<li>所有写入操作都在主节点上</li>
-<li>自动故障转移</li>
-<li>自动恢复</li>
+<li>P操作 ( wait ) ：</li>
 </ul>
-<h3 id="MongoDB分片"><a href="#MongoDB分片" class="headerlink" title="MongoDB分片"></a>MongoDB分片</h3><h4 id="分片"><a href="#分片" class="headerlink" title="分片"></a>分片</h4><p>在MongoDB中存在另外一种集群，就是分片技术，可以满足MongoDB数据量大量增长的需求。</p>
-<p>当MongoDB存储海量的数据时，一台机器可能不足以存储数据，也可能不足以提供可接受的读写吞吐量。这时，我们就可以通过在多台机器上分割数据，使得数据库系统能存储和处理更多的数据。</p>
-<h4 id="为什么分片"><a href="#为什么分片" class="headerlink" title="为什么分片"></a>为什么分片</h4><ul>
-<li>复制所有的写入操作到主节点</li>
-<li>延迟的敏感数据会在主节点查询</li>
-<li>单个副本集限制在12个节点</li>
-<li>当请求量巨大时会出现内存不足。</li>
-<li>本地磁盘不足</li>
-<li>垂直扩展价格昂贵</li>
-</ul>
-<h4 id="MongoDB分片-1"><a href="#MongoDB分片-1" class="headerlink" title="MongoDB分片"></a>MongoDB分片</h4><p>下图为MongoDB中使用分片集群结构分布：</p>
-<img src="/2019/07/19/MongoDB/1561450415384.png" title="This is an example image">
-
-<p>三个组件：</p>
+<p>先检查信号量的大小，若值大于零，则将信号量减1，同时进程获得共享资源的访问权限，继续执行；若小于或者等于零，则该进程被阻塞后，进入等待队列。</p>
 <ul>
-<li>Shard：用于存储实际的数据库，实际生产环境中一个shard server角色可由几台机器组成一个replica set承担，防止主机单点故障</li>
-<li>Config Server：mongodb实例，存储了整个ClusterMetadata，其中包括chunk信息。</li>
-<li>Query Routers：前端路由，客户端由此接入，且让整个集群看上去像单一数据库，前端应用可以透明使用。</li>
+<li>V操作 ( signal ) ：</li>
 </ul>
-<p>实例：</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Shard<span class="built_in"> Server </span>1：27020</span><br><span class="line">Shard<span class="built_in"> Server </span>2：27021</span><br><span class="line">Shard<span class="built_in"> Server </span>3：27022</span><br><span class="line">Shard<span class="built_in"> Server </span>4：27023</span><br><span class="line">Config<span class="built_in"> Server </span>：27100</span><br><span class="line">Route Process：40000</span><br></pre></td></tr></table></figure>
+<p>该操作将信号量的值加1，如果有进程阻塞着等待该信号量，那么其中一个进程将被唤醒。</p>
+<p>可看出，多进程锁方案跟多线程的锁方案实现思路大同小异。</p>
+<p>我们将互斥的级别拉高，分布式环境下不同节点不同进程或线程之间的互斥，就是分布式锁的挑战之一。后面再细讲。</p>
+<p>另外，在传统的基于数据库的架构中，对于数据的抢占问题也可以通过数据库事务（ACID）来保证。在分布式环境中，出于对性能以及一致性敏感度的要求，使得分布式锁成为了一种比较常见而高效的解决方案。</p>
+<p>▍从上面对于多线程和多进程锁的概括，可以总结出锁的抽象条件：</p>
+<p>1）“需要有存储锁的空间，并且锁的空间是可以访问到的”：</p>
+<p>对于多线程就是内存（进程中不同的线程都可以读写），多进程中通过共享内存的方式，也是提供一块地方，供不同进程读写。主要目的是保证不同的进线程改动对于其他进线程可见，进而满足互斥性需求。</p>
+<p>2）“锁需要被唯一标识”：</p>
+<p>不同的共享资源，必然需要用不同的锁进行保护，因此相应的锁必须有唯一的标识。在多线程环境中，锁可以是一个对象，那么对这个对象的引用便是这个唯一标识。多进程下，比如有名信号量，便是用硬盘中的文件名作为唯一标识。</p>
+<p>3）“锁要有至少两种状态”：</p>
+<p>有锁，没锁。存在，不存在等等。很好理解。</p>
+<p>满足上述三个条件就可以实现基础的分布式锁了。但是随着技术的演进，</p>
+<p>▍相应地，对锁也提出了更高级的条件：</p>
+<p>1）可重入：</p>
+<p>外层函数获得锁之后，内层函数还可以获得锁。原因是随着软件复杂性增加，方法嵌套获取锁已经很难避免。但是从代码层面很难分析出这个问题，因此我们要使用可重入锁。导致锁需要支持可重入的场景。对于可重入的思考，每种语言有自己的哲学和取舍，如go就舍弃了支持重入：Recursive locking in Go [ <a href="https://stackoverflow.com/questions/14670979/recursive-locking-in-go" target="_blank" rel="noopener">https://stackoverflow.com/que…</a> ]以后go又会不会认为“可重入真香”呢？哈哈，我们拭目以待。</p>
+<p>2）避免产生惊群效应（Herd Effect）：</p>
+<p>惊群效应指，在有多个请求等待获取锁的时候，一旦占有锁的线程释放之后，所有等待方都同时被唤醒，尝试抢占锁。但是绝大多数的抢占都是不必要的。这种情况在多线程和多进程中开销同样很大。要尽量避免这种情况出现。</p>
+<p>3）公平锁和非公平锁：</p>
+<p>公平锁：优先把锁给等待时间最长的一方；非公平锁：不保证等待线程拿锁的顺序。公平锁的实现成本较高。</p>
+<p>4）阻塞锁和自旋锁：</p>
+<p>主要是效率的考虑。自旋锁适用于临界区操作耗时短的场景；阻塞锁适用于临界区操作耗时长的场景。</p>
+<p>5）锁超时：</p>
+<p>防止释放锁失败，出现死锁的情况。</p>
+<p>6）高效，高可用：</p>
+<p>加锁和解锁需要高效，同时也需要保证高可用防止分布式锁失效，可以增加降级。</p>
+<p>还有很多其他更高要求的条件，不一一列举了。有兴趣的小伙伴可以看看编程史上锁的演进过程。</p>
+<h2 id="4-分布式锁"><a href="#4-分布式锁" class="headerlink" title="4. 分布式锁"></a>4. 分布式锁</h2><p>▍使用分布式锁的必要性：</p>
+<p>1）服务要求：部署的服务本身就处于分布式环境中</p>
+<p>2）效率：使用分布式锁可以避免不同节点重复相同的工作，这些工作会浪费资源。比如用户付了钱之后有可能不同节点会发出多封短信</p>
+<p>3）正确性：跟2）类似。如果两个节点在同一条数据上面操作，比如多个节点机器对同一个订单操作不同的流程有可能会导致该笔订单最后状态出现错误，造成损失</p>
+<p>包括但不限于这些必要性，在强烈地呼唤我们今天的主角—“分布式锁”闪亮登场。</p>
+<h2 id="5-分布式锁实现方案"><a href="#5-分布式锁实现方案" class="headerlink" title="5. 分布式锁实现方案"></a>5. 分布式锁实现方案</h2><p>有了非分布式锁的实现思路，和分布式环境的挑战，我们来看看分布式锁的实现策略。<br>分布式锁本质上还是要实现一个简单的目标—占一个“坑”，当别的节点机器也要来占时，发现已经有人占了，就只好放弃或者稍后再试。</p>
+<p>▍大体分为4种</p>
+<p>1）使用数据库实现<br>2）使用朴素Redis等缓存系统实现<br>3）使用ZooKeeper等分布式协调系统实现<br>4）使用Redisson来实现（本质上基于Redis）</p>
+<p>因为利用mysql实现分布式锁的性能低以及改造大，我们这里重点讲一下下面3种实现分布式锁的方案。</p>
+<h3 id="5-1-朴素Redis实现方案"><a href="#5-1-朴素Redis实现方案" class="headerlink" title="5.1 朴素Redis实现方案"></a>5.1 朴素Redis实现方案</h3><p>我们循序渐进，对比几种实现方式，找出优雅的方式：</p>
+<p>方案1：setnx+delete</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>setnx lock_key lock_value</span><br><span class="line"><span class="symbol">2 </span>// do sth</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
 
-<p>步骤一：启动Shard Server</p>
-<p>步骤二：启动Config Server</p>
-<p>步骤三：启动Route Process</p>
-<p>步骤四：配置Sharding（添加Shard节点）</p>
-<p>步骤五：按照连接普通的mongo数据库一样，接入接口40000</p>
-<h3 id="MongoDB备份"><a href="#MongoDB备份" class="headerlink" title="MongoDB备份"></a>MongoDB备份</h3><p>在Mongodb中我们使用mongodump命令来备份MongoDB数据。该命令可以导出所有数据到指定目录中。</p>
-<p>mongodump命令可以通过参数指定导出的数据量级转存的服务器。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash">mongodump -h dbhost -d dbname -o dbdirectory</span></span><br></pre></td></tr></table></figure>
+<p>缺点：一旦服务挂掉，锁无法被删除释放，会导致死锁。硬伤，pass！2</p>
+<p>方案2：setnx + setex</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>setnx lock_key lock_value</span><br><span class="line"><span class="symbol">2 </span>setex lock_key N lock_value  // N s超时</span><br><span class="line"><span class="symbol">3 </span>// do sth</span><br><span class="line"><span class="symbol">4 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
 
-<h3 id="MongoDB数据恢复"><a href="#MongoDB数据恢复" class="headerlink" title="MongoDB数据恢复"></a>MongoDB数据恢复</h3><p>mongodb使用 mongorestore 命令来恢复备份的数据。</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt;mongorestore -h <span class="tag">&lt;<span class="name">hostname</span>&gt;</span><span class="tag">&lt;<span class="name">:port</span>&gt;</span> -d dbname <span class="tag">&lt;<span class="name">path</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>在方案1的基础上设置了超时时间。但是还是会出现跟1一样的问题。如果setnx之后、setex之前服务挂掉，一样会陷入死锁。本质原因是，setnx/setex分为了两个步骤，非原子操作。硬伤，pass！</p>
+<p>方案3：set ex nx</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>SET lock_key lock_value EX N NX //N s超时</span><br><span class="line"><span class="symbol">2 </span>// do sth</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
 
-<p>MongoDB监控</p>
-<p>MongoDB中提供了mongostat 和 mongotop 两个命令来监控MongoDB的运行情况。</p>
-<h4 id="mongostat-命令"><a href="#mongostat-命令" class="headerlink" title="mongostat 命令"></a>mongostat 命令</h4><p>mongostat是mongodb自带的状态检测工具，在命令行下使用。它会间隔固定时间获取mongodb的当前运行状态，并输出。如果你发现数据库突然变慢或者有其他问题的话，你第一手的操作就考虑采用mongostat来查看mongo的状态。</p>
-<p>启动你的Mongod服务，进入到你安装的MongoDB目录下的bin目录， 然后输入mongostat命令。</p>
-<h4 id="mongotop-命令"><a href="#mongotop-命令" class="headerlink" title="mongotop 命令"></a>mongotop 命令</h4><p>mongotop也是mongodb下的一个内置工具，mongotop提供了一个方法，用来跟踪一个MongoDB的实例，查看哪些大量的时间花费在读取和写入数据。 mongotop提供每个集合的水平的统计数据。默认情况下，mongotop返回值的每一秒。</p>
-<p>启动你的Mongod服务，进入到你安装的MongoDB目录下的bin目录， 然后输入mongotop命令。</p>
+<p>将加锁、设置超时两个步骤合并为一个原子操作，从而解决方案1、2的问题。（Redis原生命令支持，Redis version需要&gt;=2.6.12，滴滴生产环境Redis version一般为3.2，所以日常能够使用）。</p>
+<p>优点：此方案目前大多数sdk、Redis部署方案都支持，实现简单<br>缺点：会存在锁被错误的释放，被错误的抢占的情况。如下图：</p>
+<img src="/2019/07/19/分布式锁/朴素redis实现分布式锁.png" title="This is an example image">
+
+<p>这块有2个问题：</p>
+<p>1）GC期间，client1超时时间已到，导致将client2错误地放进来</p>
+<p>2）client1执行完逻辑后会显式调用del，将所有的锁都释放了（正确的情况应该只释放自己的锁，错误地释放了client2的锁）</p>
+<p>方案4：</p>
+<p>在3的基础上，对于问题1，将client的超时时间设置长一些，保证只能通过显式del来释放锁，而超时时间只是作为一种最终兜底的方案。针对问题2，增加对 value 的检查，只解除自己加的锁，为保证原子性，只能需要通过lua脚本实现。</p>
+<p>lua脚本：<a href="https://redis.io/commands/eval" target="_blank" rel="noopener">https://redis.io/commands/eval</a></p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span><span class="keyword">if</span> redis.<span class="keyword">call</span>(<span class="string">"get"</span>,KEYS[<span class="number">1</span>]) == ARGV[<span class="number">1</span>] <span class="keyword">then</span></span><br><span class="line"><span class="symbol">2 </span>  <span class="keyword">return</span> redis.<span class="keyword">call</span>(<span class="string">"del"</span>,KEYS[<span class="number">1</span>])</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">else</span></span><br><span class="line"><span class="symbol">4 </span>  <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="symbol">5 </span><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<p>如果超时时间设置长，只能通过显式的del来释放锁，就不会出现问题2（错误释放掉其他client的锁）。跟滴滴KV store的王斌同学讨论过，目前没有找到方案4优于方案3（只要超时时间设置的长一些）的场景。所以，在我的认知中，方案4跟方案3的优势一样，但是方案3的实现成本明显要低很多。</p>
+<p>朴素Redis方案小结</p>
+<p>方案3用的最多，实现成本小，对于大部分场景，将超时时间设置的长一些，极少出现问题。同时本方案对不同语言的友好度极高。</p>
+<h3 id="5-2-ZooKeeper实现方案"><a href="#5-2-ZooKeeper实现方案" class="headerlink" title="5.2 ZooKeeper实现方案"></a>5.2 ZooKeeper实现方案</h3><p>我们先简要介绍一些ZooKeeper（以下简称ZK）：</p>
+<p>ZooKeeper是一种“分布式协调服务”。所谓分布式协调服务，可以在分布式系统中共享配置，协调锁资源，提供命名服务等。为读多写少的场景所设计，ZK中的节点（以下简称ZNode）非常适合用于存储少量的状态和配置信息。</p>
+<p>对ZK常见的操作：</p>
+<p>create：创建节点<br>delete：删除节点<br>exists：判断一个节点的数据<br>setdata：设置一个节点的数据<br>getchildren：获取节点下的所有子节点</p>
+<p>这其中，exists，getData，getChildren属于读操作。Zookeeper客户端在请求读操作的时候，可以选择是否设置Watch（监听机制）。</p>
+<p>什么是Watch？</p>
+<p>Watch机制是zk中非常有用的功能。我们可以理解成是注册在特定Znode上的触发器。当这个Znode发生改变，也就是调用了create，delete，setData方法的时候，将会触发Znode上注册的对应事件，请求Watch的客户端会接收到异步通知。<br>我们在实现分布式锁的时候，正是通过Watch机制，来通知正在等待的session相关锁释放的信息。</p>
+<p>什么是ZNode？</p>
+<p>ZNode就是ZK中的节点。ZooKeeper节点是有生命周期的，这取决于节点的类型。在 ZooKeeper 中，节点类型可以分为临时节点（EPHEMERAL），时序节点（SEQUENTIAL ），持久节点（PERSISTENT ）。</p>
+<p>临时节点（EPHEMERAL）：</p>
+<p>节点的生命周期跟session绑定，session创建的节点，一旦该session失效，该节点就会被删除。</p>
+<p>临时顺序节点（EPHEMERAL_SEQUENTIAL）：</p>
+<p>在临时节点的基础上增加了顺序。每个父结点会为自己的第一级子节点维护一份时序。在创建子节点的时候，会自动加上数字后缀，越后创建的节点，顺序越大，后缀越大。</p>
+<p>持久节点（PERSISTENT ）：</p>
+<p>节点创建之后就一直存在，不会因为session失效而消失。</p>
+<p>持久顺序节点（PERSISTENT_SEQUENTIAL）：</p>
+<p>与临时顺序节点同理。</p>
+<p>ZNode中的数据结构：</p>
+<p>data（znode存储的数据信息），acl（记录znode的访问权限，即哪些人或哪些ip可以访问本节点），stat（包含znode的各种元数据，比如事务id，版本号，时间戳，大小等等），child（当前节点的子节点引用）。</p>
+<p>利用ZK实现分布式锁，主要得益于ZK保证了数据的强一致性。</p>
+<p>下面说说通过zk简单实现一个保持独占的锁（利用临时节点的特性）：</p>
+<p>我们可以将ZK上的ZNode看成一把锁（类似于Redis方案中的key）。多个session都去创建同一个distribute_lock节点，只会有一个创建成功的session。相当于只有该session获取到锁，其他session没有获取到锁。在该成功获锁的session失效前，锁将会一直阻塞住。session失效时，节点会自动被删除，锁被解除。（类似于Redis方案中的expire）。</p>
+<p>上述实现方案跟Redis方案3的实现效果一样。</p>
+<p>但是，这样的锁有没有改进的地方？当然！</p>
+<p>1）我们可能会有可重入的需求，因此希望能有可重入的锁机制。</p>
+<p>2）有些场景下，在争抢锁的时候，我们既不想一次争抢不到就pass，也不想一直阻塞住直到获取到锁。一个朴素的需求是，我们希望有超时时间来控制是否去上锁。更进一步，我们不想主动的去查到底是否能够加锁，我们希望能够有事件机制来通知是否能够上锁。（这里，你是不是想到了ZK的Watch机制呢？）</p>
+<p>要满足这样的需求就需要控制时序。利用顺序临时节点和Watch机制的特性，来实现：</p>
+<p>我们事先创建/distribute_lock节点，多个session在它下面创建临时有序节点。由于zk的特性，/distribute_lock该节点会维护一份sequence，来保证子节点创建的时序性。</p>
+<p>具体实现如下：</p>
+<p>1）客户端调用create()方法在/distribute_lock节点下创建EPHEMERAL_SEQUENTIAL节点。</p>
+<p>2）客户端调用getChildren(“/distribute_lock”)方法来获取所有已经创建的子节点。</p>
+<p>3）客户端获取到所有子节点path之后，如果发现自己在步骤1中创建的节点序号最小，那么就认为这个客户端获得了锁。</p>
+<p>4）如果在步骤3中发现自己并非所有子节点中最小的，说明自己还没有获取到锁。此时客户端需要找到比自己小的那个节点，然后对其调用exist()方法，同时注册事件监听。需要注意是，只在比自己小一号的节点上注册Watch事件。如果在比自己都小的节点上注册Watch事件，将会出现惊群效应，要避免。</p>
+<p>5）之后当这个被关注的节点被移除了，客户端会收到相应的通知。这个时候客户端需要再次调用getChildren(“/distribute_lock”)方法来获取所有已经创建的子节点，确保自己确实是最小的节点了，然后进入步骤3）。</p>
+<p>Curator框架封装了对ZK的api操作。以Java为例来进行演示：<br>引入依赖：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>&lt;dependency&gt;</span><br><span class="line"><span class="symbol">2 </span>  &lt;groupId&gt;org.apache.curator&lt;/groupId&gt;</span><br><span class="line"><span class="symbol">3 </span>  &lt;artifactId&gt;curator-recipes&lt;/artifactId&gt;</span><br><span class="line"><span class="symbol">4 </span>  &lt;version&gt;<span class="number">2.11.1</span>&lt;/version&gt;</span><br><span class="line"><span class="symbol">5 </span>&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+
+<p>使用的时候需要注意Curator框架和ZK的版本兼容问题。<br>以排他锁为例，看看怎么使用：</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestLock</span> </span>&#123;</span><br><span class="line"> <span class="number">2</span></span><br><span class="line"> <span class="number">3</span>    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) throws Exception &#123;</span><br><span class="line"> <span class="number">4</span>        <span class="comment">//创建zookeeper的客户端</span></span><br><span class="line"> <span class="number">5</span>        RetryPolicy retryPolicy = <span class="keyword">new</span> <span class="type">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>);</span><br><span class="line"> <span class="number">6</span>        CuratorFramework client = CuratorFrameworkFactory.<span class="keyword">new</span><span class="type">Client</span>(“ip:<span class="type">port</span>", retryPolicy);</span><br><span class="line"> <span class="number">7</span>        client.start();</span><br><span class="line"> <span class="number">8</span></span><br><span class="line"> <span class="number">9</span>        <span class="comment">//创建分布式锁, 锁空间的根节点路径为/sunnyzengqi/curator/lock</span></span><br><span class="line"><span class="number">10</span>        InterProcessMutex mutex = <span class="keyword">new</span> <span class="type">InterProcessMutex</span>(client, <span class="string">"/sunnyzengqi/curator/lock"</span>);</span><br><span class="line"><span class="number">11</span>        mutex.acquire();</span><br><span class="line"><span class="number">12</span>        <span class="comment">//获得了锁, 进行业务流程</span></span><br><span class="line"><span class="number">13</span>        System.out.println(<span class="string">"Enter mutex"</span>);</span><br><span class="line"><span class="number">14</span>        Thread.sleep(<span class="number">10000</span>);</span><br><span class="line"><span class="number">15</span>        <span class="comment">//完成业务流程, 释放锁</span></span><br><span class="line"><span class="number">16</span>        mutex.release();</span><br><span class="line"><span class="number">17</span>        <span class="comment">//关闭客户端</span></span><br><span class="line"><span class="number">18</span>        client.close();</span><br><span class="line"><span class="number">19</span>    &#125;</span><br><span class="line"><span class="number">20</span> &#125;</span><br><span class="line"><span class="number">21</span></span><br></pre></td></tr></table></figure>
+
+<p>上面代码在业务执行的过程中，在ZK的/sunnyzengqi/curator/lock路径下，会创建一个临时节点来占位。相同的代码，在两个机器节点上运行，可以看到该路径下创建了两个临时节点：</p>
+<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案1.png" title="This is an example image">
+
+<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案2.png" title="This is an example image">
+
+<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案3.png" title="This is an example image">
+
+<p>运行命令echo wchc | nc localhost 2181查看watch信息：</p>
+<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案4.png" title="This is an example image">
+
+<p>可以看到lock1节点的session在监听节点lock0的变动。此时是lock0获取到锁。等到lock0执行完，session会失效，触发Watch机制，通知lock1的session说锁已经被释放了。这时，lock1可以来抢占锁，进而执行自己的操作。</p>
+<p>除了简单的排它锁的实现，还可以利用ZK的特性来实现更高级的锁（比如信号量，读写锁，联锁）等，这里面有很多的玩法。</p>
+<p>ZooKeeper方案小结</p>
+<p>能够实现很多具有更高条件的锁机制，并且由于ZK优越的session和watch机制，适用于复杂的场景。因为有久经检验的Curator框架，集成了很多基于ZK的分布式锁的api，对于Java语言非常友好。对于其他语言，虽然也有一些开源项目封装了它的api，但是稳定性和效率需要自己去实际检验。</p>
+<h3 id="5-3-Redisson实现方案"><a href="#5-3-Redisson实现方案" class="headerlink" title="5.3 Redisson实现方案"></a>5.3 Redisson实现方案</h3><p>我们先简要介绍一下Redisson：</p>
+<p>Redisson是Java语言编写的基于Redis的client端。功能也非常强大，功能包括：分布式对象，分布式集合，分布式锁和同步器，分布式服务等。被大家熟知的场景还是在分布式锁的场景。</p>
+<p>为了解决加锁线程在没有解锁之前崩溃进而出现死锁的问题，不同于朴素Redis中通过设置超时时间来处理。Redisson采用了新的处理方式：Redisson内部提供了一个监控锁的看门狗，它的作用是在Redisson实例被关闭前，不断的延长锁的有效期。<br>跟Zookeeper类似，Redisson也提供了这几种分布式锁：可重入锁，公平锁，联锁，红锁，读写锁等。具体怎么用这里不展开，感兴趣的朋友可以自己去实验。</p>
+<p>Redisson方案小结</p>
+<p>跟ZK一样，都能够实现很多具有更高条件的锁机制，适用于复杂的场景。但对语言非常挑剔，目前只能支持Java语言。</p>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><p>上一节，我们讨论了三种实现的方案：朴素Redis实现方案，ZooKeeper实现方案，Redisson实现方案。由于第1种与第3种都是基于Redis，所以主要是ZK和基于Redis两种。我们不禁想问，在实现分布式锁上，基于ZK与基于Redis的方案，有什么不同呢？</p>
+<p>1）锁的时长设置上：</p>
+<p>得益于ZK的session机制，客户端可以持有锁任意长的时间，这可以确保它做完所有需要的资源访问操作之后再释放锁。避免了基于Redis的锁对于有效时间到底设置多长的两难问题。实际上，基于ZooKeeper的锁是依靠Session（心跳）来维持锁的持有状态的，而Redis不支持Sesion。</p>
+<p>优势：ZK&gt;Redisson&gt;朴素Redis。</p>
+<p>2）监听机制上：</p>
+<p>得益于ZK的watch机制，在获取锁失败之后可以等待锁重新释放的事件。这让客户端对锁的使用更加灵活。避免了Redis方案主要去轮询的方式。</p>
+<p>优势：ZK&gt;Redisson=朴素Redis。</p>
+<p>3）使用便利性上：</p>
+<p>由于生产环境都有稳定的Redis和ZooKeeper集群，有专业的同学维护，这两者差别不大。在语言局限性上，朴素Redis从不挑食。ZK和Redisson都偏向于Java语言。在开发难度上，Redis最简单，几乎不用写什么代码；ZK和Redisson次之，依赖于使用的语言是否有集成的api以及集成稳定性等。</p>
+<p>优势：朴素Redis&gt;ZK&gt;Redisson。</p>
+<p>4）支持锁形式的多样性上：</p>
+<p>上面有提及，ZK和Redisson都支持了各种花样的分布锁。朴素Redis就比较捉急了，在实现更高要求的锁方面，如果自己造轮子，往往费时费力，力不从心。</p>
+<p>优势：ZK=Redisson&gt;Redis。</p>
+<h2 id="7-结束语"><a href="#7-结束语" class="headerlink" title="7. 结束语"></a>7. 结束语</h2><p>分布式锁在日常Coding中已经很常用。但是分布式锁这方面的知识依然非常深奥。2016年，Martin Kleppmann与Antirez两位分布式领域非常有造诣的前辈还针对“Redlock算法”在分布式锁上面的应用炒得沸沸扬扬。</p>
+<p><em>最后借助这场历史闹剧中Martin的话来结束我们今天的分享。与诸君共勉！将学习当成一生的主题！</em></p>
+<p><em>对我来说最重要的一点在于：我并不在乎在这场辩论中谁对谁错 —— 我只关心从其他人的工作中学到的东西，以便我们能够避免重蹈覆辙，并让未来更加美好。前人已经为我们创造出了许多伟大的成果：站在巨人的肩膀上，我们得以构建更棒的软件。</em><br>……<br><em>对于任何想法，务必要详加检验，通过论证以及检查它们是否经得住别人的详细审查。那是学习过程的一部分。但目标应该是为了获得知识，而不应该是为了说服别人相信你自己是对的。有时候，那只不过意味着停下来，好好地想一想。</em></p>
+<p>由于时间仓促，自己水平有限，文中必定存在诸多疏漏与理解不当的地方。非常希望得到各位指正，畅谈技术。</p>
+<p>▍Reference</p>
+<p><a href="https://zookeeper.apache.org/" target="_blank" rel="noopener">0.Apache ZooKeeper</a><br><a href="https://github.com/redisson/redisson" target="_blank" rel="noopener">1.Redisson</a><br><a href="https://redis.io/" target="_blank" rel="noopener">2.Redis</a><br>3.Redis分布式锁进化史<br><a href="https://tech.meituan.com/2016/09/29/distributed-system-mutually-exclusive-idempotence-cerberus-gtis.html" target="_blank" rel="noopener">4.分布式系统互斥性与幂等性问题的分析与解决</a><br>5.浅谈可重入性及其他<br><a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">6.Distributed locks with Redis</a><br><a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">7.How to do distributed locking</a><br><a href="http://antirez.com/news/101" target="_blank" rel="noopener">8.Is Redlock safe?</a><br>9.Note on fencing and distributed locks</p>
 
       
 
@@ -1265,7 +2339,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">分布式</a>
         		</li>
       		
 		</ul>
@@ -1275,499 +2349,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/MongoDB/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-消息队列常见问题示例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/消息队列常见问题示例/">消息队列常见问题示例</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/19/消息队列常见问题示例/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="一、如何解决消息队列数据丢失问题？"><a href="#一、如何解决消息队列数据丢失问题？" class="headerlink" title="一、如何解决消息队列数据丢失问题？"></a>一、如何解决消息队列数据丢失问题？</h2><p>面试官心理剖析：<br>生产上肯定会出现数据丢失问题，面试官主要是想看看你是否了解？有没有做过相应的措施来解决这个问题？如果你不知道有这个问题，那么你生产环境可能存在数据丢失问题。如果你的MQ用在核心场景下，如订单，扣费等，那么数据是万万不能丢的。</p>
-<p>回答：</p>
-<h3 id="为什么会出现数据丢失？"><a href="#为什么会出现数据丢失？" class="headerlink" title="为什么会出现数据丢失？"></a>为什么会出现数据丢失？</h3><p>分析：</p>
-<img src="/2019/07/19/消息队列常见问题示例/mq消息丢失问题.png" title="This is an example image">
-
-<p>丢数据一般会有3种情况：<br>1）生产者往MQ写数据丢失了<br>可能因为网络原因数据传输丢失。<br>2）MQ本身数据丢失了<br>数据放在内存中，MQ机器宕机了，那么内存中的数据丢失了。<br>3）消费者消费的时候丢失了<br>消费者接受到消息，马上给MQ返回已经接受到消息的回复，消费者接着处理逻辑，在处理过程中，消费者宕机了；下次重启的时候消费者会获取到下一条数据消费，这样数据就丢失了。</p>
-<p>问题解决：</p>
-<h3 id="1、解决rabbitmq生产者丢数据"><a href="#1、解决rabbitmq生产者丢数据" class="headerlink" title="1、解决rabbitmq生产者丢数据"></a>1、解决rabbitmq生产者丢数据</h3><p>1）事务机制<br>在生产者发送消息的时候，加上事务，以下是伪代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">channel.txSelect</span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="comment">//发送消息 如果MQ接收失败会抛异常，那么对事务进行回滚</span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">channel.txRollback</span><br><span class="line">&#125;</span><br><span class="line">channel.txCommit</span><br></pre></td></tr></table></figure>
-
-<p>改方案完全保证发送消息时成功的，但是缺点是：使用了事务之后，消息变成同步了，影响吞吐量。比较耗性能。</p>
-<p>2）confirm模式<br>在生产者开启confirm模式，每个消息分配唯一id；生产者发送完消息之后就不用管了，rabbitmq如果成功接收到消息，那么会调用生产者的ack(String messageId)方法；rabbitmq如果接收失败，那么会调用生产者nack(String messageId)方法，生产者根据情况判断是否要重试；</p>
-<p>小结：一般情况下，使用confirm模式，性能、吞吐量都要比事务机制高。confirm是异步的，不会阻塞。</p>
-<h3 id="2、解决rabbitmq弄丢了数据"><a href="#2、解决rabbitmq弄丢了数据" class="headerlink" title="2、解决rabbitmq弄丢了数据"></a>2、解决rabbitmq弄丢了数据</h3><p>就是开启持久化，把内存中的数据刷到磁盘中。如果在写入磁盘的时候挂了，这样的话还是会有数据丢失，但是概率很小，你可以等数据持久化到磁盘，在通知生产者ack方法，如果没有持久化成功，生产者长时间没收到消息可以尝试在重试一次。</p>
-<h3 id="3、解决rabbitmq消费端弄丢了数据"><a href="#3、解决rabbitmq消费端弄丢了数据" class="headerlink" title="3、解决rabbitmq消费端弄丢了数据"></a>3、解决rabbitmq消费端弄丢了数据</h3><p>在消费端这边，需要关闭autoAck，等自己处理完之后在发送ack给MQ。</p>
-<p>其他的MQ，无外乎也都是这些原因，只要在各自端进行一些配置就可以解决数据丢失问题。</p>
-<h2 id="二、在消息队列里面有一批数据需要顺序执行，如何来保证？"><a href="#二、在消息队列里面有一批数据需要顺序执行，如何来保证？" class="headerlink" title="二、在消息队列里面有一批数据需要顺序执行，如何来保证？"></a>二、在消息队列里面有一批数据需要顺序执行，如何来保证？</h2><p>面试官心理剖析：<br>主要看你有没有思考过这个问题？这个是常见的问题，看你有没有解决思路？</p>
-<p>回答：<br>这里讲讲几个MQ是如何来保证消息的顺序性的。</p>
-<h3 id="1、rabbitMq"><a href="#1、rabbitMq" class="headerlink" title="1、rabbitMq"></a>1、rabbitMq</h3><ul>
-<li>问题分析：</li>
-<li><img src="/2019/07/19/消息队列常见问题示例/rabbitmq消息顺序.png" title="This is an example image">
-如图，data1和data2是有顺序的，必须data1先执行，data2后执行；这两个数据被不同的消费者消费到了，可能data2先执行，data1后执行，这样原来的顺序就错乱了。</li>
-<li>解决方案：</li>
-<li><img src="/2019/07/19/消息队列常见问题示例/rabbitmq消息顺序问题解决.png" title="This is an example image">
-如图，在MQ里面创建多个queue，同一规则的数据（对唯一标识进行hash），有顺序的放入MQ的queue里面，消费者只取一个queue里面获取数据消费，这样执行的顺序是有序的。或者还是只有一个queue但是对应一个消费者，然后这个消费者内部用内存队列做排队，然后分发给底层不同的worker来处理。</li>
-</ul>
-<h3 id="2、kafka"><a href="#2、kafka" class="headerlink" title="2、kafka"></a>2、kafka</h3><p>问题分析：</p>
-<img src="/2019/07/19/消息队列常见问题示例/kafka正常流程.png" title="This is an example image">
-<p>如图，在kafka中，你对数据指定某个key，那么这些数据会到同一个partition里面，在partition里面这些数据是有顺序的。从这里看没啥问题，插入到数据库的数据都是有序的。</p>
-<p>但是，我们在消费端可能会使用多线程来处理，因为单线程的处理速度慢，为了加快处理时间和吞吐量，会使用thread来处理。在消费端加入线程之后，就会出现顺序不一致的情况。</p>
-<img src="/2019/07/19/消息队列常见问题示例/kafka顺序不一致情况.png" title="This is an example image">
-<p>如图，就是使用了多线程之后，数据顺序不一致情况。</p>
-<p>在使用了多线程之后，如何来解决数据顺序问题？</p>
-<img src="/2019/07/19/消息队列常见问题示例/kafaka顺序问题解决.png" title="This is an example image">
-<p>如图，在消费端使用内存队列，队列里的数据使用hash进行分发，每个线程对应一个队列，这样可以保证数据的顺序。</p>
-<h3 id="3、rocketMq"><a href="#3、rocketMq" class="headerlink" title="3、rocketMq"></a>3、rocketMq</h3><img src="/2019/07/19/消息队列常见问题示例/rocketmq消息书匈奴.png" title="This is an example image">
-
-<p>如图，生产者中把orderId进行取模，把相同模的数据放到messagequeue里面，消费者消费同一个messagequeue，只要消费者这边有序消费，那么可以保证数据被顺序消费。</p>
-<h3 id="4、activeMq"><a href="#4、activeMq" class="headerlink" title="4、activeMq"></a>4、activeMq</h3><img src="/2019/07/19/消息队列常见问题示例/activemq消息顺序.png" title="This is an example image">
-<p>如图，activeMq里面有messageGroups属性，可以指定JMSXGroupID，消费者会消费指定的JMSXGroupID。即保证了顺序性，又解决负载均衡的问题。</p>
-<h2 id="三、如何保证消息队列的幂等性？"><a href="#三、如何保证消息队列的幂等性？" class="headerlink" title="三、如何保证消息队列的幂等性？"></a>三、如何保证消息队列的幂等性？</h2><p>面试官心理剖析：<br>主要是看你对消息队列数据重复消费的问题，是否有了解，是否知道怎么解决？如果这块不知道，那么面试官会觉得如果交给你做功能，可能会出现多次消费的情况。</p>
-<p>回答：</p>
-<p>为什么会出现重复消费？<br>分析：</p>
-<img src="/2019/07/19/消息队列常见问题示例/kafaka重复消费场景.png" title="This is an example image">
-<p>如图，在什么场景会出现消息重复消费？比如说消费端已经消费了offset=2，offset=3，offset=4的三条数据，正准备把这个offset的值传给kafka，这时候消费端机器宕机了，这个数据没传过去；重启之后，消费端同步kafka，kafka那边消费的记录offset还是1，那么kafka会认为之前的2、3、4都没有消费过，会把这几个数据在传给消费端；这样消费端这边就重复对这几条数据进行消费了。在数据库里面可能就多了很多重复的数据。<br>像其他的MQ，也是一样，消费端再返回给MQ的时候，当机了或者重启了，那么都会出现重复消费的问题。</p>
-<p>问题解决：</p>
-<h3 id="幂等性：一个请求，不管重复来多少次，结果是不会改变的。"><a href="#幂等性：一个请求，不管重复来多少次，结果是不会改变的。" class="headerlink" title="幂等性：一个请求，不管重复来多少次，结果是不会改变的。"></a>幂等性：一个请求，不管重复来多少次，结果是不会改变的。</h3><p>每个消息都会有唯一的消息id。</p>
-<h4 id="1、先查再保存"><a href="#1、先查再保存" class="headerlink" title="1、先查再保存"></a>1、先查再保存</h4><p>每次保存数据的时候，都先查一下，如果数据存在了那么就不保存。这个情况是并发不高的情况。</p>
-<h4 id="2、业务表添加约束条件"><a href="#2、业务表添加约束条件" class="headerlink" title="2、业务表添加约束条件"></a>2、业务表添加约束条件</h4><p>如果你的数据库将来都不会分库分表，那么可以在业务表字段加上唯一约束条件（UNIQUE），这样相同的数据就不会保存为多份。</p>
-<h4 id="3、添加消息表"><a href="#3、添加消息表" class="headerlink" title="3、添加消息表"></a>3、添加消息表</h4><p>再数据库里面，添加一张消息消费记录表，表字段加上唯一约束条件（UNIQUE），消费完之后就往表里插入一条数据。因为加了唯一约束条件，第二次保存的时候，mysql就会报错，就插入不进去；通过数据库可以限制重复消费。</p>
-<h4 id="4、redis"><a href="#4、redis" class="headerlink" title="4、redis"></a>4、redis</h4><p>如果你的系统是分布式的，又做了分库分表，那么可以使用redis来做记录，把消息id存在redis里，下次再有重复消息id在消费的时候，如果发现redis里面有了就不能进行消费。</p>
-<h4 id="5、高并发"><a href="#5、高并发" class="headerlink" title="5、高并发"></a>5、高并发</h4><p>如果你的系统并发很高，那么可以使用redis或者zookeeper的分布式对消息id加锁，然后使用上面的几个方法进行幂等性控制。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">消息队列</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/消息队列常见问题示例/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Zookeeper" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/Zookeeper/">Zookeeper</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/19/Zookeeper/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="一、什么是ZooKeeper"><a href="#一、什么是ZooKeeper" class="headerlink" title="一、什么是ZooKeeper"></a>一、什么是ZooKeeper</h2><p>从上面我们也可以发现，好像哪都有ZooKeeper的身影，那什么是ZooKeeper呢？我们先去<strong>官网</strong>看看介绍：</p>
-<p>官网对ZooKeeper的介绍</p>
-<img src="/2019/07/19/Zookeeper/whatiszk.png" title="This is an example image">
-
-<p>官网还有另一段话：</p>
-<blockquote>
-<p>ZooKeeper: A Distributed Coordination Service for Distributed Applications</p>
-</blockquote>
-<p>相比于官网的介绍，我其实更喜欢<strong>Wiki</strong>中对ZooKeeper的介绍：</p>
-<img src="/2019/07/19/Zookeeper/zkforwiki.png" title="This is an example image">
-
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="wiki介绍ZooKeeper">wiki介绍ZooKeeper</p>
-<p>(留下不懂英语的泪水)</p>
-<p>我简单概括一下：</p>
-<ul>
-<li>ZooKeeper主要<strong>服务于分布式系统</strong>，可以用ZooKeeper来做：<strong>统一配置管理</strong>、<strong>统一命名服务</strong>、<strong>分布式锁</strong>、<strong>集群管理</strong> 。</li>
-<li>使用分布式系统就无法避免对节点管理的问题(需要实时感知节点的状态、对节点进行统一管理等等)，而由于这些问题处理起来可能相对麻烦和提高了系统的复杂性，ZooKeeper作为一个能够<strong>通用</strong>解决这些问题的中间件就应运而生了。</li>
-</ul>
-<h2 id="二、为什么ZooKeeper能干这么多？"><a href="#二、为什么ZooKeeper能干这么多？" class="headerlink" title="二、为什么ZooKeeper能干这么多？"></a>二、为什么ZooKeeper能干这么多？</h2><p>从上面我们可以知道，可以用ZooKeeper来做：统一配置管理、统一命名服务、分布式锁、集群管理。</p>
-<ul>
-<li>这里我们<strong>先</strong>不管<code>统一配置管理、统一命名服务、分布式锁、集群管理</code>每个具体的含义(后面会讲)</li>
-</ul>
-<p>那为什么ZooKeeper可以干那么多事？来看看ZooKeeper究竟是何方神物，在Wiki中其实也有提到：</p>
-<blockquote>
-<p>ZooKeeper nodes store their data in a hierarchical name space, much like a file system or a tree data structure</p>
-</blockquote>
-<p>ZooKeeper的数据结构，跟Unix文件系统非常类似，可以看做是一颗<strong>树</strong>，每个节点叫做<strong>ZNode</strong>。每一个节点可以通过<strong>路径</strong>来标识，结构图如下：</p>
-<img src="/2019/07/19/Zookeeper/zk结构.png" title="This is an example image">
-
-<p>ZooKeeper结构图</p>
-<p>那ZooKeeper这颗”树”有什么特点呢？？ZooKeeper的节点我们称之为<strong>Znode</strong>，Znode分为<strong>两种</strong>类型：</p>
-<ul>
-<li><strong>短暂/临时(Ephemeral)</strong>：当客户端和服务端断开连接后，所创建的Znode(节点)<strong>会自动删除</strong></li>
-<li><strong>持久(Persistent)</strong>：当客户端和服务端断开连接后，所创建的Znode(节点)<strong>不会删除</strong></li>
-</ul>
-<blockquote>
-<p>ZooKeeper和Redis一样，也是C/S结构(分成客户端和服务端)</p>
-<img src="/2019/07/19/Zookeeper/zk结点.png" title="This is an example image">
-</blockquote>
-<p>Znode和Znode的类型</p>
-<h3 id="2-1-监听器"><a href="#2-1-监听器" class="headerlink" title="2.1 监听器"></a>2.1 监听器</h3><p>在上面我们已经简单知道了ZooKeeper的数据结构了，ZooKeeper还配合了<strong>监听器</strong>才能够做那么多事的。</p>
-<p><strong>常见</strong>的监听场景有以下两项：</p>
-<ul>
-<li>监听Znode节点的<strong>数据变化</strong></li>
-<li>监听子节点的<strong>增减变化</strong></li>
-</ul>
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="监听Znode节点的数据有无变化">监听Znode节点的数据有无变化</p>
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="监听子节点的增减变化">监听子节点的增减变化</p>
-<p>没错，通过<strong>监听+Znode节点(持久/短暂[临时])</strong>，ZooKeeper就可以玩出这么多花样了。</p>
-<h2 id="三、ZooKeeper是怎么做到的？"><a href="#三、ZooKeeper是怎么做到的？" class="headerlink" title="三、ZooKeeper是怎么做到的？"></a>三、ZooKeeper是怎么做到的？</h2><p>下面我们来看看用ZooKeeper怎么来做：统一配置管理、统一命名服务、分布式锁、集群管理。</p>
-<h3 id="3-1-统一配置管理"><a href="#3-1-统一配置管理" class="headerlink" title="3.1 统一配置管理"></a>3.1 统一配置管理</h3><p>比如我们现在有三个系统A、B、C，他们有三份配置，分别是<code>ASystem.yml、BSystem.yml、CSystem.yml</code>，然后，这三份配置又非常类似，很多的配置项几乎都一样。</p>
-<ul>
-<li>此时，如果我们要改变其中一份配置项的信息，很可能其他两份都要改。并且，改变了配置项的信息<strong>很可能就要重启系统</strong></li>
-</ul>
-<p>于是，我们希望把<code>ASystem.yml、BSystem.yml、CSystem.yml</code>相同的配置项抽取出来成一份<strong>公用</strong>的配置<code>common.yml</code>，并且即便<code>common.yml</code>改了，也不需要系统A、B、C重启。</p>
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="系统A、B、C都使用着这份配置">系统A、B、C都使用着这份配置</p>
-<p>做法：我们可以将<code>common.yml</code>这份配置放在ZooKeeper的Znode节点中，系统A、B、C监听着这个Znode节点有无变更，如果变更了，<strong>及时</strong>响应。</p>
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="系统A、B、C监听着ZooKeeper的节点，一旦common.yml内容有变化，及时响应">系统A、B、C监听着ZooKeeper的节点，一旦common.yml内容有变化，及时响应</p>
-<p>参考资料：</p>
-<ul>
-<li><p>基于zookeeper实现统一配置管理</p>
-</li>
-<li><ul>
-<li><a href="https://blog.csdn.net/u011320740/article/details/78742625" target="_blank" rel="noopener">https://blog.csdn.net/u011320740/article/details/78742625</a></li>
-</ul>
-</li>
-</ul>
-<h3 id="3-2-统一命名服务"><a href="#3-2-统一命名服务" class="headerlink" title="3.2 统一命名服务"></a>3.2 统一命名服务</h3><p>统一命名服务的理解其实跟<strong>域名</strong>一样，是我们为这某一部分的资源给它<strong>取一个名字</strong>，别人通过这个名字就可以拿到对应的资源。</p>
-<p>比如说，现在我有一个域名<code>www.java3y.com</code>，但我这个域名下有多台机器：</p>
-<ul>
-<li>192.168.1.1</li>
-<li>192.168.1.2</li>
-<li>192.168.1.3</li>
-<li>192.168.1.4</li>
-</ul>
-<p>别人访问<code>www.java3y.com</code>即可访问到我的机器，而不是通过IP去访问。</p>
-<img src="/2019/07/19/Zookeeper/zk统一命名.png" title="This is an example image">
-
-<p>通过名称去访问旗下的IP</p>
-<h3 id="3-3-分布式锁"><a href="#3-3-分布式锁" class="headerlink" title="3.3 分布式锁"></a>3.3 分布式锁</h3><p>锁的概念在这我就不说了，如果对锁概念还不太了解的同学，可参考下面的文章</p>
-<ul>
-<li><a href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247484989&idx=1&sn=7beaa0db8b29cc8758c7846fe04dfbd2&chksm=ebd7473cdca0ce2a7aea8e6e2a22a5c183b8be3f1cdc93f8d7c3842a560eb5668071cebe5e37&token=948022247&lang=zh_CN&scene=21#wechat_redirect" target="_blank" rel="noopener">Java锁？分布式锁？乐观锁？行锁？</a></li>
-</ul>
-<p>我们可以使用ZooKeeper来实现分布式锁，那是怎么做的呢？？下面来看看：</p>
-<p>系统A、B、C都去访问<code>/locks</code>节点</p>
-<img src="/2019/07/19/Zookeeper/zk分布式锁.png" title="This is an example image">
-
-<p>系统A、B、C都去访问locks节点</p>
-<p>访问的时候会创建<strong>带顺序号的临时/短暂</strong>(<code>EPHEMERAL_SEQUENTIAL</code>)节点，比如，系统A创建了<code>id_000000</code>节点，系统B创建了<code>id_000002</code>节点，系统C创建了<code>id_000001</code>节点。</p>
-<img src="/2019/07/19/Zookeeper/zk分布式锁2.png" title="This is an example image">
-
-<p>创建出临时带顺序号的节点</p>
-<p>接着，拿到<code>/locks</code>节点下的所有子节点(id_000000,id_000001,id_000002)，<strong>判断自己创建的是不是最小的那个节点</strong></p>
-<ul>
-<li><p>如果是，则拿到锁。</p>
-</li>
-<li><ul>
-<li>释放锁：执行完操作后，把创建的节点给删掉</li>
-</ul>
-</li>
-<li><p>如果不是，则监听比自己要小1的节点变化</p>
-</li>
-</ul>
-<p>举个例子：</p>
-<ul>
-<li>系统A拿到<code>/locks</code>节点下的所有子节点，经过比较，发现自己(<code>id_000000</code>)，是所有子节点最小的。所以得到锁</li>
-<li>系统B拿到<code>/locks</code>节点下的所有子节点，经过比较，发现自己(<code>id_000002</code>)，不是所有子节点最小的。所以监听比自己小1的节点<code>id_000001</code>的状态</li>
-<li>系统C拿到<code>/locks</code>节点下的所有子节点，经过比较，发现自己(<code>id_000001</code>)，不是所有子节点最小的。所以监听比自己小1的节点<code>id_000000</code>的状态</li>
-<li>……</li>
-<li>等到系统A执行完操作以后，将自己创建的节点删除(<code>id_000000</code>)。通过监听，系统C发现<code>id_000000</code>节点已经删除了，发现自己已经是最小的节点了，于是顺利拿到锁</li>
-<li>….系统B如上</li>
-</ul>
-<h3 id="3-4集群状态"><a href="#3-4集群状态" class="headerlink" title="3.4集群状态"></a>3.4集群状态</h3><p>经过上面几个例子，我相信大家也很容易想到ZooKeeper是怎么”<strong>感知</strong>“节点的动态新增或者删除的了。</p>
-<p>还是以我们三个系统A、B、C为例，在ZooKeeper中创建<strong>临时节点</strong>即可：</p>
-<img src="/2019/07/19/Zookeeper/zk集群感知结点.png" title="This is an example image">
-
-<p>各维护一个临时节点</p>
-<p>只要系统A挂了，那<code>/groupMember/A</code>这个节点就会删除，通过<strong>监听</strong><code>groupMember</code>下的子节点，系统B和C就能够感知到系统A已经挂了。(新增也是同理)</p>
-<p>除了能够感知节点的上下线变化，ZooKeeper还可以实现<strong>动态选举Master</strong>的功能。(如果集群是主从架构模式下)</p>
-<p>原理也很简单，如果想要实现动态选举Master的功能，Znode节点的类型是带<strong>顺序号的临时节点</strong>(<code>EPHEMERAL_SEQUENTIAL</code>)就好了。</p>
-<ul>
-<li>Zookeeper会每次选举最小编号的作为Master，如果Master挂了，自然对应的Znode节点就会删除。然后让<strong>新的最小编号作为Master</strong>，这样就可以实现动态选举的功能了。</li>
-</ul>
-<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>这篇文章主要讲解了ZooKeeper的入门相关的知识，ZooKeeper通过<strong>Znode的节点类型+监听机制</strong>就实现那么多好用的功能了！</p>
-<p>当然了，ZooKeeper要考虑的事没那么简单的，后面有机会深入的话，我还会继续分享，希望这篇文章对大家有所帮助~ </p>
-<p>参考资料：</p>
-<ul>
-<li><p>分布式服务框架 Zookeeper</p>
-</li>
-<li><ul>
-<li><a href="https://www.ibm.com/developerworks/cn/opensource/os-cn-zookeeper/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/opensource/os-cn-zookeeper/index.html</a></li>
-</ul>
-</li>
-<li><p>ZooKeeper初识整理(老酒装新瓶)</p>
-</li>
-<li><ul>
-<li><a href="https://lxkaka.wang/2017/12/21/zookeeper/" target="_blank" rel="noopener">https://lxkaka.wang/2017/12/21/zookeeper/</a></li>
-</ul>
-</li>
-<li><p>ZooKeeper</p>
-</li>
-<li><ul>
-<li><a href="https://www.cnblogs.com/sunshine-long/p/9057191.html" target="_blank" rel="noopener">https://www.cnblogs.com/sunshine-long/p/9057191.html</a></li>
-</ul>
-</li>
-<li><p>ZooKeeper 的应用场景</p>
-</li>
-<li><ul>
-<li><a href="https://zhuanlan.zhihu.com/p/59669985" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/59669985</a></li>
-</ul>
-</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Zookeeper</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/Zookeeper/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-EventBus" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/EventBus/">EventBus</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/19/EventBus/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><p><code>EventBus</code> 是Google.Guava提供的消息发布-订阅类库，它实现了观察者设计模式，消息通知负责人通过EventBus去注册/注销观察者，最后由消息通知负责人给观察者发布消息。</p>
-<h2 id="二、观察者设计模式"><a href="#二、观察者设计模式" class="headerlink" title="二、观察者设计模式"></a>二、观察者设计模式</h2><h3 id="1、目的"><a href="#1、目的" class="headerlink" title="1、目的"></a>1、目的</h3><blockquote>
-<p>定义对象间的一种一对多依赖关系，当一个对象的状态发生改变时候，所有依赖于它的对象都得到通知并被自动更新。</p>
-</blockquote>
-<h3 id="2、应用实例"><a href="#2、应用实例" class="headerlink" title="2、应用实例"></a>2、应用实例</h3><ol>
-<li>接水的时候，接水的人观察水位，当水位到一定程度时候便停止接水；</li>
-<li>老师一布置任务，学生听到都得做。</li>
-</ol>
-<h3 id="3、代码"><a href="#3、代码" class="headerlink" title="3、代码"></a>3、代码</h3><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">package com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="markdown">/**</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>观察者接口IListenner</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>定义一个update()方法，当被观察者调用notifyListenner()方法时，观察者的update（）方法会被回调</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>@author gary</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"> *</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"> */</span></span></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">interface</span> <span class="title">IListenner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    public <span class="keyword">void</span> update(<span class="built_in">String</span> info);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> * 被观察者接口ISpeaker</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> * 声明添加删除通知观察者方法</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> gary</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ISpeaker</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addListenner</span><span class="params">(IListenner listenner)</span></span>;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeListenner</span><span class="params">(IListennerlistenner)</span></span>;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">notifyListenner</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">implements</span> <span class="title">IListenner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String info;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Student</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">this</span>.name = name;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(String info)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">this</span>.info = info ;</span><br><span class="line"></span><br><span class="line">         read();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">read</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         System.out.println(<span class="string">"学生:"</span> + name + <span class="string">" 接收到老师的消息 :"</span> + info);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Teacher</span> <span class="keyword">implements</span> <span class="title">ISpeaker</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;IListenner&gt; listennerList;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String info;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Teacher</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         listennerList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addListenner</span><span class="params">(IListenner listenner)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         listennerList.add(listenner);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeListenner</span><span class="params">(IListennerlistenner)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         listennerList.remove(listenner);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">notifyListenner</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; listennerList.size();i++) &#123;</span><br><span class="line"></span><br><span class="line">             IListenner lis = listennerList.get(i);</span><br><span class="line"></span><br><span class="line">             lis.update(info);</span><br><span class="line"></span><br><span class="line">         &#125;            </span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setInfo</span><span class="params">(String info)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         System.out.println(<span class="string">"老师发送消息 ： "</span> +info);</span><br><span class="line"></span><br><span class="line">         <span class="keyword">this</span>.info = info;</span><br><span class="line"></span><br><span class="line">         notifyListenner();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
-<p>测试：</p>
-<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line"></span><br><span class="line">         Teacher teacher = <span class="keyword">new</span> <span class="type">Teacher</span>();</span><br><span class="line"></span><br><span class="line">         teacher.addListenner(<span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"张三"</span>));</span><br><span class="line"></span><br><span class="line">         teacher.addListenner(<span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"李四"</span>));</span><br><span class="line"></span><br><span class="line">         teacher.addListenner(<span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"王五"</span>));</span><br><span class="line"></span><br><span class="line">         teacher.setInfo(<span class="string">"大家好"</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
-<p>结果：</p>
-<p>老师发送消息 ： 大家好</p>
-<p>学生:张三 接收到老师的消息 :大家好</p>
-<p>学生:李四 接收到老师的消息 :大家好</p>
-<p>学生:王五 接收到老师的消息 :大家好</p>
-<h2 id="三、EventBus使用"><a href="#三、EventBus使用" class="headerlink" title="三、EventBus使用"></a>三、EventBus使用</h2><h3 id="1、引入依赖"><a href="#1、引入依赖" class="headerlink" title="1、引入依赖"></a>1、引入依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.guava<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>guava<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>19.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2、示例"><a href="#2、示例" class="headerlink" title="2、示例"></a>2、示例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EventBusCenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> EventBus eventBus = <span class="keyword">new</span> EventBus();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">EventBusCenter</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> EventBus <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> eventBus;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">        eventBus.register(object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">unregister</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">        eventBus.unregister(object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">post</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">        eventBus.post(object);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataListenerTwo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Subscribe</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">(Integer msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Two fun Integer msg: "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Subscribe</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun2</span><span class="params">(Integer msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Two fun2 Integer msg: "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataListenerOne</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Subscribe</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"One fun String msg: "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Subscribe</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun2</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"One fun2 String msg: "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestForEventBus</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        DataListenerOne one = <span class="keyword">new</span> DataListenerOne();</span><br><span class="line">        DataListenerTwo two = <span class="keyword">new</span> DataListenerTwo();</span><br><span class="line"></span><br><span class="line">        EventBusCenter.register(one);</span><br><span class="line">        EventBusCenter.register(two);</span><br><span class="line"></span><br><span class="line">        EventBusCenter.post(<span class="string">"post string"</span>);</span><br><span class="line">        EventBusCenter.post(<span class="number">123</span>);</span><br><span class="line"></span><br><span class="line">        EventBusCenter.unregister(two);</span><br><span class="line"></span><br><span class="line">        EventBusCenter.post(<span class="string">"post string"</span>);</span><br><span class="line">        EventBusCenter.post(<span class="number">123</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">One fun2 String <span class="symbol">msg:</span> post string</span><br><span class="line">One <span class="function"><span class="keyword">fun</span> <span class="title">String</span></span> <span class="symbol">msg:</span> post string</span><br><span class="line">Two <span class="function"><span class="keyword">fun</span> <span class="title">Integer</span></span> <span class="symbol">msg:</span> <span class="number">123</span></span><br><span class="line">Two fun2 Integer <span class="symbol">msg:</span> <span class="number">123</span></span><br><span class="line">One fun2 String <span class="symbol">msg:</span> post string</span><br><span class="line">One <span class="function"><span class="keyword">fun</span> <span class="title">String</span></span> <span class="symbol">msg:</span> post string</span><br></pre></td></tr></table></figure>
-
-<h3 id="3、注意事项"><a href="#3、注意事项" class="headerlink" title="3、注意事项"></a>3、注意事项</h3><ul>
-<li>只有通过@Subscribe注解的方法才会被注册金EventBus</li>
-<li>方法只能有1个参数</li>
-<li>使用基本数据类型的包装类，否则会无法匹配</li>
-</ul>
-<h3 id="4、带来的问题"><a href="#4、带来的问题" class="headerlink" title="4、带来的问题"></a>4、带来的问题</h3><p>由于EventBus是将消息队列放入到内存中的，listener消费这个消息队列，所以系统重启之后，保存或者堆积在队列中的消息丢失。</p>
-<p>解决思路：把内存中的数据持久化到磁盘中。</p>
-<h3 id="5、原理图"><a href="#5、原理图" class="headerlink" title="5、原理图"></a>5、原理图</h3><img src="/2019/07/19/EventBus/EventBus-Publish-Subscribe.png" title="This is an example image">
-
-<h3 id="6、注意"><a href="#6、注意" class="headerlink" title="6、注意"></a>6、注意</h3><p>每次register后都需要进行一次unregister，因为如果不unregister，会让对象无法得到内存回收，导致内存泄漏。所以必须在unregister方法中释放对象所占的内存。</p>
-<h2 id="四、源码分析"><a href="#四、源码分析" class="headerlink" title="四、源码分析"></a>四、源码分析</h2><h3 id="1、构造方法"><a href="#1、构造方法" class="headerlink" title="1、构造方法"></a>1、构造方法</h3><p>默认构造方法：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Creates a new EventBus named "default".</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">EventBus</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>(<span class="string">"default"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Creates a new EventBus with the given &#123;<span class="doctag">@code</span> identifier&#125;.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> identifier  a brief name for this bus, for logging purposes.  Should</span></span><br><span class="line"><span class="comment"> *                    be a valid Java identifier.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">EventBus</span><span class="params">(String identifier)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>(identifier, MoreExecutors.directExecutor(),</span><br><span class="line">      Dispatcher.perThreadDispatchQueue(), 			LoggingHandler.INSTANCE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EventBus(String identifier, Executor executor, Dispatcher dispatcher,</span><br><span class="line">    SubscriberExceptionHandler exceptionHandler) &#123;</span><br><span class="line">  <span class="keyword">this</span>.identifier = checkNotNull(identifier);</span><br><span class="line">  <span class="keyword">this</span>.executor = checkNotNull(executor);</span><br><span class="line">  <span class="keyword">this</span>.dispatcher = checkNotNull(dispatcher);</span><br><span class="line">  <span class="keyword">this</span>.exceptionHandler = checkNotNull(exceptionHandler);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2、订阅者（register）"><a href="#2、订阅者（register）" class="headerlink" title="2、订阅者（register）"></a>2、订阅者（register）</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">  subscribers.register(object);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 添加订阅者</span></span><br><span class="line"><span class="comment">  * Registers all subscriber methods on the given listener object.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">register</span><span class="params">(Object listener)</span> </span>&#123;</span><br><span class="line">   <span class="comment">//找到该对象下的所有订阅者</span></span><br><span class="line">   Multimap&lt;Class&lt;?&gt;, Subscriber&gt; listenerMethods = findAllSubscribers(listener);</span><br><span class="line"><span class="comment">//遍历订阅者map</span></span><br><span class="line">   <span class="keyword">for</span> (Map.Entry&lt;Class&lt;?&gt;, Collection&lt;Subscriber&gt;&gt; entry : listenerMethods.asMap().entrySet()) &#123;</span><br><span class="line">     Class&lt;?&gt; eventType = entry.getKey();</span><br><span class="line">     Collection&lt;Subscriber&gt; eventMethodsInListener = entry.getValue();</span><br><span class="line">     <span class="comment">//将遍历得到的每一个订阅者添加到对应事件类型的Copy-On-Write容器中</span></span><br><span class="line">     </span><br><span class="line">     CopyOnWriteArraySet&lt;Subscriber&gt; eventSubscribers = subscribers.get(eventType);</span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (eventSubscribers == <span class="keyword">null</span>) &#123;</span><br><span class="line">       CopyOnWriteArraySet&lt;Subscriber&gt; newSet = <span class="keyword">new</span> CopyOnWriteArraySet&lt;Subscriber&gt;();</span><br><span class="line">       <span class="comment">//putIfAbsent将新事件类型对应set加到map，如果map中存在则返回原来的value，如果不存在加入新的后则返回null</span></span><br><span class="line">       <span class="comment">//如果返回值为null，那么使用newSet</span></span><br><span class="line">       eventSubscribers = MoreObjects.firstNonNull(</span><br><span class="line">           subscribers.putIfAbsent(eventType, newSet), newSet);</span><br><span class="line">     &#125;</span><br><span class="line">  <span class="comment">//把该事件所有订阅者加入该事件的set中</span></span><br><span class="line">     eventSubscribers.addAll(eventMethodsInListener);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 返回map，以事件类型（方法第一个参数类型）为键，订阅者（以eventBus，listener对象，以及method封装而成的订阅者对象）为值</span></span><br><span class="line"><span class="comment"> * Returns all subscribers for the given listener grouped by the type of event they subscribe to.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> Multimap&lt;Class&lt;?&gt;, Subscriber&gt; findAllSubscribers(Object listener) &#123;</span><br><span class="line">  Multimap&lt;Class&lt;?&gt;, Subscriber&gt; methodsInListener = HashMultimap.create();</span><br><span class="line">  Class&lt;?&gt; clazz = listener.getClass();</span><br><span class="line">  <span class="comment">//将订阅者加入事件对应的multimap中 （Multimap k唯一 v可以放多个）</span></span><br><span class="line">  <span class="keyword">for</span> (Method method : getAnnotatedMethods(clazz)) &#123;</span><br><span class="line">    Class&lt;?&gt;[] parameterTypes = method.getParameterTypes();</span><br><span class="line">    Class&lt;?&gt; eventType = parameterTypes[<span class="number">0</span>];</span><br><span class="line">    methodsInListener.put(eventType, Subscriber.create(bus, listener, method));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> methodsInListener;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * All registered subscribers, indexed by event type.</span></span><br><span class="line"><span class="comment"> * 事件类型 对应的 所有订阅者</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;The &#123;<span class="doctag">@link</span> CopyOnWriteArraySet&#125; values make it easy and relatively lightweight to get an</span></span><br><span class="line"><span class="comment"> * immutable snapshot of all current subscribers to an event without any locking.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> ConcurrentMap&lt;Class&lt;?&gt;, CopyOnWriteArraySet&lt;Subscriber&gt;&gt; subscribers =</span><br><span class="line">    Maps.newConcurrentMap();</span><br></pre></td></tr></table></figure>
-
-<h3 id="3、发布者（post）"><a href="#3、发布者（post）" class="headerlink" title="3、发布者（post）"></a>3、发布者（post）</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 将事件发部给所有的订阅者</span></span><br><span class="line"><span class="comment"> * Posts an event to all registered subscribers.  This method will return</span></span><br><span class="line"><span class="comment"> * successfully after the event has been posted to all subscribers, and</span></span><br><span class="line"><span class="comment"> * regardless of any exceptions thrown by subscribers.</span></span><br><span class="line"><span class="comment"> * 如果没有订阅者订阅该事件，那么将会用一个DeadEvent事件包装该事件，重发布</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;If no subscribers have been subscribed for &#123;<span class="doctag">@code</span> event&#125;'s class, and</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@code</span> event&#125; is not already a &#123;<span class="doctag">@link</span> DeadEvent&#125;, it will be wrapped in a</span></span><br><span class="line"><span class="comment"> * DeadEvent and reposted.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> event  event to post.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">post</span><span class="params">(Object event)</span> </span>&#123;</span><br><span class="line">  <span class="comment">//获取事件对应的所有订阅者  </span></span><br><span class="line">  Iterator&lt;Subscriber&gt; eventSubscribers = subscribers.getSubscribers(event);</span><br><span class="line">  <span class="comment">//遍历订阅者  </span></span><br><span class="line">  <span class="keyword">if</span> (eventSubscribers.hasNext()) &#123;</span><br><span class="line">    <span class="comment">//将事件分发给订阅者</span></span><br><span class="line">    <span class="comment">//dispatcher在构造中已经初始化为PerThreadQueuedDispatcher</span></span><br><span class="line">    dispatcher.dispatch(event, eventSubscribers);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!(event <span class="keyword">instanceof</span> DeadEvent)) &#123;</span><br><span class="line">    <span class="comment">// the event had no subscribers and was not itself a DeadEvent</span></span><br><span class="line">    post(<span class="keyword">new</span> DeadEvent(<span class="keyword">this</span>, event));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>PerThreadQueuedDispatcher中的dispatch方法</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dispatch</span><span class="params">(Object event, Iterator&lt;Subscriber&gt; subscribers)</span> </span>&#123;</span><br><span class="line">  checkNotNull(event);</span><br><span class="line">  checkNotNull(subscribers);</span><br><span class="line">  Queue&lt;Event&gt; queueForThread = queue.get();</span><br><span class="line">  queueForThread.offer(<span class="keyword">new</span> Event(event, subscribers));</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!dispatching.get()) &#123;</span><br><span class="line">    dispatching.set(<span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Event nextEvent;</span><br><span class="line">      <span class="keyword">while</span> ((nextEvent = queueForThread.poll()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">while</span> (nextEvent.subscribers.hasNext()) &#123;</span><br><span class="line">          <span class="comment">//分发事件给订阅者执行</span></span><br><span class="line">          nextEvent.subscribers.next().dispatchEvent(nextEvent.event);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      dispatching.remove();</span><br><span class="line">      queue.remove();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Dispatches &#123;<span class="doctag">@code</span> event&#125; to this subscriber using the proper executor.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">dispatchEvent</span><span class="params">(<span class="keyword">final</span> Object event)</span> </span>&#123;</span><br><span class="line">  executor.execute(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//订阅者执行事件（反射执行方法，即订阅者为方法，事件为参数）  </span></span><br><span class="line">        invokeSubscriberMethod(event);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">        bus.handleSubscriberException(e.getCause(), context(event));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">事件总线</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/EventBus/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/07/19/分布式锁/">展开全文 >></a>
         </p>
       
 
@@ -1894,7 +2476,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">容器</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">数据库</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1902,7 +2492,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">数据库</a>
+                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1914,7 +2504,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
+                <a href="javascript:void(0)" class="js-tag color3">中台</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1935,10 +2525,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">feed</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">中台</a>
               </li>
             
             <div class="clearfix"></div>

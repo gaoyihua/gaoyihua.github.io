@@ -6,18 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2019 | Gary&#39;s Blog</title>
+  <title>文件和目录管理 | Gary&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Gary&apos;s Blog">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Gary&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/archives/2019/index.html">
+  <meta name="description" content="文件及目录管理Linux系统中一切皆文件，不仅程序和数据是以文件的形式保存的，目录和各种设备也都被当作文件来使用。 系统IO接口提供了不带缓冲区的IO操作，而标准io接口提供了带缓冲区的io操作。 1、文件和I/O操作分类1.1、文件概念大多数应用中，文件是一个核心成分，除了实时应用和一些特殊的应用外，应用程序的输入都是通过文件来实现的。实际上所有应用程序的输出都保存在文件中，这便于信息的长期存储">
+<meta name="keywords" content="Linux">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件和目录管理">
+<meta property="og:url" content="http://yoursite.com/2019/07/19/文件和目录管理/index.html">
 <meta property="og:site_name" content="Gary&#39;s Blog">
-<meta property="og:description" content="Gary&apos;s Blog">
+<meta property="og:description" content="文件及目录管理Linux系统中一切皆文件，不仅程序和数据是以文件的形式保存的，目录和各种设备也都被当作文件来使用。 系统IO接口提供了不带缓冲区的IO操作，而标准io接口提供了带缓冲区的io操作。 1、文件和I/O操作分类1.1、文件概念大多数应用中，文件是一个核心成分，除了实时应用和一些特殊的应用外，应用程序的输入都是通过文件来实现的。实际上所有应用程序的输出都保存在文件中，这便于信息的长期存储">
 <meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/文件和目录管理/1562515228634.png">
+<meta property="og:updated_time" content="2019-07-19T15:02:00.111Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Gary&#39;s Blog">
-<meta name="twitter:description" content="Gary&apos;s Blog">
+<meta name="twitter:title" content="文件和目录管理">
+<meta name="twitter:description" content="文件及目录管理Linux系统中一切皆文件，不仅程序和数据是以文件的形式保存的，目录和各种设备也都被当作文件来使用。 系统IO接口提供了不带缓冲区的IO操作，而标准io接口提供了带缓冲区的io操作。 1、文件和I/O操作分类1.1、文件概念大多数应用中，文件是一个核心成分，除了实时应用和一些特殊的应用外，应用程序的输入都是通过文件来实现的。实际上所有应用程序的输出都保存在文件中，这便于信息的长期存储">
+<meta name="twitter:image" content="http://yoursite.com/2019/07/19/文件和目录管理/1562515228634.png">
   
     <link rel="alternative" href="/atom.xml" title="Gary&#39;s Blog" type="application/atom+xml">
   
@@ -153,36 +157,366 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-文件和目录管理" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      文件和目录管理
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/文件和目录管理/" class="archive-article-date">
+
+        
+        <a href="/2019/07/19/文件和目录管理/" class="archive-article-date">
   	<time datetime="2019-07-19T14:57:17.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/文件和目录管理/">文件和目录管理</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="文件及目录管理"><a href="#文件及目录管理" class="headerlink" title="文件及目录管理"></a>文件及目录管理</h1><p>Linux系统中一切皆文件，不仅程序和数据是以文件的形式保存的，目录和各种设备也都被当作文件来使用。</p>
+<p>系统IO接口提供了不带缓冲区的IO操作，而标准io接口提供了带缓冲区的io操作。</p>
+<h2 id="1、文件和I-O操作分类"><a href="#1、文件和I-O操作分类" class="headerlink" title="1、文件和I/O操作分类"></a>1、文件和I/O操作分类</h2><h3 id="1-1、文件概念"><a href="#1-1、文件概念" class="headerlink" title="1.1、文件概念"></a>1.1、文件概念</h3><p>大多数应用中，文件是一个核心成分，除了实时应用和一些特殊的应用外，应用程序的输入都是通过文件来实现的。实际上所有应用程序的输出都保存在文件中，这便于信息的长期存储以及用户或应用程序将来的访问。</p>
+<p>文件可认为是具有标识符的一组相关联信息项的有序集合，一般体现在磁盘上的文件。</p>
+<p>对于文件的管理，</p>
+<p>从Linux内核的角度来看，处理文件的部分是文件系统，linux内核通过文件系统对文件存储空间进行组织和分配，负责文件存储并对存入的文件进行保护和检索。</p>
+<p>具体来说，文件系统负责为用户建立文件，存入、读出、修改、转储文件、控制文件的存取，当用户不再使用时候撤销文件等。</p>
+<p>从 用户的角度来看，文件的管理是通过Linux操作系统提供的一系列接口完成的，比如系统IO、标准IO、字符命令和图形接口来完成文件的管理</p>
+<h3 id="1-2、文件操作分类"><a href="#1-2、文件操作分类" class="headerlink" title="1.2、文件操作分类"></a>1.2、文件操作分类</h3><p>对文件的访问分不带缓冲区的文件操作和带缓冲区的文件操作</p>
+<p>1、不带缓冲区的文件操作：属于低级文件操作，需要用户自己在自己的程序中为每个文件设置缓冲区。遵循POSIX标准的系统IO使用的就是这个，系统IO接口也称为IO系统调用，如open、read、write和lseek等。</p>
+<p>2、带缓冲区的文件操作：属于高级文件操作，系统将在用户空间中自动为正在使用的文件开辟内存缓冲区。数据在从文件读到程序数据区和从程序数据区输出到文件过程中，将会经过一个系统管理的输入或者输出缓冲区进行缓冲。遵循ANSI标准的IO操作使用的就是缓冲区的文件操作，标准IO接口也称为IO库函数，如fopen、fread、fwrite、flush和fseek</p>
+<p>调用系统调用会陷入Linux内核，而调用库函数不会陷入Linux内核。</p>
+<p>如果<strong><em>采用非缓冲区</em></strong>的文件访问方式，每次在对文件进行任何一次读写操作，分别使用读文件的系统调用read来处理读操作，或使用写文件的系统调用write来处理写操作。</p>
+<p>如果用户程序需要访问磁盘空间中的某个文件，read或者write是以一个数据单元为单位进行读写操作，因此，一个文件的读写操作可能需要多次调用read或write系统调用完成。</p>
+<p>一个文件长度可能被分成多个数据单元，每访问一个数据单元都需要执行一次系统调用，执行系统调用会有一次用户态到内核态的切换，系统调用完后还会有内核态到用户态的转换，这俩次态式转换将要涉及CPU状态的切换、用户态进程和系统进程的上下文转换，这将消耗一定的CPU时间。对磁盘读写操作是一个机械运动，相对CPU处理速度来说，是一个缓慢的过程，频繁的磁盘访问对程序执行效率会造成较大的影响。</p>
+<p>故 通过多次调用read或者write系统调用完成大文件数据的读写，从效率讲是比较低效的。</p>
+<p>如果<strong><em>采用带缓冲区</em></strong>的的文件访问方式，ANSI标准IO库函数建立在底层系统调用上，在对文件函数库的实现中使用了低级文件IO系统调用。为了减少使用系统调用的次数以及提高效率。对磁盘文件进行读写操作时，可以一次性地从文件中读取大量的数据到缓冲区中。以后对这部分数据的访问就不需要再使用系统调用了，因为数据可以直接从输入文件缓冲区或者输出文件缓冲区中获得，即整个读写操作只需要少量的CPU状态的切换和磁盘的读写机械访问次数。在对磁盘写文件进行操作时，可以先讲内容存储在文件缓冲区中，充满后，或者确实需要更新的时候再调用系统调用，讲文件一次性写入到磁盘。</p>
+<p>ANSI标准C库函数为了实现这一特性，采用的流的概念，因为数据的输入输出像流动的水一样。</p>
+<p>在流的实现中，缓冲区是最重要的单元。根据需求不同可以选择全缓冲区、行缓冲区和无缓冲区等来处理读写操作。</p>
+<h2 id="2、Linux文件系统概述"><a href="#2、Linux文件系统概述" class="headerlink" title="2、Linux文件系统概述"></a>2、Linux文件系统概述</h2><h3 id="2-1、文件结构"><a href="#2-1、文件结构" class="headerlink" title="2.1、文件结构"></a>2.1、文件结构</h3><p>根目录下目录：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/bin</td>
+<td>存放普通用户可执行命令</td>
+</tr>
+<tr>
+<td>/boot</td>
+<td>Linux内核以及启动系统所需要的文件</td>
+</tr>
+<tr>
+<td>/dev</td>
+<td>设备文件的存储目录</td>
+</tr>
+<tr>
+<td>/etc</td>
+<td>系统配置文件</td>
+</tr>
+<tr>
+<td>/home</td>
+<td>普通用户主目录，每个用户在该目录下都有一个与用户同名的目录</td>
+</tr>
+<tr>
+<td>/lib</td>
+<td>各种库文件</td>
+</tr>
+<tr>
+<td>/proc</td>
+<td>虚拟文件系统</td>
+</tr>
+<tr>
+<td>/root</td>
+<td>超级用户root的主目录</td>
+</tr>
+<tr>
+<td>/sbin</td>
+<td>存放的是用于管理系统的命令</td>
+</tr>
+<tr>
+<td>/tmp</td>
+<td>临时文件</td>
+</tr>
+<tr>
+<td>/usr</td>
+<td>系统应用程序以及相关文件</td>
+</tr>
+<tr>
+<td>/var</td>
+<td>系统中经常编号的文件</td>
+</tr>
+</tbody></table>
+<h3 id="2-2、文件系统模型"><a href="#2-2、文件系统模型" class="headerlink" title="2.2、文件系统模型"></a>2.2、文件系统模型</h3><p>文件的本质是长期存储在物理磁盘上的数据，擦欧总系统通过文件系统功能可以方便地对磁盘上的文件进行管理。</p>
+<p>对物理磁盘的访问都是通过设备驱动程序进行的。</p>
+<p>对设备驱动访问则俩种：1、通过设备驱动提供的接口。2、通过虚拟文件系统</p>
+<p>从硬盘的构造可知，访问物理磁盘的最小单位是位于某个盘面上某个磁道的一个扇区，即使用户只需访问1个字节的数据，实际读写时都需要先将该字节所在的扇区读入到内存，然后再选择指定的数据进行访问。</p>
+<h3 id="2-3、目录、索引结点和文件描述符"><a href="#2-3、目录、索引结点和文件描述符" class="headerlink" title="2.3、目录、索引结点和文件描述符"></a>2.3、目录、索引结点和文件描述符</h3><p>1、目录和索引结点</p>
+<p><strong><em>为了能对一个文件进行正确的读取，必须为文件设置用户描述和控制文件的数据结构</em></strong>，称为文件控制块（File Control Block，FCB），文件管理程序（内核）可借助文件控制块中的信息对文件以各种操作。</p>
+<p>每个文件都有一个FCB用于描述文件的各种属性信息，FCB的有序集称为文件目录。一个FCB也称为一个目录项，为了实现对文件目录的管理，通常将文件目录以文件的形式保存在外存上，这个文件就成为目录文件。</p>
+<p>FCB一般包含三类信息：</p>
+<ul>
+<li>基本信息，如文件名、文件物理位置、文件逻辑结构和文件物理结构</li>
+<li>存取控制信息，如文件所有者存取权限、所在组<del>、其他用户</del></li>
+<li>信息类，如文件建立日期、上一次修改日期、当前使用信息项（已经打开该文件的进程数，是否被其他进程锁住）</li>
+</ul>
+<p>现在操作系统中，一般为了加快文件的检索速度，将除文件名之外的一些属性信息，如文件创建/修改日期、文件访问权限、文件长度和文件在磁盘的存放位置等信息存储在一个特殊的索引结点inode数据库中，因此每个文件都有一个inode。</p>
+<p>Linux的文件系统把所有的inode组织成一个数组，给每个inode分配一个号码，也就是该inode在数组中的索引号，称索引结点编号。</p>
+<p>Linux将FCB（对应内核的dentry结构体）组织为“文件名，索引结点编号”这样的结构。如下表：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>.</td>
+<td>2</td>
+</tr>
+<tr>
+<td>bin</td>
+<td>3407873</td>
+</tr>
+</tbody></table>
+<p>表中每一行对应一个文件的FCB，通过索引结点编号，内核可以找到文件对应的索引结点inode，通过inode可以了解文件的许多属性。</p>
+<p>Linux一切皆文件，每个文件都对应一个索引结点。</p>
+<p><strong><em>文件-&gt;FCB-&gt;文件名-&gt;索引结点编号-&gt;索引结点inode-&gt;属性</em></strong></p>
+<p>2、文件描述符</p>
+<p>操作系统中，一个处于运行状态的程序，称为进程，为了描述和控制进程的运行，内核定义了一个称为进程控制块PCB（Process Control Block)的数据结构，PCB中记录了内核所需的、用户描述进程当前情况以及控制进程运行的全部信息，在Linux中，这个数据结构为task_struct。</p>
+<p>文件描述符是一个非负整数，对于内核，所有打开的文件都是通过文件描述符引用。</p>
+<p>当用户需要访问文件，内核通过open、create等系统调用向用户程序返回一个文件描述符，随后在用户程序中所有对该文件的访问都使用该文件描述符。</p>
+<p>内核中打开的文件是用file结构体表示的，每个结构体会有一个指针指向它，这些指针统一存放在fd_array的数组，而这个数组被存放在以恶搞称为files_struct的结构体，改结构体是进程控制块task_struck中的重要组成部分。</p>
+<p><strong><em>task_struct-&gt;其中的file_struct-&gt; 其中的fd_array[]-&gt;其中的指针-&gt;file结构体-&gt;其中的f_dentry-&gt;i_node-&gt;inode_文件在磁盘上的物理位置</em></strong></p>
+<h3 id="2-4、文件的分类"><a href="#2-4、文件的分类" class="headerlink" title="2.4、文件的分类"></a>2.4、文件的分类</h3><p>1、普通文件（-）</p>
+<p>2、目录文件（d）</p>
+<p>3、字符特殊文件（c）：系统字符类型的设备，如键盘，鼠标</p>
+<p>4、块特殊文件（b）：块类型设备，如硬盘、光驱，对这些设备上的数据的访问通常以块方式进行，即一次至少读写一块。</p>
+<p>5、FIFO（p）：这种类型文件用于进程间的通信，也称为命名管道。</p>
+<p>6、套接字（s）：用于网络通信，套接字也可以用于一台主机上的进程之间的通信。</p>
+<p>7、符号链接（l）：指向另一个文件，是另一个文件的引用。</p>
+<h3 id="2-5、文件访问权限控制"><a href="#2-5、文件访问权限控制" class="headerlink" title="2.5、文件访问权限控制"></a>2.5、文件访问权限控制</h3><h4 id="2-5-1、访问权限控制"><a href="#2-5-1、访问权限控制" class="headerlink" title="2.5.1、访问权限控制"></a>2.5.1、访问权限控制</h4><p>ls -l后</p>
+<p><strong><em>从左往右是 类型 + 所有者访问权限 + 同组访问权限 + 其他用户访问权限 + 链接数 + 文件所有者 + 所在组 + 文件大小 + 时间 + 时间</em></strong></p>
+<h4 id="2-5-2、访问权限在系统中的表示"><a href="#2-5-2、访问权限在系统中的表示" class="headerlink" title="2.5.2、访问权限在系统中的表示"></a>2.5.2、访问权限在系统中的表示</h4><p>1、st_mode结构：</p>
+<p>文件类型与访问权限被定义在一个名为st_mode的内核数据结构中，st_mode实质是一个无符号16位短整型数，文件类型和权限被编码在这个数中。</p>
+<img src="/2019/07/19/文件和目录管理/1562515228634.png" title="This is an example image">
 
-        <div class="article-info info-on-right">
-          
+<p>中间三位是文件的特殊属性：1代表有，0代表没有</p>
+<ul>
+<li>suid：1，任何用户在执行该文件时候均会获得该文件所有者的临时授权，即其有效UID将等于文件所有者UID</li>
+<li>sgig：1，任何在该目录下执行的程序均会获得该目录所属组成员的临时授权，即其有效GID将等于该目录所属组成员的GID</li>
+<li>sticky：1，只对目录有效，在当前用户拥有该目录写情况，用户只能删除在本目录下属于自己的文件。</li>
+</ul>
+<p>可以通过chmod命令修改，在读写执行三个数字前加的那个数代表这三个特殊权限。suid 4，sgid 2，sticky 1.</p>
+<p>2、掩码技术：</p>
+<p>通过按位与操作，掩码可以将二进制数中不需要的位置0，需要的不发生变化。</p>
+<p>将8进制的042664的st_mode按位与八进制掩码170000，结果保留了042664的高4位。说明st_mode值对应的文件是一个目录文件。</p>
+<p>3、st_mode中的一些宏定义</p>
+<p>文件类型和特殊位宏定义：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>#define S_IFMT</td>
+<td>00170000</td>
+<td>文件类型掩码</td>
+</tr>
+<tr>
+<td>IFSOCK</td>
+<td>0140000</td>
+<td>文件类型：套接字</td>
+</tr>
+<tr>
+<td>IFLNK</td>
+<td>0120000</td>
+<td>链接</td>
+</tr>
+<tr>
+<td>IFREG</td>
+<td>0100000</td>
+<td>普通文件</td>
+</tr>
+<tr>
+<td>IFBLK</td>
+<td>0060000</td>
+<td>块设备</td>
+</tr>
+<tr>
+<td>IFDIR</td>
+<td>0040000</td>
+<td>目录</td>
+</tr>
+<tr>
+<td>IFCHA</td>
+<td>0020000</td>
+<td>字符设备</td>
+</tr>
+<tr>
+<td>IFIFO</td>
+<td>0010000</td>
+<td>管道</td>
+</tr>
+<tr>
+<td>IFUID</td>
+<td>0004000</td>
+<td>suid</td>
+</tr>
+<tr>
+<td>IFGID</td>
+<td>0002000</td>
+<td>sgid</td>
+</tr>
+<tr>
+<td>ISVTX</td>
+<td>0001000</td>
+<td>文件的粘贴位</td>
+</tr>
+</tbody></table>
+<p>判断文件权限的宏定义：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>#define S_ISLNK(m)</td>
+<td>(((m) &amp; S_IFMT) == S_IFLNK)</td>
+<td>判断是否为链接文件</td>
+</tr>
+<tr>
+<td>ISREG</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISDIR</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISCHA</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISBLK</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISFIFO</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ISSOCK</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<p>文件权限的宏定义：</p>
+<table>
+<thead>
+<tr>
+<th>—</th>
+<th>—</th>
+<th>—</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>#define S_IRWXU</td>
+<td>00700</td>
+<td>所有者权限掩码</td>
+</tr>
+<tr>
+<td>S_IRUSR</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IWUSR</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IXUSR</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IRWXG</td>
+<td></td>
+<td>所属组成员权限掩码</td>
+</tr>
+<tr>
+<td>S_IRGRP</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IWGRP</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IXGRP</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>S_IRWXO</td>
+<td></td>
+<td>其他用户权限掩码</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h3 id="2-6、文件的读写"><a href="#2-6、文件的读写" class="headerlink" title="2.6、文件的读写"></a>2.6、文件的读写</h3><h3 id="2-7、文件属性以及相关系统调用"><a href="#2-7、文件属性以及相关系统调用" class="headerlink" title="2.7、文件属性以及相关系统调用"></a>2.7、文件属性以及相关系统调用</h3><h3 id="2-8、目录操作"><a href="#2-8、目录操作" class="headerlink" title="2.8、目录操作"></a>2.8、目录操作</h3>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -194,364 +528,118 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/19/文件和目录管理/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/Linux基础知识/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:57:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2019/07/19/Linux基础知识/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Linux基础知识</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/Linux基础知识/">Linux基础知识</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#文件及目录管理"><span class="toc-number">1.</span> <span class="toc-text">文件及目录管理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1、文件和I-O操作分类"><span class="toc-number">1.1.</span> <span class="toc-text">1、文件和I/O操作分类</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1、文件概念"><span class="toc-number">1.1.1.</span> <span class="toc-text">1.1、文件概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2、文件操作分类"><span class="toc-number">1.1.2.</span> <span class="toc-text">1.2、文件操作分类</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2、Linux文件系统概述"><span class="toc-number">1.2.</span> <span class="toc-text">2、Linux文件系统概述</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1、文件结构"><span class="toc-number">1.2.1.</span> <span class="toc-text">2.1、文件结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2、文件系统模型"><span class="toc-number">1.2.2.</span> <span class="toc-text">2.2、文件系统模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3、目录、索引结点和文件描述符"><span class="toc-number">1.2.3.</span> <span class="toc-text">2.3、目录、索引结点和文件描述符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4、文件的分类"><span class="toc-number">1.2.4.</span> <span class="toc-text">2.4、文件的分类</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5、文件访问权限控制"><span class="toc-number">1.2.5.</span> <span class="toc-text">2.5、文件访问权限控制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-1、访问权限控制"><span class="toc-number">1.2.5.1.</span> <span class="toc-text">2.5.1、访问权限控制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-5-2、访问权限在系统中的表示"><span class="toc-number">1.2.5.2.</span> <span class="toc-text">2.5.2、访问权限在系统中的表示</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-6、文件的读写"><span class="toc-number">1.2.6.</span> <span class="toc-text">2.6、文件的读写</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-7、文件属性以及相关系统调用"><span class="toc-number">1.2.7.</span> <span class="toc-text">2.7、文件属性以及相关系统调用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-8、目录操作"><span class="toc-number">1.2.8.</span> <span class="toc-text">2.8、目录操作</span></a></li></ol></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/C编程工具/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:56:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/C编程工具/">C编程工具</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/JavaSPI机制的优点与缺点/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/JavaSPI机制的优点与缺点/">JavaSPI机制的优点与缺点</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">SPI</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/Feed流系统设计/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/Feed流系统设计/">Feed流系统设计</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">feed</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/RocketMQ/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/RocketMQ/">RocketMQ</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">消息队列</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/为什么分布式/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/为什么分布式/">为什么分布式</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">分布式</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/中台/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/中台/">中台</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">中台</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/数据库读写分离/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/数据库读写分离/">数据库读写分离</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/07/19/分布式锁/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/07/19/分布式锁/">分布式锁</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">分布式</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/archives/2019/page/2/">2</a><a class="extend next" rel="next" href="/archives/2019/page/2/">Next &raquo;</a>
-    </nav>
   
 
 
@@ -575,8 +663,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
