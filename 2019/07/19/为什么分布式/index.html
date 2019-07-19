@@ -6,26 +6,31 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>分布式锁 | Gary&#39;s Blog</title>
+  <title>为什么分布式 | Gary&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言：随着计算机技术和工程架构的发展，微服务变得越来越热。如今，绝大多数服务都处于分布式环境中，其中，数据一致性是我们一直关注的重点。分布式锁到底是什么？经过了哪些发展演进？工程上有哪些实现方案？各种方案的利弊权衡又有哪些？希望这篇文章能够对你有一些帮助。 ▍阅读索引 [TOC] 0. 名词定义分布式锁：顾名思义，是指在分布式环境下的锁，重点在锁。所以我们先从锁开始讲起。 1. 问题引入举个例子：">
+  <meta name="description" content="一、为什么分布式？在之前的文章（外行人都能看懂的SpringCloud，错过了血亏！）也提过为什么要分布式：  模块之间独立，各做各的事，便于扩展，复用性高 高吞吐量。某个任务需要一个机器运行10个小时，将该任务用10台机器的分布式跑(将这个任务拆分成10个小任务)，可能2个小时就跑完了  在书上给出的观点：  升级单机的处理能力的性价比越来越低，单机的处理能力存在瓶颈 分布式系统更加稳定和可用（">
 <meta name="keywords" content="分布式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="分布式锁">
-<meta property="og:url" content="http://yoursite.com/2019/06/06/分布式锁/index.html">
+<meta property="og:title" content="为什么分布式">
+<meta property="og:url" content="http://yoursite.com/2019/07/19/为什么分布式/index.html">
 <meta property="og:site_name" content="Gary&#39;s Blog">
-<meta property="og:description" content="前言：随着计算机技术和工程架构的发展，微服务变得越来越热。如今，绝大多数服务都处于分布式环境中，其中，数据一致性是我们一直关注的重点。分布式锁到底是什么？经过了哪些发展演进？工程上有哪些实现方案？各种方案的利弊权衡又有哪些？希望这篇文章能够对你有一些帮助。 ▍阅读索引 [TOC] 0. 名词定义分布式锁：顾名思义，是指在分布式环境下的锁，重点在锁。所以我们先从锁开始讲起。 1. 问题引入举个例子：">
+<meta property="og:description" content="一、为什么分布式？在之前的文章（外行人都能看懂的SpringCloud，错过了血亏！）也提过为什么要分布式：  模块之间独立，各做各的事，便于扩展，复用性高 高吞吐量。某个任务需要一个机器运行10个小时，将该任务用10台机器的分布式跑(将这个任务拆分成10个小任务)，可能2个小时就跑完了  在书上给出的观点：  升级单机的处理能力的性价比越来越低，单机的处理能力存在瓶颈 分布式系统更加稳定和可用（">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/分布式锁/朴素redis实现分布式锁.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/分布式锁/zookeeep分布式锁方案1.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/分布式锁/zookeeep分布式锁方案2.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/分布式锁/zookeeep分布式锁方案3.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/分布式锁/zookeeep分布式锁方案4.png">
-<meta property="og:updated_time" content="2019-07-19T14:29:14.500Z">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/单机架构.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/数据库应用分开架构.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/服务器集群架构.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/集群session.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/sso.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/读写分离架构.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/主从架构.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/加搜索引擎和缓存架构.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/垂直拆分架构.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/为什么分布式/服务拆分架构.png">
+<meta property="og:updated_time" content="2019-07-19T14:42:15.150Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="分布式锁">
-<meta name="twitter:description" content="前言：随着计算机技术和工程架构的发展，微服务变得越来越热。如今，绝大多数服务都处于分布式环境中，其中，数据一致性是我们一直关注的重点。分布式锁到底是什么？经过了哪些发展演进？工程上有哪些实现方案？各种方案的利弊权衡又有哪些？希望这篇文章能够对你有一些帮助。 ▍阅读索引 [TOC] 0. 名词定义分布式锁：顾名思义，是指在分布式环境下的锁，重点在锁。所以我们先从锁开始讲起。 1. 问题引入举个例子：">
-<meta name="twitter:image" content="http://yoursite.com/2019/06/06/分布式锁/朴素redis实现分布式锁.png">
+<meta name="twitter:title" content="为什么分布式">
+<meta name="twitter:description" content="一、为什么分布式？在之前的文章（外行人都能看懂的SpringCloud，错过了血亏！）也提过为什么要分布式：  模块之间独立，各做各的事，便于扩展，复用性高 高吞吐量。某个任务需要一个机器运行10个小时，将该任务用10台机器的分布式跑(将这个任务拆分成10个小任务)，可能2个小时就跑完了  在书上给出的观点：  升级单机的处理能力的性价比越来越低，单机的处理能力存在瓶颈 分布式系统更加稳定和可用（">
+<meta name="twitter:image" content="http://yoursite.com/2019/07/19/为什么分布式/单机架构.png">
   
     <link rel="alternative" href="/atom.xml" title="Gary&#39;s Blog" type="application/atom+xml">
   
@@ -161,191 +166,102 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-分布式锁" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-为什么分布式" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      分布式锁
+      为什么分布式
     </h1>
   
 
         
-        <a href="/2019/06/06/分布式锁/" class="archive-article-date">
-  	<time datetime="2019-06-06T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-06</time>
+        <a href="/2019/07/19/为什么分布式/" class="archive-article-date">
+  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>前言：随着计算机技术和工程架构的发展，微服务变得越来越热。如今，绝大多数服务都处于分布式环境中，其中，数据一致性是我们一直关注的重点。分布式锁到底是什么？经过了哪些发展演进？工程上有哪些实现方案？各种方案的利弊权衡又有哪些？希望这篇文章能够对你有一些帮助。</p>
-<p>▍阅读索引</p>
-<p>[TOC]</p>
-<h2 id="0-名词定义"><a href="#0-名词定义" class="headerlink" title="0. 名词定义"></a>0. 名词定义</h2><p>分布式锁：顾名思义，是指在分布式环境下的锁，重点在锁。所以我们先从锁开始讲起。</p>
-<h2 id="1-问题引入"><a href="#1-问题引入" class="headerlink" title="1. 问题引入"></a>1. 问题引入</h2><p>举个例子：</p>
-<p>某服务记录数据X，当前值为100。A请求需要将X增加200；同时，B请求需要将X减100。 在理想的情况下，A先读取到X=100，然后X增加200，最后写入X=300。B请求接着读取到X=300，减少100，最后写入X=200。 然而在真实情况下，如果不做任何处理，则可能会出现：A和B同时读取到X=100；A写入之前B读取到X；B比A先写入等等情况。</p>
-<p>上面这个例子相信大家都非常熟悉。出现不符合预期的结果本质上是对临界资源没有做好互斥操作。互斥性问题通俗来讲，就是对共享资源的抢占问题。对于共享资源争抢的正确性，锁是最常用的方式，其他的如CAS（compare and swap）等，这里不展开。</p>
-<h2 id="2-分布式环境的特点"><a href="#2-分布式环境的特点" class="headerlink" title="2. 分布式环境的特点"></a>2. 分布式环境的特点</h2><p>我们的绝大部分服务都处于分布式环境中。那么，分布式系统有哪些特点呢？大致如下：</p>
+        <h2 id="一、为什么分布式？"><a href="#一、为什么分布式？" class="headerlink" title="一、为什么分布式？"></a>一、为什么分布式？</h2><p>在之前的文章（<a href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247484335&idx=1&sn=a871bf871fcaffda0be40e1388a69d7d&chksm=ebd742aedca0cbb8e22138fa7488cb80ee09a5b5d7aa065679904005c609e92a0d9ad755a913&token=620000779&lang=zh_CN&scene=21#wechat_redirect" target="_blank" rel="noopener">外行人都能看懂的SpringCloud，错过了血亏！</a>）也提过为什么要分布式：</p>
 <ul>
-<li>可扩展性：可通过横向水平扩展提高系统的性能和吞吐量。</li>
-<li>高可靠性：高容错，即使系统中一台或几台故障，系统仍可提供服务。</li>
-<li>高并发性：各机器并行独立处理和计算。</li>
-<li>廉价高效：多台小型机而非单台高性能机。</li>
+<li>模块之间独立，各做各的事，<strong>便于扩展，复用性高</strong></li>
+<li><strong>高吞吐量</strong>。某个任务需要一个机器运行10个小时，将该任务用10台机器的分布式跑(将这个任务拆分成10个小任务)，可能2个小时就跑完了</li>
 </ul>
-<h2 id="3-锁"><a href="#3-锁" class="headerlink" title="3.锁"></a>3.锁</h2><p>我们先来看下非分布式情况下的锁方案（多线程和多进程的情况），然后再演进到分布式锁。</p>
-<h3 id="多线程下的锁机制："><a href="#多线程下的锁机制：" class="headerlink" title="多线程下的锁机制："></a>多线程下的锁机制：</h3><p>各种语言有不同的实现方式，比较成熟。比如，go语言中的sync.RWMutex（读写锁）、sync.Mutex（互斥锁）；JAVA中的ReentrantLock、synchronized；在php中没有找到原生的支持锁的方式，只能通过外部来间接实现，比如文件锁，借助外部存储的锁等。</p>
-<h3 id="多进程下的锁机制："><a href="#多进程下的锁机制：" class="headerlink" title="多进程下的锁机制："></a>多进程下的锁机制：</h3><p>对于临界资源的访问已经超出了单个进程的控制范围。在多进程的情况下，主要是利用操作系统层面的进程间通信原理来解决临界资源的抢占问题。比较常见的一种方法便是使用信号量（Semaphores）。</p>
-<p>▍对信号量的操作，主要是P操作（wait）和V操作（signal）：</p>
+<p>在书上给出的观点：</p>
 <ul>
-<li>P操作 ( wait ) ：</li>
+<li>升级单机的处理能力的性价比越来越低，单机的处理能力存在瓶颈</li>
+<li>分布式系统<strong>更加稳定和可用</strong>（单机挂了就挂了，分布式挂了一般还有备用/不至于整个链路全挂）</li>
 </ul>
-<p>先检查信号量的大小，若值大于零，则将信号量减1，同时进程获得共享资源的访问权限，继续执行；若小于或者等于零，则该进程被阻塞后，进入等待队列。</p>
+<h2 id="二、大型网站架构演进过程"><a href="#二、大型网站架构演进过程" class="headerlink" title="二、大型网站架构演进过程"></a>二、大型网站架构演进过程</h2><p>其实在没接触过分布式之前，在逛论坛的时候，经常会出现一些<strong>看起来</strong>很牛逼的词，诸如”读写分离“、”分库分表“、”主从架构“、”负载均衡“、”单点故障“等等名词，就觉得很高大上。下面我就稍微顺着”大型网站架构演进过程“来讲解一下这些词</p>
+<p>在我们最开始接触Java项目的时候，一般来说是单机的（数据库、Web服务器都是同一台机器）</p>
+<img src="/2019/07/19/为什么分布式/单机架构.png" title="This is an example image">
+
+<p>网站对外开放以后，访问量增大，服务器的压力也随之提高。此时，我们最简单的做法就是可以将<strong>数据库和应用分开</strong>，这样可以缓解一下当前系统的压力</p>
+<img src="/2019/07/19/为什么分布式/数据库应用分开架构.png" title="This is an example image">
+
+<p>应用服务器的压力继续增大，我们可以把应用服务器做成集群（说白了，就是加了台机器）</p>
+<img src="/2019/07/19/为什么分布式/服务器集群架构.png" title="This is an example image">
+
+<p>加了台应用服务器以后，就出现<strong>新的</strong>问题了：</p>
 <ul>
-<li>V操作 ( signal ) ：</li>
+<li>用户请求的时候，走哪台服务器啊？</li>
+<li>Session是依赖单台服务器的，那Session怎么搞？</li>
 </ul>
-<p>该操作将信号量的值加1，如果有进程阻塞着等待该信号量，那么其中一个进程将被唤醒。</p>
-<p>可看出，多进程锁方案跟多线程的锁方案实现思路大同小异。</p>
-<p>我们将互斥的级别拉高，分布式环境下不同节点不同进程或线程之间的互斥，就是分布式锁的挑战之一。后面再细讲。</p>
-<p>另外，在传统的基于数据库的架构中，对于数据的抢占问题也可以通过数据库事务（ACID）来保证。在分布式环境中，出于对性能以及一致性敏感度的要求，使得分布式锁成为了一种比较常见而高效的解决方案。</p>
-<p>▍从上面对于多线程和多进程锁的概括，可以总结出锁的抽象条件：</p>
-<p>1）“需要有存储锁的空间，并且锁的空间是可以访问到的”：</p>
-<p>对于多线程就是内存（进程中不同的线程都可以读写），多进程中通过共享内存的方式，也是提供一块地方，供不同进程读写。主要目的是保证不同的进线程改动对于其他进线程可见，进而满足互斥性需求。</p>
-<p>2）“锁需要被唯一标识”：</p>
-<p>不同的共享资源，必然需要用不同的锁进行保护，因此相应的锁必须有唯一的标识。在多线程环境中，锁可以是一个对象，那么对这个对象的引用便是这个唯一标识。多进程下，比如有名信号量，便是用硬盘中的文件名作为唯一标识。</p>
-<p>3）“锁要有至少两种状态”：</p>
-<p>有锁，没锁。存在，不存在等等。很好理解。</p>
-<p>满足上述三个条件就可以实现基础的分布式锁了。但是随着技术的演进，</p>
-<p>▍相应地，对锁也提出了更高级的条件：</p>
-<p>1）可重入：</p>
-<p>外层函数获得锁之后，内层函数还可以获得锁。原因是随着软件复杂性增加，方法嵌套获取锁已经很难避免。但是从代码层面很难分析出这个问题，因此我们要使用可重入锁。导致锁需要支持可重入的场景。对于可重入的思考，每种语言有自己的哲学和取舍，如go就舍弃了支持重入：Recursive locking in Go [ <a href="https://stackoverflow.com/questions/14670979/recursive-locking-in-go" target="_blank" rel="noopener">https://stackoverflow.com/que…</a> ]以后go又会不会认为“可重入真香”呢？哈哈，我们拭目以待。</p>
-<p>2）避免产生惊群效应（Herd Effect）：</p>
-<p>惊群效应指，在有多个请求等待获取锁的时候，一旦占有锁的线程释放之后，所有等待方都同时被唤醒，尝试抢占锁。但是绝大多数的抢占都是不必要的。这种情况在多线程和多进程中开销同样很大。要尽量避免这种情况出现。</p>
-<p>3）公平锁和非公平锁：</p>
-<p>公平锁：优先把锁给等待时间最长的一方；非公平锁：不保证等待线程拿锁的顺序。公平锁的实现成本较高。</p>
-<p>4）阻塞锁和自旋锁：</p>
-<p>主要是效率的考虑。自旋锁适用于临界区操作耗时短的场景；阻塞锁适用于临界区操作耗时长的场景。</p>
-<p>5）锁超时：</p>
-<p>防止释放锁失败，出现死锁的情况。</p>
-<p>6）高效，高可用：</p>
-<p>加锁和解锁需要高效，同时也需要保证高可用防止分布式锁失效，可以增加降级。</p>
-<p>还有很多其他更高要求的条件，不一一列举了。有兴趣的小伙伴可以看看编程史上锁的演进过程。</p>
-<h2 id="4-分布式锁"><a href="#4-分布式锁" class="headerlink" title="4. 分布式锁"></a>4. 分布式锁</h2><p>▍使用分布式锁的必要性：</p>
-<p>1）服务要求：部署的服务本身就处于分布式环境中</p>
-<p>2）效率：使用分布式锁可以避免不同节点重复相同的工作，这些工作会浪费资源。比如用户付了钱之后有可能不同节点会发出多封短信</p>
-<p>3）正确性：跟2）类似。如果两个节点在同一条数据上面操作，比如多个节点机器对同一个订单操作不同的流程有可能会导致该笔订单最后状态出现错误，造成损失</p>
-<p>包括但不限于这些必要性，在强烈地呼唤我们今天的主角—“分布式锁”闪亮登场。</p>
-<h2 id="5-分布式锁实现方案"><a href="#5-分布式锁实现方案" class="headerlink" title="5. 分布式锁实现方案"></a>5. 分布式锁实现方案</h2><p>有了非分布式锁的实现思路，和分布式环境的挑战，我们来看看分布式锁的实现策略。<br>分布式锁本质上还是要实现一个简单的目标—占一个“坑”，当别的节点机器也要来占时，发现已经有人占了，就只好放弃或者稍后再试。</p>
-<p>▍大体分为4种</p>
-<p>1）使用数据库实现<br>2）使用朴素Redis等缓存系统实现<br>3）使用ZooKeeper等分布式协调系统实现<br>4）使用Redisson来实现（本质上基于Redis）</p>
-<p>因为利用mysql实现分布式锁的性能低以及改造大，我们这里重点讲一下下面3种实现分布式锁的方案。</p>
-<h3 id="5-1-朴素Redis实现方案"><a href="#5-1-朴素Redis实现方案" class="headerlink" title="5.1 朴素Redis实现方案"></a>5.1 朴素Redis实现方案</h3><p>我们循序渐进，对比几种实现方式，找出优雅的方式：</p>
-<p>方案1：setnx+delete</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>setnx lock_key lock_value</span><br><span class="line"><span class="symbol">2 </span>// do sth</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
+<img src="/2019/07/19/为什么分布式/集群session.png" title="This is an example image">
 
-<p>缺点：一旦服务挂掉，锁无法被删除释放，会导致死锁。硬伤，pass！2</p>
-<p>方案2：setnx + setex</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>setnx lock_key lock_value</span><br><span class="line"><span class="symbol">2 </span>setex lock_key N lock_value  // N s超时</span><br><span class="line"><span class="symbol">3 </span>// do sth</span><br><span class="line"><span class="symbol">4 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
+<p>解决用户走哪台服务器，我们就在用户请求到达应用服务器之前，加了一个”负载均衡器“，这个”负载均衡器“说白了就写了<strong>用户请求会到哪台应用服务器的逻辑</strong></p>
+<ul>
+<li>比如说，一个用户请求过来，负载均衡器指派这个请求到服务器A。另一个用户请求过来，负载均衡器指派这个请求到服务器B。这样就<strong>平摊</strong>了请求— 这种方式就叫做<strong>轮询</strong></li>
+<li>…策略还有很多种，就看你想怎么实现了，反正这个逻辑的代码放在负载均衡器上。</li>
+</ul>
+<p>而Session的问题，我之前写<a href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247485230&idx=1&sn=7c32a09e4b4b72a3565bfa05ae899d92&chksm=ebd7462fdca0cf39c2282dfd02b3f9d4dc3984c3103645ab5b112755cd89e8ee577eb35062e6&token=1230572157&lang=zh_CN&scene=21#wechat_redirect" target="_blank" rel="noopener">什么是单点登录(SSO)</a>已经讲过了，一般来说我们可以将Session保存在Redis上就行了。</p>
+<img src="/2019/07/19/为什么分布式/sso.png" title="This is an example image">
 
-<p>在方案1的基础上设置了超时时间。但是还是会出现跟1一样的问题。如果setnx之后、setex之前服务挂掉，一样会陷入死锁。本质原因是，setnx/setex分为了两个步骤，非原子操作。硬伤，pass！</p>
-<p>方案3：set ex nx</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>SET lock_key lock_value EX N NX //N s超时</span><br><span class="line"><span class="symbol">2 </span>// do sth</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
+<p>随着业务的发展，我们的数据量和访问量都在增长，现在有不少的业务都是<strong>读多写少</strong>的，对于这种业务也是会直接反应到<strong>数据库</strong>上。</p>
+<p>于是，我们可以增加一个<strong>读库</strong>。写入的操作走服务器C的MySQL，读取的操作走服务器D的MySQL。这样就实现了<strong>读写分离</strong>。</p>
+<img src="/2019/07/19/为什么分布式/读写分离架构.png" title="This is an example image">
 
-<p>将加锁、设置超时两个步骤合并为一个原子操作，从而解决方案1、2的问题。（Redis原生命令支持，Redis version需要&gt;=2.6.12，滴滴生产环境Redis version一般为3.2，所以日常能够使用）。</p>
-<p>优点：此方案目前大多数sdk、Redis部署方案都支持，实现简单<br>缺点：会存在锁被错误的释放，被错误的抢占的情况。如下图：</p>
-<img src="/2019/06/06/分布式锁/朴素redis实现分布式锁.png" title="This is an example image">
+<p>一般来说，我们的写库也叫做主库，读库也叫做从库，在互联网架构中，这叫做<strong>主从架构</strong>，比如常见的架构：<strong>一主多从</strong>（详细的参考资料：<a href="https://mp.weixin.qq.com/s/VF1_Ehat8GXkb9EqLUn6lg" target="_blank" rel="noopener">如何给老婆解释什么是 Master-Slave</a>）</p>
+<img src="/2019/07/19/为什么分布式/主从架构.png" title="This is an example image">
 
-<p>这块有2个问题：</p>
-<p>1）GC期间，client1超时时间已到，导致将client2错误地放进来</p>
-<p>2）client1执行完逻辑后会显式调用del，将所有的锁都释放了（正确的情况应该只释放自己的锁，错误地释放了client2的锁）</p>
-<p>方案4：</p>
-<p>在3的基础上，对于问题1，将client的超时时间设置长一些，保证只能通过显式del来释放锁，而超时时间只是作为一种最终兜底的方案。针对问题2，增加对 value 的检查，只解除自己加的锁，为保证原子性，只能需要通过lua脚本实现。</p>
-<p>lua脚本：<a href="https://redis.io/commands/eval" target="_blank" rel="noopener">https://redis.io/commands/eval</a></p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span><span class="keyword">if</span> redis.<span class="keyword">call</span>(<span class="string">"get"</span>,KEYS[<span class="number">1</span>]) == ARGV[<span class="number">1</span>] <span class="keyword">then</span></span><br><span class="line"><span class="symbol">2 </span>  <span class="keyword">return</span> redis.<span class="keyword">call</span>(<span class="string">"del"</span>,KEYS[<span class="number">1</span>])</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">else</span></span><br><span class="line"><span class="symbol">4 </span>  <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="symbol">5 </span><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>针对读多写少的业务，我们还有优化策略，引入<strong>搜索引擎和缓存</strong>。</p>
+<ul>
+<li>搜索引擎也相当于一个读库，使用搜索引擎的<strong>倒排表</strong>方式，能够大大提升检索的速度</li>
+<li>缓存则将<strong>热数据</strong>放入内存中，如果查询的数据在缓存中存在，则直接返回</li>
+</ul>
+<img src="/2019/07/19/为什么分布式/加搜索引擎和缓存架构.png" title="This is an example image">
 
-<p>如果超时时间设置长，只能通过显式的del来释放锁，就不会出现问题2（错误释放掉其他client的锁）。跟滴滴KV store的王斌同学讨论过，目前没有找到方案4优于方案3（只要超时时间设置的长一些）的场景。所以，在我的认知中，方案4跟方案3的优势一样，但是方案3的实现成本明显要低很多。</p>
-<p>朴素Redis方案小结</p>
-<p>方案3用的最多，实现成本小，对于大部分场景，将超时时间设置的长一些，极少出现问题。同时本方案对不同语言的友好度极高。</p>
-<h3 id="5-2-ZooKeeper实现方案"><a href="#5-2-ZooKeeper实现方案" class="headerlink" title="5.2 ZooKeeper实现方案"></a>5.2 ZooKeeper实现方案</h3><p>我们先简要介绍一些ZooKeeper（以下简称ZK）：</p>
-<p>ZooKeeper是一种“分布式协调服务”。所谓分布式协调服务，可以在分布式系统中共享配置，协调锁资源，提供命名服务等。为读多写少的场景所设计，ZK中的节点（以下简称ZNode）非常适合用于存储少量的状态和配置信息。</p>
-<p>对ZK常见的操作：</p>
-<p>create：创建节点<br>delete：删除节点<br>exists：判断一个节点的数据<br>setdata：设置一个节点的数据<br>getchildren：获取节点下的所有子节点</p>
-<p>这其中，exists，getData，getChildren属于读操作。Zookeeper客户端在请求读操作的时候，可以选择是否设置Watch（监听机制）。</p>
-<p>什么是Watch？</p>
-<p>Watch机制是zk中非常有用的功能。我们可以理解成是注册在特定Znode上的触发器。当这个Znode发生改变，也就是调用了create，delete，setData方法的时候，将会触发Znode上注册的对应事件，请求Watch的客户端会接收到异步通知。<br>我们在实现分布式锁的时候，正是通过Watch机制，来通知正在等待的session相关锁释放的信息。</p>
-<p>什么是ZNode？</p>
-<p>ZNode就是ZK中的节点。ZooKeeper节点是有生命周期的，这取决于节点的类型。在 ZooKeeper 中，节点类型可以分为临时节点（EPHEMERAL），时序节点（SEQUENTIAL ），持久节点（PERSISTENT ）。</p>
-<p>临时节点（EPHEMERAL）：</p>
-<p>节点的生命周期跟session绑定，session创建的节点，一旦该session失效，该节点就会被删除。</p>
-<p>临时顺序节点（EPHEMERAL_SEQUENTIAL）：</p>
-<p>在临时节点的基础上增加了顺序。每个父结点会为自己的第一级子节点维护一份时序。在创建子节点的时候，会自动加上数字后缀，越后创建的节点，顺序越大，后缀越大。</p>
-<p>持久节点（PERSISTENT ）：</p>
-<p>节点创建之后就一直存在，不会因为session失效而消失。</p>
-<p>持久顺序节点（PERSISTENT_SEQUENTIAL）：</p>
-<p>与临时顺序节点同理。</p>
-<p>ZNode中的数据结构：</p>
-<p>data（znode存储的数据信息），acl（记录znode的访问权限，即哪些人或哪些ip可以访问本节点），stat（包含znode的各种元数据，比如事务id，版本号，时间戳，大小等等），child（当前节点的子节点引用）。</p>
-<p>利用ZK实现分布式锁，主要得益于ZK保证了数据的强一致性。</p>
-<p>下面说说通过zk简单实现一个保持独占的锁（利用临时节点的特性）：</p>
-<p>我们可以将ZK上的ZNode看成一把锁（类似于Redis方案中的key）。多个session都去创建同一个distribute_lock节点，只会有一个创建成功的session。相当于只有该session获取到锁，其他session没有获取到锁。在该成功获锁的session失效前，锁将会一直阻塞住。session失效时，节点会自动被删除，锁被解除。（类似于Redis方案中的expire）。</p>
-<p>上述实现方案跟Redis方案3的实现效果一样。</p>
-<p>但是，这样的锁有没有改进的地方？当然！</p>
-<p>1）我们可能会有可重入的需求，因此希望能有可重入的锁机制。</p>
-<p>2）有些场景下，在争抢锁的时候，我们既不想一次争抢不到就pass，也不想一直阻塞住直到获取到锁。一个朴素的需求是，我们希望有超时时间来控制是否去上锁。更进一步，我们不想主动的去查到底是否能够加锁，我们希望能够有事件机制来通知是否能够上锁。（这里，你是不是想到了ZK的Watch机制呢？）</p>
-<p>要满足这样的需求就需要控制时序。利用顺序临时节点和Watch机制的特性，来实现：</p>
-<p>我们事先创建/distribute_lock节点，多个session在它下面创建临时有序节点。由于zk的特性，/distribute_lock该节点会维护一份sequence，来保证子节点创建的时序性。</p>
-<p>具体实现如下：</p>
-<p>1）客户端调用create()方法在/distribute_lock节点下创建EPHEMERAL_SEQUENTIAL节点。</p>
-<p>2）客户端调用getChildren(“/distribute_lock”)方法来获取所有已经创建的子节点。</p>
-<p>3）客户端获取到所有子节点path之后，如果发现自己在步骤1中创建的节点序号最小，那么就认为这个客户端获得了锁。</p>
-<p>4）如果在步骤3中发现自己并非所有子节点中最小的，说明自己还没有获取到锁。此时客户端需要找到比自己小的那个节点，然后对其调用exist()方法，同时注册事件监听。需要注意是，只在比自己小一号的节点上注册Watch事件。如果在比自己都小的节点上注册Watch事件，将会出现惊群效应，要避免。</p>
-<p>5）之后当这个被关注的节点被移除了，客户端会收到相应的通知。这个时候客户端需要再次调用getChildren(“/distribute_lock”)方法来获取所有已经创建的子节点，确保自己确实是最小的节点了，然后进入步骤3）。</p>
-<p>Curator框架封装了对ZK的api操作。以Java为例来进行演示：<br>引入依赖：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>&lt;dependency&gt;</span><br><span class="line"><span class="symbol">2 </span>  &lt;groupId&gt;org.apache.curator&lt;/groupId&gt;</span><br><span class="line"><span class="symbol">3 </span>  &lt;artifactId&gt;curator-recipes&lt;/artifactId&gt;</span><br><span class="line"><span class="symbol">4 </span>  &lt;version&gt;<span class="number">2.11.1</span>&lt;/version&gt;</span><br><span class="line"><span class="symbol">5 </span>&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<p>搜索引擎和缓存的参考资料：</p>
+<ul>
+<li><a href="https://mp.weixin.qq.com/s/3Fmv7h5p2QDtLxc9n1dp5A" target="_blank" rel="noopener">Redis合集</a></li>
+<li><a href="https://mp.weixin.qq.com/s/PaVymD_93afWM5XVB3nGfA" target="_blank" rel="noopener">什么是Lucene</a></li>
+<li><a href="https://mp.weixin.qq.com/s/3IIRObB6BAIJnnGXhnPM3Q" target="_blank" rel="noopener">Elasticsearch入门</a></li>
+</ul>
+<p><strong>注</strong>：这里说的索引和缓存就未必特指ES和Redis，比如缓存我也可以用本地缓存而不一定是Redis的。这里用Redis和ES只是我画图方便。</p>
+<p>继读写分离之后，数据库还是遇到了瓶颈，此时我们就可以采用<strong>分库分表</strong>策略了：</p>
+<ul>
+<li>垂直拆分— 不同的业务数据分到不同的数据库</li>
+<li>水平拆分— 将同一张表的数据拆分到不同的数据库中（原因是这张表的数据量/更新量太大了）</li>
+</ul>
+<img src="/2019/07/19/为什么分布式/垂直拆分架构.png" title="This is an example image">
 
-<p>使用的时候需要注意Curator框架和ZK的版本兼容问题。<br>以排他锁为例，看看怎么使用：</p>
-<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestLock</span> </span>&#123;</span><br><span class="line"> <span class="number">2</span></span><br><span class="line"> <span class="number">3</span>    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) throws Exception &#123;</span><br><span class="line"> <span class="number">4</span>        <span class="comment">//创建zookeeper的客户端</span></span><br><span class="line"> <span class="number">5</span>        RetryPolicy retryPolicy = <span class="keyword">new</span> <span class="type">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>);</span><br><span class="line"> <span class="number">6</span>        CuratorFramework client = CuratorFrameworkFactory.<span class="keyword">new</span><span class="type">Client</span>(“ip:<span class="type">port</span>", retryPolicy);</span><br><span class="line"> <span class="number">7</span>        client.start();</span><br><span class="line"> <span class="number">8</span></span><br><span class="line"> <span class="number">9</span>        <span class="comment">//创建分布式锁, 锁空间的根节点路径为/sunnyzengqi/curator/lock</span></span><br><span class="line"><span class="number">10</span>        InterProcessMutex mutex = <span class="keyword">new</span> <span class="type">InterProcessMutex</span>(client, <span class="string">"/sunnyzengqi/curator/lock"</span>);</span><br><span class="line"><span class="number">11</span>        mutex.acquire();</span><br><span class="line"><span class="number">12</span>        <span class="comment">//获得了锁, 进行业务流程</span></span><br><span class="line"><span class="number">13</span>        System.out.println(<span class="string">"Enter mutex"</span>);</span><br><span class="line"><span class="number">14</span>        Thread.sleep(<span class="number">10000</span>);</span><br><span class="line"><span class="number">15</span>        <span class="comment">//完成业务流程, 释放锁</span></span><br><span class="line"><span class="number">16</span>        mutex.release();</span><br><span class="line"><span class="number">17</span>        <span class="comment">//关闭客户端</span></span><br><span class="line"><span class="number">18</span>        client.close();</span><br><span class="line"><span class="number">19</span>    &#125;</span><br><span class="line"><span class="number">20</span> &#125;</span><br><span class="line"><span class="number">21</span></span><br></pre></td></tr></table></figure>
+<p>注：单表行数<strong>超过500万行或者单表容量超过2GB</strong>才推荐进行<strong>分库分表</strong>(如果预计三年都达不到这个数据量，不要在创建表的时候就分库分表!) —《阿里巴巴 Java开发手册》</p>
+<p>在数据存储方面，除了关系型数据库之外，如果有别的业务场景，可能还需要引入<strong>分布式存储系统</strong></p>
+<ul>
+<li>分布式文件系统</li>
+<li>分布式Key-Value系统</li>
+<li>分布式数据库</li>
+</ul>
+<hr>
+<p>数据库问题解决之后，应用也面临着挑战（应用的功能会越做越多，应用也随之越做越大），为了不让应用持续变大，这就需要<strong>把应用拆开</strong>，从一个应用变为两个/多个应用。</p>
+<img src="/2019/07/19/为什么分布式/服务拆分架构.png" title="This is an example image">
 
-<p>上面代码在业务执行的过程中，在ZK的/sunnyzengqi/curator/lock路径下，会创建一个临时节点来占位。相同的代码，在两个机器节点上运行，可以看到该路径下创建了两个临时节点：</p>
-<img src="/2019/06/06/分布式锁/zookeeep分布式锁方案1.png" title="This is an example image">
-
-<img src="/2019/06/06/分布式锁/zookeeep分布式锁方案2.png" title="This is an example image">
-
-<img src="/2019/06/06/分布式锁/zookeeep分布式锁方案3.png" title="This is an example image">
-
-<p>运行命令echo wchc | nc localhost 2181查看watch信息：</p>
-<img src="/2019/06/06/分布式锁/zookeeep分布式锁方案4.png" title="This is an example image">
-
-<p>可以看到lock1节点的session在监听节点lock0的变动。此时是lock0获取到锁。等到lock0执行完，session会失效，触发Watch机制，通知lock1的session说锁已经被释放了。这时，lock1可以来抢占锁，进而执行自己的操作。</p>
-<p>除了简单的排它锁的实现，还可以利用ZK的特性来实现更高级的锁（比如信号量，读写锁，联锁）等，这里面有很多的玩法。</p>
-<p>ZooKeeper方案小结</p>
-<p>能够实现很多具有更高条件的锁机制，并且由于ZK优越的session和watch机制，适用于复杂的场景。因为有久经检验的Curator框架，集成了很多基于ZK的分布式锁的api，对于Java语言非常友好。对于其他语言，虽然也有一些开源项目封装了它的api，但是稳定性和效率需要自己去实际检验。</p>
-<h3 id="5-3-Redisson实现方案"><a href="#5-3-Redisson实现方案" class="headerlink" title="5.3 Redisson实现方案"></a>5.3 Redisson实现方案</h3><p>我们先简要介绍一下Redisson：</p>
-<p>Redisson是Java语言编写的基于Redis的client端。功能也非常强大，功能包括：分布式对象，分布式集合，分布式锁和同步器，分布式服务等。被大家熟知的场景还是在分布式锁的场景。</p>
-<p>为了解决加锁线程在没有解锁之前崩溃进而出现死锁的问题，不同于朴素Redis中通过设置超时时间来处理。Redisson采用了新的处理方式：Redisson内部提供了一个监控锁的看门狗，它的作用是在Redisson实例被关闭前，不断的延长锁的有效期。<br>跟Zookeeper类似，Redisson也提供了这几种分布式锁：可重入锁，公平锁，联锁，红锁，读写锁等。具体怎么用这里不展开，感兴趣的朋友可以自己去实验。</p>
-<p>Redisson方案小结</p>
-<p>跟ZK一样，都能够实现很多具有更高条件的锁机制，适用于复杂的场景。但对语言非常挑剔，目前只能支持Java语言。</p>
-<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><p>上一节，我们讨论了三种实现的方案：朴素Redis实现方案，ZooKeeper实现方案，Redisson实现方案。由于第1种与第3种都是基于Redis，所以主要是ZK和基于Redis两种。我们不禁想问，在实现分布式锁上，基于ZK与基于Redis的方案，有什么不同呢？</p>
-<p>1）锁的时长设置上：</p>
-<p>得益于ZK的session机制，客户端可以持有锁任意长的时间，这可以确保它做完所有需要的资源访问操作之后再释放锁。避免了基于Redis的锁对于有效时间到底设置多长的两难问题。实际上，基于ZooKeeper的锁是依靠Session（心跳）来维持锁的持有状态的，而Redis不支持Sesion。</p>
-<p>优势：ZK&gt;Redisson&gt;朴素Redis。</p>
-<p>2）监听机制上：</p>
-<p>得益于ZK的watch机制，在获取锁失败之后可以等待锁重新释放的事件。这让客户端对锁的使用更加灵活。避免了Redis方案主要去轮询的方式。</p>
-<p>优势：ZK&gt;Redisson=朴素Redis。</p>
-<p>3）使用便利性上：</p>
-<p>由于生产环境都有稳定的Redis和ZooKeeper集群，有专业的同学维护，这两者差别不大。在语言局限性上，朴素Redis从不挑食。ZK和Redisson都偏向于Java语言。在开发难度上，Redis最简单，几乎不用写什么代码；ZK和Redisson次之，依赖于使用的语言是否有集成的api以及集成稳定性等。</p>
-<p>优势：朴素Redis&gt;ZK&gt;Redisson。</p>
-<p>4）支持锁形式的多样性上：</p>
-<p>上面有提及，ZK和Redisson都支持了各种花样的分布锁。朴素Redis就比较捉急了，在实现更高要求的锁方面，如果自己造轮子，往往费时费力，力不从心。</p>
-<p>优势：ZK=Redisson&gt;Redis。</p>
-<h2 id="7-结束语"><a href="#7-结束语" class="headerlink" title="7. 结束语"></a>7. 结束语</h2><p>分布式锁在日常Coding中已经很常用。但是分布式锁这方面的知识依然非常深奥。2016年，Martin Kleppmann与Antirez两位分布式领域非常有造诣的前辈还针对“Redlock算法”在分布式锁上面的应用炒得沸沸扬扬。</p>
-<p><em>最后借助这场历史闹剧中Martin的话来结束我们今天的分享。与诸君共勉！将学习当成一生的主题！</em></p>
-<p><em>对我来说最重要的一点在于：我并不在乎在这场辩论中谁对谁错 —— 我只关心从其他人的工作中学到的东西，以便我们能够避免重蹈覆辙，并让未来更加美好。前人已经为我们创造出了许多伟大的成果：站在巨人的肩膀上，我们得以构建更棒的软件。</em><br>……<br><em>对于任何想法，务必要详加检验，通过论证以及检查它们是否经得住别人的详细审查。那是学习过程的一部分。但目标应该是为了获得知识，而不应该是为了说服别人相信你自己是对的。有时候，那只不过意味着停下来，好好地想一想。</em></p>
-<p>由于时间仓促，自己水平有限，文中必定存在诸多疏漏与理解不当的地方。非常希望得到各位指正，畅谈技术。</p>
-<p>▍Reference</p>
-<p><a href="https://zookeeper.apache.org/" target="_blank" rel="noopener">0.Apache ZooKeeper</a><br><a href="https://github.com/redisson/redisson" target="_blank" rel="noopener">1.Redisson</a><br><a href="https://redis.io/" target="_blank" rel="noopener">2.Redis</a><br>3.Redis分布式锁进化史<br><a href="https://tech.meituan.com/2016/09/29/distributed-system-mutually-exclusive-idempotence-cerberus-gtis.html" target="_blank" rel="noopener">4.分布式系统互斥性与幂等性问题的分析与解决</a><br>5.浅谈可重入性及其他<br><a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">6.Distributed locks with Redis</a><br><a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">7.How to do distributed locking</a><br><a href="http://antirez.com/news/101" target="_blank" rel="noopener">8.Is Redlock safe?</a><br>9.Note on fencing and distributed locks</p>
+<p>不同功能/模块之间的调用不再单纯通过本机调用，引入了<strong>远程的服务调用</strong>。</p>
+<p>某个应用只有一台机器上运行着，如果这台机器上出现了问题，导致这个应用无法运行，这就叫<strong>单点故障</strong>。</p>
 
       
 
@@ -436,7 +352,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/06/06/分布式锁/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/19/为什么分布式/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -450,15 +366,20 @@
   
 <nav id="article-nav">
   
-    <a href="/2019/06/06/Feed流系统设计/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/07/19/中台/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Feed流系统设计
+          中台
         
       </div>
     </a>
   
+  
+    <a href="/2019/07/19/数据库读写分离/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">数据库读写分离</div>
+      <i class="icon-circle-right"></i>
+    </a>
   
 </nav>
 
@@ -483,7 +404,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0-名词定义"><span class="toc-number">1.</span> <span class="toc-text">0. 名词定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-问题引入"><span class="toc-number">2.</span> <span class="toc-text">1. 问题引入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-分布式环境的特点"><span class="toc-number">3.</span> <span class="toc-text">2. 分布式环境的特点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-锁"><span class="toc-number">4.</span> <span class="toc-text">3.锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#多线程下的锁机制："><span class="toc-number">4.1.</span> <span class="toc-text">多线程下的锁机制：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#多进程下的锁机制："><span class="toc-number">4.2.</span> <span class="toc-text">多进程下的锁机制：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-分布式锁"><span class="toc-number">5.</span> <span class="toc-text">4. 分布式锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-分布式锁实现方案"><span class="toc-number">6.</span> <span class="toc-text">5. 分布式锁实现方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-朴素Redis实现方案"><span class="toc-number">6.1.</span> <span class="toc-text">5.1 朴素Redis实现方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-ZooKeeper实现方案"><span class="toc-number">6.2.</span> <span class="toc-text">5.2 ZooKeeper实现方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-Redisson实现方案"><span class="toc-number">6.3.</span> <span class="toc-text">5.3 Redisson实现方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-总结"><span class="toc-number">7.</span> <span class="toc-text">6. 总结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#7-结束语"><span class="toc-number">8.</span> <span class="toc-text">7. 结束语</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、为什么分布式？"><span class="toc-number">1.</span> <span class="toc-text">一、为什么分布式？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、大型网站架构演进过程"><span class="toc-number">2.</span> <span class="toc-text">二、大型网站架构演进过程</span></a></li></ol>
                     </div>
                 </span>
             </div>
@@ -636,6 +557,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">feed</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">中台</a>
               </li>
             
             <div class="clearfix"></div>

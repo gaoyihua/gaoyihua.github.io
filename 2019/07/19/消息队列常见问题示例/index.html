@@ -6,34 +6,30 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Zookeeper | Gary&#39;s Blog</title>
+  <title>消息队列常见问题示例 | Gary&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="一、什么是ZooKeeper从上面我们也可以发现，好像哪都有ZooKeeper的身影，那什么是ZooKeeper呢？我们先去官网看看介绍： 官网对ZooKeeper的介绍   官网还有另一段话：  ZooKeeper: A Distributed Coordination Service for Distributed Applications  相比于官网的介绍，我其实更喜欢Wiki中对ZooK">
-<meta name="keywords" content="Zookeeper">
+  <meta name="description" content="一、如何解决消息队列数据丢失问题？面试官心理剖析：生产上肯定会出现数据丢失问题，面试官主要是想看看你是否了解？有没有做过相应的措施来解决这个问题？如果你不知道有这个问题，那么你生产环境可能存在数据丢失问题。如果你的MQ用在核心场景下，如订单，扣费等，那么数据是万万不能丢的。 回答： 为什么会出现数据丢失？分析：   丢数据一般会有3种情况：1）生产者往MQ写数据丢失了可能因为网络原因数据传输丢失。">
+<meta name="keywords" content="消息队列">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Zookeeper">
-<meta property="og:url" content="http://yoursite.com/2019/06/06/Zookeeper/index.html">
+<meta property="og:title" content="消息队列常见问题示例">
+<meta property="og:url" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/index.html">
 <meta property="og:site_name" content="Gary&#39;s Blog">
-<meta property="og:description" content="一、什么是ZooKeeper从上面我们也可以发现，好像哪都有ZooKeeper的身影，那什么是ZooKeeper呢？我们先去官网看看介绍： 官网对ZooKeeper的介绍   官网还有另一段话：  ZooKeeper: A Distributed Coordination Service for Distributed Applications  相比于官网的介绍，我其实更喜欢Wiki中对ZooK">
+<meta property="og:description" content="一、如何解决消息队列数据丢失问题？面试官心理剖析：生产上肯定会出现数据丢失问题，面试官主要是想看看你是否了解？有没有做过相应的措施来解决这个问题？如果你不知道有这个问题，那么你生产环境可能存在数据丢失问题。如果你的MQ用在核心场景下，如订单，扣费等，那么数据是万万不能丢的。 回答： 为什么会出现数据丢失？分析：   丢数据一般会有3种情况：1）生产者往MQ写数据丢失了可能因为网络原因数据传输丢失。">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/Zookeeper/whatiszk.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/Zookeeper/zkforwiki.png">
-<meta property="og:image" content="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/Zookeeper/zk结构.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/Zookeeper/zk结点.png">
-<meta property="og:image" content="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==">
-<meta property="og:image" content="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==">
-<meta property="og:image" content="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==">
-<meta property="og:image" content="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/Zookeeper/zk统一命名.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/Zookeeper/zk分布式锁.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/Zookeeper/zk分布式锁2.png">
-<meta property="og:image" content="http://yoursite.com/2019/06/06/Zookeeper/zk集群感知结点.png">
-<meta property="og:updated_time" content="2019-07-19T14:25:18.041Z">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/mq消息丢失问题.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/rabbitmq消息顺序.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/rabbitmq消息顺序问题解决.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/kafka正常流程.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/kafka顺序不一致情况.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/kafaka顺序问题解决.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/rocketmq消息书匈奴.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/activemq消息顺序.png">
+<meta property="og:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/kafaka重复消费场景.png">
+<meta property="og:updated_time" content="2019-07-19T14:41:05.415Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Zookeeper">
-<meta name="twitter:description" content="一、什么是ZooKeeper从上面我们也可以发现，好像哪都有ZooKeeper的身影，那什么是ZooKeeper呢？我们先去官网看看介绍： 官网对ZooKeeper的介绍   官网还有另一段话：  ZooKeeper: A Distributed Coordination Service for Distributed Applications  相比于官网的介绍，我其实更喜欢Wiki中对ZooK">
-<meta name="twitter:image" content="http://yoursite.com/2019/06/06/Zookeeper/whatiszk.png">
+<meta name="twitter:title" content="消息队列常见问题示例">
+<meta name="twitter:description" content="一、如何解决消息队列数据丢失问题？面试官心理剖析：生产上肯定会出现数据丢失问题，面试官主要是想看看你是否了解？有没有做过相应的措施来解决这个问题？如果你不知道有这个问题，那么你生产环境可能存在数据丢失问题。如果你的MQ用在核心场景下，如订单，扣费等，那么数据是万万不能丢的。 回答： 为什么会出现数据丢失？分析：   丢数据一般会有3种情况：1）生产者往MQ写数据丢失了可能因为网络原因数据传输丢失。">
+<meta name="twitter:image" content="http://yoursite.com/2019/07/19/消息队列常见问题示例/mq消息丢失问题.png">
   
     <link rel="alternative" href="/atom.xml" title="Gary&#39;s Blog" type="application/atom+xml">
   
@@ -169,178 +165,78 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-Zookeeper" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-消息队列常见问题示例" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      Zookeeper
+      消息队列常见问题示例
     </h1>
   
 
         
-        <a href="/2019/06/06/Zookeeper/" class="archive-article-date">
-  	<time datetime="2019-06-06T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-06-06</time>
+        <a href="/2019/07/19/消息队列常见问题示例/" class="archive-article-date">
+  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="一、什么是ZooKeeper"><a href="#一、什么是ZooKeeper" class="headerlink" title="一、什么是ZooKeeper"></a>一、什么是ZooKeeper</h2><p>从上面我们也可以发现，好像哪都有ZooKeeper的身影，那什么是ZooKeeper呢？我们先去<strong>官网</strong>看看介绍：</p>
-<p>官网对ZooKeeper的介绍</p>
-<img src="/2019/06/06/Zookeeper/whatiszk.png" title="This is an example image">
+        <h2 id="一、如何解决消息队列数据丢失问题？"><a href="#一、如何解决消息队列数据丢失问题？" class="headerlink" title="一、如何解决消息队列数据丢失问题？"></a>一、如何解决消息队列数据丢失问题？</h2><p>面试官心理剖析：<br>生产上肯定会出现数据丢失问题，面试官主要是想看看你是否了解？有没有做过相应的措施来解决这个问题？如果你不知道有这个问题，那么你生产环境可能存在数据丢失问题。如果你的MQ用在核心场景下，如订单，扣费等，那么数据是万万不能丢的。</p>
+<p>回答：</p>
+<h3 id="为什么会出现数据丢失？"><a href="#为什么会出现数据丢失？" class="headerlink" title="为什么会出现数据丢失？"></a>为什么会出现数据丢失？</h3><p>分析：</p>
+<img src="/2019/07/19/消息队列常见问题示例/mq消息丢失问题.png" title="This is an example image">
 
-<p>官网还有另一段话：</p>
-<blockquote>
-<p>ZooKeeper: A Distributed Coordination Service for Distributed Applications</p>
-</blockquote>
-<p>相比于官网的介绍，我其实更喜欢<strong>Wiki</strong>中对ZooKeeper的介绍：</p>
-<img src="/2019/06/06/Zookeeper/zkforwiki.png" title="This is an example image">
+<p>丢数据一般会有3种情况：<br>1）生产者往MQ写数据丢失了<br>可能因为网络原因数据传输丢失。<br>2）MQ本身数据丢失了<br>数据放在内存中，MQ机器宕机了，那么内存中的数据丢失了。<br>3）消费者消费的时候丢失了<br>消费者接受到消息，马上给MQ返回已经接受到消息的回复，消费者接着处理逻辑，在处理过程中，消费者宕机了；下次重启的时候消费者会获取到下一条数据消费，这样数据就丢失了。</p>
+<p>问题解决：</p>
+<h3 id="1、解决rabbitmq生产者丢数据"><a href="#1、解决rabbitmq生产者丢数据" class="headerlink" title="1、解决rabbitmq生产者丢数据"></a>1、解决rabbitmq生产者丢数据</h3><p>1）事务机制<br>在生产者发送消息的时候，加上事务，以下是伪代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">channel.txSelect</span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="comment">//发送消息 如果MQ接收失败会抛异常，那么对事务进行回滚</span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">channel.txRollback</span><br><span class="line">&#125;</span><br><span class="line">channel.txCommit</span><br></pre></td></tr></table></figure>
 
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="wiki介绍ZooKeeper">wiki介绍ZooKeeper</p>
-<p>(留下不懂英语的泪水)</p>
-<p>我简单概括一下：</p>
-<ul>
-<li>ZooKeeper主要<strong>服务于分布式系统</strong>，可以用ZooKeeper来做：<strong>统一配置管理</strong>、<strong>统一命名服务</strong>、<strong>分布式锁</strong>、<strong>集群管理</strong> 。</li>
-<li>使用分布式系统就无法避免对节点管理的问题(需要实时感知节点的状态、对节点进行统一管理等等)，而由于这些问题处理起来可能相对麻烦和提高了系统的复杂性，ZooKeeper作为一个能够<strong>通用</strong>解决这些问题的中间件就应运而生了。</li>
+<p>改方案完全保证发送消息时成功的，但是缺点是：使用了事务之后，消息变成同步了，影响吞吐量。比较耗性能。</p>
+<p>2）confirm模式<br>在生产者开启confirm模式，每个消息分配唯一id；生产者发送完消息之后就不用管了，rabbitmq如果成功接收到消息，那么会调用生产者的ack(String messageId)方法；rabbitmq如果接收失败，那么会调用生产者nack(String messageId)方法，生产者根据情况判断是否要重试；</p>
+<p>小结：一般情况下，使用confirm模式，性能、吞吐量都要比事务机制高。confirm是异步的，不会阻塞。</p>
+<h3 id="2、解决rabbitmq弄丢了数据"><a href="#2、解决rabbitmq弄丢了数据" class="headerlink" title="2、解决rabbitmq弄丢了数据"></a>2、解决rabbitmq弄丢了数据</h3><p>就是开启持久化，把内存中的数据刷到磁盘中。如果在写入磁盘的时候挂了，这样的话还是会有数据丢失，但是概率很小，你可以等数据持久化到磁盘，在通知生产者ack方法，如果没有持久化成功，生产者长时间没收到消息可以尝试在重试一次。</p>
+<h3 id="3、解决rabbitmq消费端弄丢了数据"><a href="#3、解决rabbitmq消费端弄丢了数据" class="headerlink" title="3、解决rabbitmq消费端弄丢了数据"></a>3、解决rabbitmq消费端弄丢了数据</h3><p>在消费端这边，需要关闭autoAck，等自己处理完之后在发送ack给MQ。</p>
+<p>其他的MQ，无外乎也都是这些原因，只要在各自端进行一些配置就可以解决数据丢失问题。</p>
+<h2 id="二、在消息队列里面有一批数据需要顺序执行，如何来保证？"><a href="#二、在消息队列里面有一批数据需要顺序执行，如何来保证？" class="headerlink" title="二、在消息队列里面有一批数据需要顺序执行，如何来保证？"></a>二、在消息队列里面有一批数据需要顺序执行，如何来保证？</h2><p>面试官心理剖析：<br>主要看你有没有思考过这个问题？这个是常见的问题，看你有没有解决思路？</p>
+<p>回答：<br>这里讲讲几个MQ是如何来保证消息的顺序性的。</p>
+<h3 id="1、rabbitMq"><a href="#1、rabbitMq" class="headerlink" title="1、rabbitMq"></a>1、rabbitMq</h3><ul>
+<li>问题分析：</li>
+<li><img src="/2019/07/19/消息队列常见问题示例/rabbitmq消息顺序.png" title="This is an example image">
+如图，data1和data2是有顺序的，必须data1先执行，data2后执行；这两个数据被不同的消费者消费到了，可能data2先执行，data1后执行，这样原来的顺序就错乱了。</li>
+<li>解决方案：</li>
+<li><img src="/2019/07/19/消息队列常见问题示例/rabbitmq消息顺序问题解决.png" title="This is an example image">
+如图，在MQ里面创建多个queue，同一规则的数据（对唯一标识进行hash），有顺序的放入MQ的queue里面，消费者只取一个queue里面获取数据消费，这样执行的顺序是有序的。或者还是只有一个queue但是对应一个消费者，然后这个消费者内部用内存队列做排队，然后分发给底层不同的worker来处理。</li>
 </ul>
-<h2 id="二、为什么ZooKeeper能干这么多？"><a href="#二、为什么ZooKeeper能干这么多？" class="headerlink" title="二、为什么ZooKeeper能干这么多？"></a>二、为什么ZooKeeper能干这么多？</h2><p>从上面我们可以知道，可以用ZooKeeper来做：统一配置管理、统一命名服务、分布式锁、集群管理。</p>
-<ul>
-<li>这里我们<strong>先</strong>不管<code>统一配置管理、统一命名服务、分布式锁、集群管理</code>每个具体的含义(后面会讲)</li>
-</ul>
-<p>那为什么ZooKeeper可以干那么多事？来看看ZooKeeper究竟是何方神物，在Wiki中其实也有提到：</p>
-<blockquote>
-<p>ZooKeeper nodes store their data in a hierarchical name space, much like a file system or a tree data structure</p>
-</blockquote>
-<p>ZooKeeper的数据结构，跟Unix文件系统非常类似，可以看做是一颗<strong>树</strong>，每个节点叫做<strong>ZNode</strong>。每一个节点可以通过<strong>路径</strong>来标识，结构图如下：</p>
-<img src="/2019/06/06/Zookeeper/zk结构.png" title="This is an example image">
+<h3 id="2、kafka"><a href="#2、kafka" class="headerlink" title="2、kafka"></a>2、kafka</h3><p>问题分析：</p>
+<img src="/2019/07/19/消息队列常见问题示例/kafka正常流程.png" title="This is an example image">
+<p>如图，在kafka中，你对数据指定某个key，那么这些数据会到同一个partition里面，在partition里面这些数据是有顺序的。从这里看没啥问题，插入到数据库的数据都是有序的。</p>
+<p>但是，我们在消费端可能会使用多线程来处理，因为单线程的处理速度慢，为了加快处理时间和吞吐量，会使用thread来处理。在消费端加入线程之后，就会出现顺序不一致的情况。</p>
+<img src="/2019/07/19/消息队列常见问题示例/kafka顺序不一致情况.png" title="This is an example image">
+<p>如图，就是使用了多线程之后，数据顺序不一致情况。</p>
+<p>在使用了多线程之后，如何来解决数据顺序问题？</p>
+<img src="/2019/07/19/消息队列常见问题示例/kafaka顺序问题解决.png" title="This is an example image">
+<p>如图，在消费端使用内存队列，队列里的数据使用hash进行分发，每个线程对应一个队列，这样可以保证数据的顺序。</p>
+<h3 id="3、rocketMq"><a href="#3、rocketMq" class="headerlink" title="3、rocketMq"></a>3、rocketMq</h3><img src="/2019/07/19/消息队列常见问题示例/rocketmq消息书匈奴.png" title="This is an example image">
 
-<p>ZooKeeper结构图</p>
-<p>那ZooKeeper这颗”树”有什么特点呢？？ZooKeeper的节点我们称之为<strong>Znode</strong>，Znode分为<strong>两种</strong>类型：</p>
-<ul>
-<li><strong>短暂/临时(Ephemeral)</strong>：当客户端和服务端断开连接后，所创建的Znode(节点)<strong>会自动删除</strong></li>
-<li><strong>持久(Persistent)</strong>：当客户端和服务端断开连接后，所创建的Znode(节点)<strong>不会删除</strong></li>
-</ul>
-<blockquote>
-<p>ZooKeeper和Redis一样，也是C/S结构(分成客户端和服务端)</p>
-<img src="/2019/06/06/Zookeeper/zk结点.png" title="This is an example image">
-</blockquote>
-<p>Znode和Znode的类型</p>
-<h3 id="2-1-监听器"><a href="#2-1-监听器" class="headerlink" title="2.1 监听器"></a>2.1 监听器</h3><p>在上面我们已经简单知道了ZooKeeper的数据结构了，ZooKeeper还配合了<strong>监听器</strong>才能够做那么多事的。</p>
-<p><strong>常见</strong>的监听场景有以下两项：</p>
-<ul>
-<li>监听Znode节点的<strong>数据变化</strong></li>
-<li>监听子节点的<strong>增减变化</strong></li>
-</ul>
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="监听Znode节点的数据有无变化">监听Znode节点的数据有无变化</p>
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="监听子节点的增减变化">监听子节点的增减变化</p>
-<p>没错，通过<strong>监听+Znode节点(持久/短暂[临时])</strong>，ZooKeeper就可以玩出这么多花样了。</p>
-<h2 id="三、ZooKeeper是怎么做到的？"><a href="#三、ZooKeeper是怎么做到的？" class="headerlink" title="三、ZooKeeper是怎么做到的？"></a>三、ZooKeeper是怎么做到的？</h2><p>下面我们来看看用ZooKeeper怎么来做：统一配置管理、统一命名服务、分布式锁、集群管理。</p>
-<h3 id="3-1-统一配置管理"><a href="#3-1-统一配置管理" class="headerlink" title="3.1 统一配置管理"></a>3.1 统一配置管理</h3><p>比如我们现在有三个系统A、B、C，他们有三份配置，分别是<code>ASystem.yml、BSystem.yml、CSystem.yml</code>，然后，这三份配置又非常类似，很多的配置项几乎都一样。</p>
-<ul>
-<li>此时，如果我们要改变其中一份配置项的信息，很可能其他两份都要改。并且，改变了配置项的信息<strong>很可能就要重启系统</strong></li>
-</ul>
-<p>于是，我们希望把<code>ASystem.yml、BSystem.yml、CSystem.yml</code>相同的配置项抽取出来成一份<strong>公用</strong>的配置<code>common.yml</code>，并且即便<code>common.yml</code>改了，也不需要系统A、B、C重启。</p>
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="系统A、B、C都使用着这份配置">系统A、B、C都使用着这份配置</p>
-<p>做法：我们可以将<code>common.yml</code>这份配置放在ZooKeeper的Znode节点中，系统A、B、C监听着这个Znode节点有无变更，如果变更了，<strong>及时</strong>响应。</p>
-<p><img src="data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==" alt="系统A、B、C监听着ZooKeeper的节点，一旦common.yml内容有变化，及时响应">系统A、B、C监听着ZooKeeper的节点，一旦common.yml内容有变化，及时响应</p>
-<p>参考资料：</p>
-<ul>
-<li><p>基于zookeeper实现统一配置管理</p>
-</li>
-<li><ul>
-<li><a href="https://blog.csdn.net/u011320740/article/details/78742625" target="_blank" rel="noopener">https://blog.csdn.net/u011320740/article/details/78742625</a></li>
-</ul>
-</li>
-</ul>
-<h3 id="3-2-统一命名服务"><a href="#3-2-统一命名服务" class="headerlink" title="3.2 统一命名服务"></a>3.2 统一命名服务</h3><p>统一命名服务的理解其实跟<strong>域名</strong>一样，是我们为这某一部分的资源给它<strong>取一个名字</strong>，别人通过这个名字就可以拿到对应的资源。</p>
-<p>比如说，现在我有一个域名<code>www.java3y.com</code>，但我这个域名下有多台机器：</p>
-<ul>
-<li>192.168.1.1</li>
-<li>192.168.1.2</li>
-<li>192.168.1.3</li>
-<li>192.168.1.4</li>
-</ul>
-<p>别人访问<code>www.java3y.com</code>即可访问到我的机器，而不是通过IP去访问。</p>
-<img src="/2019/06/06/Zookeeper/zk统一命名.png" title="This is an example image">
-
-<p>通过名称去访问旗下的IP</p>
-<h3 id="3-3-分布式锁"><a href="#3-3-分布式锁" class="headerlink" title="3.3 分布式锁"></a>3.3 分布式锁</h3><p>锁的概念在这我就不说了，如果对锁概念还不太了解的同学，可参考下面的文章</p>
-<ul>
-<li><a href="https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247484989&idx=1&sn=7beaa0db8b29cc8758c7846fe04dfbd2&chksm=ebd7473cdca0ce2a7aea8e6e2a22a5c183b8be3f1cdc93f8d7c3842a560eb5668071cebe5e37&token=948022247&lang=zh_CN&scene=21#wechat_redirect" target="_blank" rel="noopener">Java锁？分布式锁？乐观锁？行锁？</a></li>
-</ul>
-<p>我们可以使用ZooKeeper来实现分布式锁，那是怎么做的呢？？下面来看看：</p>
-<p>系统A、B、C都去访问<code>/locks</code>节点</p>
-<img src="/2019/06/06/Zookeeper/zk分布式锁.png" title="This is an example image">
-
-<p>系统A、B、C都去访问locks节点</p>
-<p>访问的时候会创建<strong>带顺序号的临时/短暂</strong>(<code>EPHEMERAL_SEQUENTIAL</code>)节点，比如，系统A创建了<code>id_000000</code>节点，系统B创建了<code>id_000002</code>节点，系统C创建了<code>id_000001</code>节点。</p>
-<img src="/2019/06/06/Zookeeper/zk分布式锁2.png" title="This is an example image">
-
-<p>创建出临时带顺序号的节点</p>
-<p>接着，拿到<code>/locks</code>节点下的所有子节点(id_000000,id_000001,id_000002)，<strong>判断自己创建的是不是最小的那个节点</strong></p>
-<ul>
-<li><p>如果是，则拿到锁。</p>
-</li>
-<li><ul>
-<li>释放锁：执行完操作后，把创建的节点给删掉</li>
-</ul>
-</li>
-<li><p>如果不是，则监听比自己要小1的节点变化</p>
-</li>
-</ul>
-<p>举个例子：</p>
-<ul>
-<li>系统A拿到<code>/locks</code>节点下的所有子节点，经过比较，发现自己(<code>id_000000</code>)，是所有子节点最小的。所以得到锁</li>
-<li>系统B拿到<code>/locks</code>节点下的所有子节点，经过比较，发现自己(<code>id_000002</code>)，不是所有子节点最小的。所以监听比自己小1的节点<code>id_000001</code>的状态</li>
-<li>系统C拿到<code>/locks</code>节点下的所有子节点，经过比较，发现自己(<code>id_000001</code>)，不是所有子节点最小的。所以监听比自己小1的节点<code>id_000000</code>的状态</li>
-<li>……</li>
-<li>等到系统A执行完操作以后，将自己创建的节点删除(<code>id_000000</code>)。通过监听，系统C发现<code>id_000000</code>节点已经删除了，发现自己已经是最小的节点了，于是顺利拿到锁</li>
-<li>….系统B如上</li>
-</ul>
-<h3 id="3-4集群状态"><a href="#3-4集群状态" class="headerlink" title="3.4集群状态"></a>3.4集群状态</h3><p>经过上面几个例子，我相信大家也很容易想到ZooKeeper是怎么”<strong>感知</strong>“节点的动态新增或者删除的了。</p>
-<p>还是以我们三个系统A、B、C为例，在ZooKeeper中创建<strong>临时节点</strong>即可：</p>
-<img src="/2019/06/06/Zookeeper/zk集群感知结点.png" title="This is an example image">
-
-<p>各维护一个临时节点</p>
-<p>只要系统A挂了，那<code>/groupMember/A</code>这个节点就会删除，通过<strong>监听</strong><code>groupMember</code>下的子节点，系统B和C就能够感知到系统A已经挂了。(新增也是同理)</p>
-<p>除了能够感知节点的上下线变化，ZooKeeper还可以实现<strong>动态选举Master</strong>的功能。(如果集群是主从架构模式下)</p>
-<p>原理也很简单，如果想要实现动态选举Master的功能，Znode节点的类型是带<strong>顺序号的临时节点</strong>(<code>EPHEMERAL_SEQUENTIAL</code>)就好了。</p>
-<ul>
-<li>Zookeeper会每次选举最小编号的作为Master，如果Master挂了，自然对应的Znode节点就会删除。然后让<strong>新的最小编号作为Master</strong>，这样就可以实现动态选举的功能了。</li>
-</ul>
-<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>这篇文章主要讲解了ZooKeeper的入门相关的知识，ZooKeeper通过<strong>Znode的节点类型+监听机制</strong>就实现那么多好用的功能了！</p>
-<p>当然了，ZooKeeper要考虑的事没那么简单的，后面有机会深入的话，我还会继续分享，希望这篇文章对大家有所帮助~ </p>
-<p>参考资料：</p>
-<ul>
-<li><p>分布式服务框架 Zookeeper</p>
-</li>
-<li><ul>
-<li><a href="https://www.ibm.com/developerworks/cn/opensource/os-cn-zookeeper/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/opensource/os-cn-zookeeper/index.html</a></li>
-</ul>
-</li>
-<li><p>ZooKeeper初识整理(老酒装新瓶)</p>
-</li>
-<li><ul>
-<li><a href="https://lxkaka.wang/2017/12/21/zookeeper/" target="_blank" rel="noopener">https://lxkaka.wang/2017/12/21/zookeeper/</a></li>
-</ul>
-</li>
-<li><p>ZooKeeper</p>
-</li>
-<li><ul>
-<li><a href="https://www.cnblogs.com/sunshine-long/p/9057191.html" target="_blank" rel="noopener">https://www.cnblogs.com/sunshine-long/p/9057191.html</a></li>
-</ul>
-</li>
-<li><p>ZooKeeper 的应用场景</p>
-</li>
-<li><ul>
-<li><a href="https://zhuanlan.zhihu.com/p/59669985" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/59669985</a></li>
-</ul>
-</li>
-</ul>
+<p>如图，生产者中把orderId进行取模，把相同模的数据放到messagequeue里面，消费者消费同一个messagequeue，只要消费者这边有序消费，那么可以保证数据被顺序消费。</p>
+<h3 id="4、activeMq"><a href="#4、activeMq" class="headerlink" title="4、activeMq"></a>4、activeMq</h3><img src="/2019/07/19/消息队列常见问题示例/activemq消息顺序.png" title="This is an example image">
+<p>如图，activeMq里面有messageGroups属性，可以指定JMSXGroupID，消费者会消费指定的JMSXGroupID。即保证了顺序性，又解决负载均衡的问题。</p>
+<h2 id="三、如何保证消息队列的幂等性？"><a href="#三、如何保证消息队列的幂等性？" class="headerlink" title="三、如何保证消息队列的幂等性？"></a>三、如何保证消息队列的幂等性？</h2><p>面试官心理剖析：<br>主要是看你对消息队列数据重复消费的问题，是否有了解，是否知道怎么解决？如果这块不知道，那么面试官会觉得如果交给你做功能，可能会出现多次消费的情况。</p>
+<p>回答：</p>
+<p>为什么会出现重复消费？<br>分析：</p>
+<img src="/2019/07/19/消息队列常见问题示例/kafaka重复消费场景.png" title="This is an example image">
+<p>如图，在什么场景会出现消息重复消费？比如说消费端已经消费了offset=2，offset=3，offset=4的三条数据，正准备把这个offset的值传给kafka，这时候消费端机器宕机了，这个数据没传过去；重启之后，消费端同步kafka，kafka那边消费的记录offset还是1，那么kafka会认为之前的2、3、4都没有消费过，会把这几个数据在传给消费端；这样消费端这边就重复对这几条数据进行消费了。在数据库里面可能就多了很多重复的数据。<br>像其他的MQ，也是一样，消费端再返回给MQ的时候，当机了或者重启了，那么都会出现重复消费的问题。</p>
+<p>问题解决：</p>
+<h3 id="幂等性：一个请求，不管重复来多少次，结果是不会改变的。"><a href="#幂等性：一个请求，不管重复来多少次，结果是不会改变的。" class="headerlink" title="幂等性：一个请求，不管重复来多少次，结果是不会改变的。"></a>幂等性：一个请求，不管重复来多少次，结果是不会改变的。</h3><p>每个消息都会有唯一的消息id。</p>
+<h4 id="1、先查再保存"><a href="#1、先查再保存" class="headerlink" title="1、先查再保存"></a>1、先查再保存</h4><p>每次保存数据的时候，都先查一下，如果数据存在了那么就不保存。这个情况是并发不高的情况。</p>
+<h4 id="2、业务表添加约束条件"><a href="#2、业务表添加约束条件" class="headerlink" title="2、业务表添加约束条件"></a>2、业务表添加约束条件</h4><p>如果你的数据库将来都不会分库分表，那么可以在业务表字段加上唯一约束条件（UNIQUE），这样相同的数据就不会保存为多份。</p>
+<h4 id="3、添加消息表"><a href="#3、添加消息表" class="headerlink" title="3、添加消息表"></a>3、添加消息表</h4><p>再数据库里面，添加一张消息消费记录表，表字段加上唯一约束条件（UNIQUE），消费完之后就往表里插入一条数据。因为加了唯一约束条件，第二次保存的时候，mysql就会报错，就插入不进去；通过数据库可以限制重复消费。</p>
+<h4 id="4、redis"><a href="#4、redis" class="headerlink" title="4、redis"></a>4、redis</h4><p>如果你的系统是分布式的，又做了分库分表，那么可以使用redis来做记录，把消息id存在redis里，下次再有重复消息id在消费的时候，如果发现redis里面有了就不能进行消费。</p>
+<h4 id="5、高并发"><a href="#5、高并发" class="headerlink" title="5、高并发"></a>5、高并发</h4><p>如果你的系统并发很高，那么可以使用redis或者zookeeper的分布式对消息id加锁，然后使用上面的几个方法进行幂等性控制。</p>
 
       
 
@@ -375,7 +271,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Zookeeper</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">消息队列</a>
         		</li>
       		
 		</ul>
@@ -431,7 +327,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/06/06/Zookeeper/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/19/消息队列常见问题示例/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -445,18 +341,18 @@
   
 <nav id="article-nav">
   
-    <a href="/2019/06/06/Java-8-stream流/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/07/19/MongoDB/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Java-8-stream流
+          MongoDB
         
       </div>
     </a>
   
   
-    <a href="/2019/06/06/Feed流系统设计/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">Feed流系统设计</div>
+    <a href="/2019/07/19/Zookeeper/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Zookeeper</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -483,7 +379,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、什么是ZooKeeper"><span class="toc-number">1.</span> <span class="toc-text">一、什么是ZooKeeper</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、为什么ZooKeeper能干这么多？"><span class="toc-number">2.</span> <span class="toc-text">二、为什么ZooKeeper能干这么多？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-监听器"><span class="toc-number">2.1.</span> <span class="toc-text">2.1 监听器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、ZooKeeper是怎么做到的？"><span class="toc-number">3.</span> <span class="toc-text">三、ZooKeeper是怎么做到的？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-统一配置管理"><span class="toc-number">3.1.</span> <span class="toc-text">3.1 统一配置管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-统一命名服务"><span class="toc-number">3.2.</span> <span class="toc-text">3.2 统一命名服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-3-分布式锁"><span class="toc-number">3.3.</span> <span class="toc-text">3.3 分布式锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-4集群状态"><span class="toc-number">3.4.</span> <span class="toc-text">3.4集群状态</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#最后"><span class="toc-number">4.</span> <span class="toc-text">最后</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、如何解决消息队列数据丢失问题？"><span class="toc-number">1.</span> <span class="toc-text">一、如何解决消息队列数据丢失问题？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么会出现数据丢失？"><span class="toc-number">1.1.</span> <span class="toc-text">为什么会出现数据丢失？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1、解决rabbitmq生产者丢数据"><span class="toc-number">1.2.</span> <span class="toc-text">1、解决rabbitmq生产者丢数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、解决rabbitmq弄丢了数据"><span class="toc-number">1.3.</span> <span class="toc-text">2、解决rabbitmq弄丢了数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、解决rabbitmq消费端弄丢了数据"><span class="toc-number">1.4.</span> <span class="toc-text">3、解决rabbitmq消费端弄丢了数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、在消息队列里面有一批数据需要顺序执行，如何来保证？"><span class="toc-number">2.</span> <span class="toc-text">二、在消息队列里面有一批数据需要顺序执行，如何来保证？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、rabbitMq"><span class="toc-number">2.1.</span> <span class="toc-text">1、rabbitMq</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、kafka"><span class="toc-number">2.2.</span> <span class="toc-text">2、kafka</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、rocketMq"><span class="toc-number">2.3.</span> <span class="toc-text">3、rocketMq</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4、activeMq"><span class="toc-number">2.4.</span> <span class="toc-text">4、activeMq</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、如何保证消息队列的幂等性？"><span class="toc-number">3.</span> <span class="toc-text">三、如何保证消息队列的幂等性？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#幂等性：一个请求，不管重复来多少次，结果是不会改变的。"><span class="toc-number">3.1.</span> <span class="toc-text">幂等性：一个请求，不管重复来多少次，结果是不会改变的。</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1、先查再保存"><span class="toc-number">3.1.1.</span> <span class="toc-text">1、先查再保存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2、业务表添加约束条件"><span class="toc-number">3.1.2.</span> <span class="toc-text">2、业务表添加约束条件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3、添加消息表"><span class="toc-number">3.1.3.</span> <span class="toc-text">3、添加消息表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4、redis"><span class="toc-number">3.1.4.</span> <span class="toc-text">4、redis</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5、高并发"><span class="toc-number">3.1.5.</span> <span class="toc-text">5、高并发</span></a></li></ol></li></ol></li></ol>
                     </div>
                 </span>
             </div>
@@ -636,6 +532,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">feed</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">中台</a>
               </li>
             
             <div class="clearfix"></div>
