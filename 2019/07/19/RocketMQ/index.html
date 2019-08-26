@@ -23,7 +23,7 @@
 <meta property="og:image" content="http://yoursite.com/2019/07/19/RocketMQ/1561720411103.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/19/RocketMQ/1561720763037.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/19/RocketMQ/1561720891179.png">
-<meta property="og:updated_time" content="2019-07-19T14:42:00.398Z">
+<meta property="og:updated_time" content="2019-08-26T15:26:15.194Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RocketMQ">
 <meta name="twitter:description" content="RocketMQ简介RocketMQ是从阿里内部的MetaQ演化而来 特性 高吞吐低延迟 抗海量消息堆积 简单的横向扩容 顺序消息 定时消息 服务端消息过滤 消费组消费 多种方式消息查询 消息回溯  使用场景消息中间件典型的作用  应用解耦 上游业务负责生产，下游业务负责消费，俩个业务相互独立   削峰填谷 生产高峰时，消费进入队列堆积，避免冲垮消费方    设计原理 - 总览 NameServe">
@@ -232,6 +232,33 @@
 
 </li>
 </ul>
+<h4 id="RocketMQ物理部署结构"><a href="#RocketMQ物理部署结构" class="headerlink" title="RocketMQ物理部署结构"></a>RocketMQ物理部署结构</h4>
+
+<p>如上图所示，RocktMQ的部署结构有以下特点：</p>
+<ul>
+<li>NameServer是一个几乎无状态节点，可集群部署，节点之间无任何信息同步。</li>
+<li>Broker部署相对复杂，Broker分为Master与Slave，一个Master可以对应多个Slave，但是一个Slave只能对应一个Master，Master与Salve的对应关系指定相同的BroerName，不同的BrokerName，不同的BrokerId来定义，0表示Master，非0表示Slave。Mater也可以部署多个。每个Broker与NameServer集群中的所有节点建立长连接，定时注册Topic信息到所有nameServer</li>
+<li>Produce与NameServer集群中的其中一个节点（随机选择）简历长连接，定期从nameserver取topic路由信息，并向topic服务的master建立长连接，且定时向master发送心跳。Producer完全无状态，可集群部署。</li>
+<li>Consumer与Name Server集群中的其中一个节点（随机选择）建立长连接，定期从Name Server取Topic路由信息，并向提供Topic服务的Master、Slave建立长连接，且定时向Master、Slave发送心跳。Consumer既可以从Master订阅消息，也可以从Slave订阅消息，订阅规则由Broker配置决定。</li>
+</ul>
+<h4 id="RocketMQ逻辑部署结构"><a href="#RocketMQ逻辑部署结构" class="headerlink" title="RocketMQ逻辑部署结构"></a>RocketMQ逻辑部署结构</h4>
+
+<ul>
+<li>Producer Group</li>
+</ul>
+<p>用来表示一个发送消息应用，一个Producer Group下包含多个Producer实例，可以是多台机器，也可以是一台机器的多个进程，或者一个进程的多个Producer对象。一个Producer Group可以发送多个Topic消息，Producer Group作用如下：</p>
+<ol>
+<li>标识一类Producer</li>
+<li>可以通过运维工具查询这个发送消息应用下有多个Producer实例</li>
+<li>发送分布式事务消息时，如果Producer中途意外宕机，Broker会主动回调Producer Group内的任意一台机器来确认事务状态。</li>
+</ol>
+<ul>
+<li>Consumer Group</li>
+</ul>
+<p>用来表示一个消费消息应用，一个Consumer Group下包含多个Consumer实例，可以是多台机器，也可以是多个进程，或者是一个进程的多个Consumer对象。一个Consumer Group下的多个Consumer以均摊方式消费消息，如果设置为广播方式，那么这个Consumer Group下的每个实例都消费全量数据。</p>
+<h4 id="RocketMQ数据存储结构"><a href="#RocketMQ数据存储结构" class="headerlink" title="RocketMQ数据存储结构"></a>RocketMQ数据存储结构</h4>
+
+<p>如上图所示，RocketMQ采取了一种数据与索引分离的存储方法。有效降低文件资源、IO资源，内存资源的损耗。即便是阿里这种海量数据，高并发场景也能够有效降低端到端延迟，并具备较强的横向扩展能力。</p>
 <h3 id="设计原理-生产"><a href="#设计原理-生产" class="headerlink" title="设计原理 - 生产"></a>设计原理 - 生产</h3><ul>
 <li><p>Topic</p>
 <ul>
@@ -499,7 +526,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RocketMQ"><span class="toc-number">1.</span> <span class="toc-text">RocketMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#简介"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#特性"><span class="toc-number">1.2.</span> <span class="toc-text">特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用场景"><span class="toc-number">1.3.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-总览"><span class="toc-number">1.4.</span> <span class="toc-text">设计原理 - 总览</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-生产"><span class="toc-number">1.5.</span> <span class="toc-text">设计原理 - 生产</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消费"><span class="toc-number">1.6.</span> <span class="toc-text">设计原理 - 消费</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消费线程模型"><span class="toc-number">1.7.</span> <span class="toc-text">设计原理 - 消费线程模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消息ACK"><span class="toc-number">1.8.</span> <span class="toc-text">设计原理 - 消息ACK</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-Broker-HA"><span class="toc-number">1.9.</span> <span class="toc-text">设计原理 - Broker HA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他特性"><span class="toc-number">1.10.</span> <span class="toc-text">其他特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#常见问题"><span class="toc-number">1.11.</span> <span class="toc-text">常见问题</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RocketMQ"><span class="toc-number">1.</span> <span class="toc-text">RocketMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#简介"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#特性"><span class="toc-number">1.2.</span> <span class="toc-text">特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用场景"><span class="toc-number">1.3.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-总览"><span class="toc-number">1.4.</span> <span class="toc-text">设计原理 - 总览</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ物理部署结构"><span class="toc-number">1.4.1.</span> <span class="toc-text">RocketMQ物理部署结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ逻辑部署结构"><span class="toc-number">1.4.2.</span> <span class="toc-text">RocketMQ逻辑部署结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ数据存储结构"><span class="toc-number">1.4.3.</span> <span class="toc-text">RocketMQ数据存储结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-生产"><span class="toc-number">1.5.</span> <span class="toc-text">设计原理 - 生产</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消费"><span class="toc-number">1.6.</span> <span class="toc-text">设计原理 - 消费</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消费线程模型"><span class="toc-number">1.7.</span> <span class="toc-text">设计原理 - 消费线程模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消息ACK"><span class="toc-number">1.8.</span> <span class="toc-text">设计原理 - 消息ACK</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-Broker-HA"><span class="toc-number">1.9.</span> <span class="toc-text">设计原理 - Broker HA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他特性"><span class="toc-number">1.10.</span> <span class="toc-text">其他特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#常见问题"><span class="toc-number">1.11.</span> <span class="toc-text">常见问题</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
