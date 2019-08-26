@@ -1596,7 +1596,7 @@
 
 </li>
 </ul>
-<h4 id="RocketMQ物理部署结构"><a href="#RocketMQ物理部署结构" class="headerlink" title="RocketMQ物理部署结构"></a>RocketMQ物理部署结构</h4>
+<h4 id="RocketMQ物理部署结构"><a href="#RocketMQ物理部署结构" class="headerlink" title="RocketMQ物理部署结构"></a>RocketMQ物理部署结构</h4><img src="/2019/07/19/RocketMQ/1566810894325.png" title="This is an example image"> 
 
 <p>如上图所示，RocktMQ的部署结构有以下特点：</p>
 <ul>
@@ -1605,7 +1605,7 @@
 <li>Produce与NameServer集群中的其中一个节点（随机选择）简历长连接，定期从nameserver取topic路由信息，并向topic服务的master建立长连接，且定时向master发送心跳。Producer完全无状态，可集群部署。</li>
 <li>Consumer与Name Server集群中的其中一个节点（随机选择）建立长连接，定期从Name Server取Topic路由信息，并向提供Topic服务的Master、Slave建立长连接，且定时向Master、Slave发送心跳。Consumer既可以从Master订阅消息，也可以从Slave订阅消息，订阅规则由Broker配置决定。</li>
 </ul>
-<h4 id="RocketMQ逻辑部署结构"><a href="#RocketMQ逻辑部署结构" class="headerlink" title="RocketMQ逻辑部署结构"></a>RocketMQ逻辑部署结构</h4>
+<h4 id="RocketMQ逻辑部署结构"><a href="#RocketMQ逻辑部署结构" class="headerlink" title="RocketMQ逻辑部署结构"></a>RocketMQ逻辑部署结构</h4><img src="/2019/07/19/RocketMQ/1566811724265.png" title="This is an example image">
 
 <ul>
 <li>Producer Group</li>
@@ -1620,7 +1620,7 @@
 <li>Consumer Group</li>
 </ul>
 <p>用来表示一个消费消息应用，一个Consumer Group下包含多个Consumer实例，可以是多台机器，也可以是多个进程，或者是一个进程的多个Consumer对象。一个Consumer Group下的多个Consumer以均摊方式消费消息，如果设置为广播方式，那么这个Consumer Group下的每个实例都消费全量数据。</p>
-<h4 id="RocketMQ数据存储结构"><a href="#RocketMQ数据存储结构" class="headerlink" title="RocketMQ数据存储结构"></a>RocketMQ数据存储结构</h4>
+<h4 id="RocketMQ数据存储结构"><a href="#RocketMQ数据存储结构" class="headerlink" title="RocketMQ数据存储结构"></a>RocketMQ数据存储结构</h4><img src="/2019/07/19/RocketMQ/1566811995506.png" title="This is an example image">
 
 <p>如上图所示，RocketMQ采取了一种数据与索引分离的存储方法。有效降低文件资源、IO资源，内存资源的损耗。即便是阿里这种海量数据，高并发场景也能够有效降低端到端延迟，并具备较强的横向扩展能力。</p>
 <h3 id="设计原理-生产"><a href="#设计原理-生产" class="headerlink" title="设计原理 - 生产"></a>设计原理 - 生产</h3><ul>
