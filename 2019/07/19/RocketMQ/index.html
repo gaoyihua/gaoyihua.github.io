@@ -8,13 +8,13 @@
   <link rel="dns-prefetch" href="http://yoursite.com">
   <title>RocketMQ | Gary&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="RocketMQ简介RocketMQ是从阿里内部的MetaQ演化而来 特性 高吞吐低延迟 抗海量消息堆积 简单的横向扩容 顺序消息 定时消息 服务端消息过滤 消费组消费 多种方式消息查询 消息回溯  使用场景消息中间件典型的作用  应用解耦 上游业务负责生产，下游业务负责消费，俩个业务相互独立   削峰填谷 生产高峰时，消费进入队列堆积，避免冲垮消费方    设计原理 - 总览 NameServe">
+  <meta name="description" content="RocketMQ简介RocketMQ是从阿里内部的MetaQ演化而来 为什么RocetMQ Based on our research, with increased queues and virtual topics in use, ActiveMQ IO module reaches a bottleneck. We tried our best to solve this problem t">
 <meta name="keywords" content="消息队列">
 <meta property="og:type" content="article">
 <meta property="og:title" content="RocketMQ">
 <meta property="og:url" content="http://yoursite.com/2019/07/19/RocketMQ/index.html">
 <meta property="og:site_name" content="Gary&#39;s Blog">
-<meta property="og:description" content="RocketMQ简介RocketMQ是从阿里内部的MetaQ演化而来 特性 高吞吐低延迟 抗海量消息堆积 简单的横向扩容 顺序消息 定时消息 服务端消息过滤 消费组消费 多种方式消息查询 消息回溯  使用场景消息中间件典型的作用  应用解耦 上游业务负责生产，下游业务负责消费，俩个业务相互独立   削峰填谷 生产高峰时，消费进入队列堆积，避免冲垮消费方    设计原理 - 总览 NameServe">
+<meta property="og:description" content="RocketMQ简介RocketMQ是从阿里内部的MetaQ演化而来 为什么RocetMQ Based on our research, with increased queues and virtual topics in use, ActiveMQ IO module reaches a bottleneck. We tried our best to solve this problem t">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/07/19/RocketMQ/1561719093338.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/19/RocketMQ/1566810894325.png">
@@ -26,10 +26,10 @@
 <meta property="og:image" content="http://yoursite.com/2019/07/19/RocketMQ/1561720411103.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/19/RocketMQ/1561720763037.png">
 <meta property="og:image" content="http://yoursite.com/2019/07/19/RocketMQ/1561720891179.png">
-<meta property="og:updated_time" content="2019-08-26T16:07:53.969Z">
+<meta property="og:updated_time" content="2019-08-31T15:07:46.312Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="RocketMQ">
-<meta name="twitter:description" content="RocketMQ简介RocketMQ是从阿里内部的MetaQ演化而来 特性 高吞吐低延迟 抗海量消息堆积 简单的横向扩容 顺序消息 定时消息 服务端消息过滤 消费组消费 多种方式消息查询 消息回溯  使用场景消息中间件典型的作用  应用解耦 上游业务负责生产，下游业务负责消费，俩个业务相互独立   削峰填谷 生产高峰时，消费进入队列堆积，避免冲垮消费方    设计原理 - 总览 NameServe">
+<meta name="twitter:description" content="RocketMQ简介RocketMQ是从阿里内部的MetaQ演化而来 为什么RocetMQ Based on our research, with increased queues and virtual topics in use, ActiveMQ IO module reaches a bottleneck. We tried our best to solve this problem t">
 <meta name="twitter:image" content="http://yoursite.com/2019/07/19/RocketMQ/1561719093338.png">
   
     <link rel="alternative" href="/atom.xml" title="Gary&#39;s Blog" type="application/atom+xml">
@@ -187,6 +187,10 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h2 id="RocketMQ"><a href="#RocketMQ" class="headerlink" title="RocketMQ"></a>RocketMQ</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>RocketMQ是从阿里内部的MetaQ演化而来</p>
+<h3 id="为什么RocetMQ"><a href="#为什么RocetMQ" class="headerlink" title="为什么RocetMQ"></a>为什么RocetMQ</h3><blockquote>
+<p>Based on our research, with increased queues and virtual topics in use, ActiveMQ IO module reaches a bottleneck. We tried our best to solve this problem through throttling, circuit breaker or degradation, but it did not work well. So we begin to focus on the popular messaging solution Kafka at that time. Unfortunately, Kafka can not meet our requirements especially in terms of <strong><em>low latency</em></strong> and <strong><em>high reliability</em></strong>, see <a href="http://rocketmq.apache.org/rocketmq/how-to-support-more-queues-in-rocketmq/" target="_blank" rel="noopener">here</a> for details.</p>
+</blockquote>
+<p>根据研究，随着使用的队列和虚拟主题的增加，ActiveMQ IO模块遇到了瓶颈。我们尽力通过节流、断路器或降级解决这个问题，但效果不佳。因此，我们开始关注当时流行的消息传递解决方案Kafka。不幸的是，Kafka无法满足我们的要求，特别是在<strong><em>低延迟</em></strong>和<strong><em>高可靠</em></strong>性方面</p>
 <h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><ul>
 <li>高吞吐低延迟</li>
 <li>抗海量消息堆积</li>
@@ -369,9 +373,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><p>RocketMQ会丢消息吗？消息会重复消费么？</p>
-<p>Broker丢消息的场景：</p>
-<ul>
+<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><h4 id="RocketMQ会丢消息吗？消息会重复消费么？"><a href="#RocketMQ会丢消息吗？消息会重复消费么？" class="headerlink" title="RocketMQ会丢消息吗？消息会重复消费么？"></a>RocketMQ会丢消息吗？消息会重复消费么？</h4><h5 id="Broker丢消息的场景："><a href="#Broker丢消息的场景：" class="headerlink" title="Broker丢消息的场景："></a>Broker丢消息的场景：</h5><ul>
 <li>消息还未消费，存放消息的磁盘发生不可逆损坏</li>
 <li>消息在系统PageCache内，且未被消费，服务器发生断电</li>
 </ul>
@@ -380,13 +382,144 @@
 <li>启用同步复制 - &gt; Master和Slave磁盘同事发生不可逆损坏</li>
 <li>启用同步刷盘</li>
 </ul>
-<p>消息重复消费的场景：</p>
-<ul>
+<h5 id="消息重复消费的场景："><a href="#消息重复消费的场景：" class="headerlink" title="消息重复消费的场景："></a>消息重复消费的场景：</h5><ul>
 <li>直接终止Consumer进程，消费进度未被提交到Broker时</li>
 <li>有Consumer重启，Group内发生Rebalance时，部分消息消费进度未提交时</li>
 <li>生产者发送了多次同一消息时</li>
 </ul>
-<p>待续……</p>
+<h4 id="生产者发送失败会重试么？"><a href="#生产者发送失败会重试么？" class="headerlink" title="生产者发送失败会重试么？"></a>生产者发送失败会重试么？</h4><h5 id="同步发送失败的场景"><a href="#同步发送失败的场景" class="headerlink" title="同步发送失败的场景"></a>同步发送失败的场景</h5><ul>
+<li>连接失败 - RemotingConnectException，关闭连接，重试，抛出异常</li>
+<li>网络异常，消息发送失败 - RemotingSendRequestException，关闭连接，重试，抛出异常</li>
+<li>消息响应超时 - RemotingTimeoutException，重试，抛出异常</li>
+<li>Broker消息处理失败，返回失败Result - BrokerException，以下错误重试，俩次后抛出异常<ul>
+<li>TOPIX NOT EXIST</li>
+<li>SERVICE NOT AVAILABLE</li>
+<li>SYSTEM ERROR</li>
+<li>NO_PERMISSION</li>
+</ul>
+</li>
+</ul>
+<h5 id="异步发送失败的场景"><a href="#异步发送失败的场景" class="headerlink" title="异步发送失败的场景"></a>异步发送失败的场景</h5><ul>
+<li>连接失败 - RemotingConnectException，无重试，抛出异常</li>
+<li>网络异常，消息发送失败  - RemotingSendRequestException，无重试，抛出异常</li>
+<li>网络异常，消息发送失败 - MQClientException，重试，Callback.onEcxeption</li>
+<li>消息响应超时 - MQClientException，重试，Callback.onEcxeption</li>
+<li>BrkBroker消息处理失败，返回失败Result - BrokerException，无重试，Callback.onEcxeption</li>
+</ul>
+<h4 id="消费者Pull-Consume失败会重试么"><a href="#消费者Pull-Consume失败会重试么" class="headerlink" title="消费者Pull/Consume失败会重试么"></a>消费者Pull/Consume失败会重试么</h4><h5 id="Pull失败的场景"><a href="#Pull失败的场景" class="headerlink" title="Pull失败的场景"></a>Pull失败的场景</h5><ul>
+<li>连接失败 - 3秒后重新提交PullRequest</li>
+<li>Pull请求发送失败 - 3秒后重新提交</li>
+<li>响应返回，没找到消息 - 立刻重新提交<ul>
+<li>NO_NEW_MESAGE</li>
+<li>NO_MATCHED_MESSAGE</li>
+</ul>
+</li>
+<li>响应返回，offset不合法 - 纠正offset</li>
+</ul>
+<h5 id="Consume失败的场景"><a href="#Consume失败的场景" class="headerlink" title="Consume失败的场景"></a>Consume失败的场景</h5><ul>
+<li>RECONSUME_LATER 发送回Broker，若发送失败，重新提交ConsumeRequest</li>
+<li>Null - 重置为RECONSUME_LATER</li>
+<li>throw Exception - 重置为RECONSUME LATER</li>
+</ul>
+<h4 id="消费者从哪里开始消费"><a href="#消费者从哪里开始消费" class="headerlink" title="消费者从哪里开始消费"></a>消费者从哪里开始消费</h4><p>对于一个新的ConsumerGroup，订阅已经存在的Topic后，可以选择从以下三个地方开始消费</p>
+<ul>
+<li>CONSUME_FROM_LAST_OFFSET 从队列末尾开始消费</li>
+<li>CONSUME_FROM_FIRTST_OFFSET 从队列最初开始消费</li>
+<li>CONSUME_FROM_YTIMESTAMP 从指定时间戳开始消费</li>
+</ul>
+<h4 id="InsyanceName是什么？什么时候需要设置？"><a href="#InsyanceName是什么？什么时候需要设置？" class="headerlink" title="InsyanceName是什么？什么时候需要设置？"></a>InsyanceName是什么？什么时候需要设置？</h4><p>ClientID构造规则：IP@InstanceName</p>
+<p>默认ClientID为：IP@PID</p>
+<ul>
+<li>对于Broker而言<ul>
+<li>客户端的表示，Cahnnel的附属信息</li>
+</ul>
+</li>
+<li>对于客户端而言<ul>
+<li>作为key，对应一个MQClientInstance（对象包含底层网络连接，定时任务，线程池等）。</li>
+<li>影响Rebalance时，接口中俩个参数（ClientIDList，CurrentClientID）。</li>
+</ul>
+</li>
+</ul>
+<p>例子：Docker的IP和PID很容易重复，如果不设置InstanceName，多个Docker内从消费者会有一样的ClientID，在Rebalance时候，会分配错误，造成重复消费。</p>
+<h3 id="比较选型"><a href="#比较选型" class="headerlink" title="比较选型"></a>比较选型</h3><h4 id="相比ActiveMQ"><a href="#相比ActiveMQ" class="headerlink" title="相比ActiveMQ"></a>相比ActiveMQ</h4><p>抗堆积、易扩展、原生支持消费组消费，组和组互不影响</p>
+<p>相比Kafka：完善的消息失败重试、按Key或者ID查询消息、消息回溯、服务端消息过滤、消费状态查询，JAVA写的。</p>
+<h3 id="RocketMQ-vs-ActiveMQ-vs-Kafka"><a href="#RocketMQ-vs-ActiveMQ-vs-Kafka" class="headerlink" title="RocketMQ vs. ActiveMQ vs. Kafka"></a>RocketMQ vs. ActiveMQ vs. Kafka</h3><p>The table below is a handy quick reference for spotting the differences among RocketMQ and its most popular alternatives at a glance.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Messaging Product</th>
+<th align="left">Client SDK</th>
+<th align="left">Protocol and Specification</th>
+<th align="left">Ordered Message（有序消息）</th>
+<th align="left">Scheduled Message（计划消息）</th>
+<th align="left">Batched Message（批量消息）</th>
+<th align="left">BroadCast Message（广播消息）</th>
+<th align="left">Message Filter（消息过滤）</th>
+<th align="left">Server Triggered Redelivery</th>
+<th align="left">Message Storage</th>
+<th align="left">Message Retroactive（回溯）</th>
+<th align="left">Message Priority</th>
+<th align="left">High Availability and Failover（高可用和容错）</th>
+<th align="left">Message Track（消息追踪）</th>
+<th align="left">Configuration</th>
+<th align="left">Management and Operation Tools</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">ActiveMQ</td>
+<td align="left">Java, .NET, C++ etc.</td>
+<td align="left">Push model, support OpenWire, STOMP, AMQP, MQTT, JMS</td>
+<td align="left">Exclusive Consumer or Exclusive Queues can ensure ordering</td>
+<td align="left">Supported</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported</td>
+<td align="left">Supported</td>
+<td align="left">Not Supported</td>
+<td align="left">Supports very fast persistence using JDBC along with a high performance journal，such as levelDB, kahaDB</td>
+<td align="left">Supported</td>
+<td align="left">Supported</td>
+<td align="left">Supported, depending on storage,if using kahadb it requires a ZooKeeper server</td>
+<td align="left">Not Supported</td>
+<td align="left">The default configuration is low level, user need to optimize the configuration parameters</td>
+<td align="left">Supported</td>
+</tr>
+<tr>
+<td align="left">Kafka</td>
+<td align="left">Java, Scala etc.</td>
+<td align="left">Pull model, support TCP</td>
+<td align="left">Ensure ordering of messages within a partition</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported, with async producer</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported, you can use Kafka Streams to filter messages</td>
+<td align="left">Not Supported</td>
+<td align="left">High performance file storage</td>
+<td align="left">Supported offset indicate</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported, requires a ZooKeeper server</td>
+<td align="left">Not Supported</td>
+<td align="left">Kafka uses key-value pairs format for configuration. These values can be supplied either from a file or programmatically.</td>
+<td align="left">Supported, use terminal command to expose core metrics</td>
+</tr>
+<tr>
+<td align="left">RocketMQ</td>
+<td align="left">Java, C++, Go</td>
+<td align="left">Pull model, support TCP, JMS, OpenMessaging</td>
+<td align="left">Ensure strict ordering of messages,and can scale out gracefully</td>
+<td align="left">Supported</td>
+<td align="left">Supported, with sync mode to avoid message loss</td>
+<td align="left">Supported</td>
+<td align="left">Supported, property filter expressions based on SQL92</td>
+<td align="left">Supported</td>
+<td align="left">High performance and low latency file storage</td>
+<td align="left">Supported timestamp and offset two indicates</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported, Master-Slave model, without another kit</td>
+<td align="left">Supported</td>
+<td align="left">Work out of box,user only need to pay attention to a few configurations</td>
+<td align="left">Supported, rich web and terminal command to expose core metrics</td>
+</tr>
+</tbody></table>
 
       
 
@@ -491,11 +624,11 @@
   
 <nav id="article-nav">
   
-    <a href="/2019/07/19/Feed流系统设计/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/07/19/C编程工具/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          Feed流系统设计
+          C编程工具
         
       </div>
     </a>
@@ -529,7 +662,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RocketMQ"><span class="toc-number">1.</span> <span class="toc-text">RocketMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#简介"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#特性"><span class="toc-number">1.2.</span> <span class="toc-text">特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用场景"><span class="toc-number">1.3.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-总览"><span class="toc-number">1.4.</span> <span class="toc-text">设计原理 - 总览</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ物理部署结构"><span class="toc-number">1.4.1.</span> <span class="toc-text">RocketMQ物理部署结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ逻辑部署结构"><span class="toc-number">1.4.2.</span> <span class="toc-text">RocketMQ逻辑部署结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ数据存储结构"><span class="toc-number">1.4.3.</span> <span class="toc-text">RocketMQ数据存储结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-生产"><span class="toc-number">1.5.</span> <span class="toc-text">设计原理 - 生产</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消费"><span class="toc-number">1.6.</span> <span class="toc-text">设计原理 - 消费</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消费线程模型"><span class="toc-number">1.7.</span> <span class="toc-text">设计原理 - 消费线程模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消息ACK"><span class="toc-number">1.8.</span> <span class="toc-text">设计原理 - 消息ACK</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-Broker-HA"><span class="toc-number">1.9.</span> <span class="toc-text">设计原理 - Broker HA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他特性"><span class="toc-number">1.10.</span> <span class="toc-text">其他特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#常见问题"><span class="toc-number">1.11.</span> <span class="toc-text">常见问题</span></a></li></ol></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#RocketMQ"><span class="toc-number">1.</span> <span class="toc-text">RocketMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#简介"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#为什么RocetMQ"><span class="toc-number">1.2.</span> <span class="toc-text">为什么RocetMQ</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#特性"><span class="toc-number">1.3.</span> <span class="toc-text">特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#使用场景"><span class="toc-number">1.4.</span> <span class="toc-text">使用场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-总览"><span class="toc-number">1.5.</span> <span class="toc-text">设计原理 - 总览</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ物理部署结构"><span class="toc-number">1.5.1.</span> <span class="toc-text">RocketMQ物理部署结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ逻辑部署结构"><span class="toc-number">1.5.2.</span> <span class="toc-text">RocketMQ逻辑部署结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ数据存储结构"><span class="toc-number">1.5.3.</span> <span class="toc-text">RocketMQ数据存储结构</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-生产"><span class="toc-number">1.6.</span> <span class="toc-text">设计原理 - 生产</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消费"><span class="toc-number">1.7.</span> <span class="toc-text">设计原理 - 消费</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消费线程模型"><span class="toc-number">1.8.</span> <span class="toc-text">设计原理 - 消费线程模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-消息ACK"><span class="toc-number">1.9.</span> <span class="toc-text">设计原理 - 消息ACK</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设计原理-Broker-HA"><span class="toc-number">1.10.</span> <span class="toc-text">设计原理 - Broker HA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他特性"><span class="toc-number">1.11.</span> <span class="toc-text">其他特性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#常见问题"><span class="toc-number">1.12.</span> <span class="toc-text">常见问题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RocketMQ会丢消息吗？消息会重复消费么？"><span class="toc-number">1.12.1.</span> <span class="toc-text">RocketMQ会丢消息吗？消息会重复消费么？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Broker丢消息的场景："><span class="toc-number">1.12.1.1.</span> <span class="toc-text">Broker丢消息的场景：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#消息重复消费的场景："><span class="toc-number">1.12.1.2.</span> <span class="toc-text">消息重复消费的场景：</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#生产者发送失败会重试么？"><span class="toc-number">1.12.2.</span> <span class="toc-text">生产者发送失败会重试么？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#同步发送失败的场景"><span class="toc-number">1.12.2.1.</span> <span class="toc-text">同步发送失败的场景</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#异步发送失败的场景"><span class="toc-number">1.12.2.2.</span> <span class="toc-text">异步发送失败的场景</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#消费者Pull-Consume失败会重试么"><span class="toc-number">1.12.3.</span> <span class="toc-text">消费者Pull/Consume失败会重试么</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Pull失败的场景"><span class="toc-number">1.12.3.1.</span> <span class="toc-text">Pull失败的场景</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Consume失败的场景"><span class="toc-number">1.12.3.2.</span> <span class="toc-text">Consume失败的场景</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#消费者从哪里开始消费"><span class="toc-number">1.12.4.</span> <span class="toc-text">消费者从哪里开始消费</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#InsyanceName是什么？什么时候需要设置？"><span class="toc-number">1.12.5.</span> <span class="toc-text">InsyanceName是什么？什么时候需要设置？</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#比较选型"><span class="toc-number">1.13.</span> <span class="toc-text">比较选型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#相比ActiveMQ"><span class="toc-number">1.13.1.</span> <span class="toc-text">相比ActiveMQ</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#RocketMQ-vs-ActiveMQ-vs-Kafka"><span class="toc-number">1.14.</span> <span class="toc-text">RocketMQ vs. ActiveMQ vs. Kafka</span></a></li></ol></li></ol>
                     </div>
                 </span>
             </div>
@@ -641,15 +774,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">数据库</a>
+                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -657,11 +786,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
+                <a href="javascript:void(0)" class="js-tag color4">数据库</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">消息队列</a>
+                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -673,6 +802,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">消息队列</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JVM</a>
               </li>
              
@@ -681,11 +814,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Zookeeper</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Zookeeper</a>
+                <a href="javascript:void(0)" class="js-tag color2">锁</a>
               </li>
              
               <li class="article-tag-list-item">

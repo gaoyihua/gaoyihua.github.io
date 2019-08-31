@@ -6,22 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>C编程工具 | Gary&#39;s Blog</title>
+  <title>锁 | Gary&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="1、编辑工具1.1、编辑工具介绍1、vi 2、vim 3、Emacs 4、Nano 5、Gedit 1.2、vi和vim程序编辑器  vim常用命令：    — —    :w 保持当前文件   :w filename 保持当前文件   :q 退出正在编辑的文件   :q! 强制退出   :wq 保存文件并退出   u 撤销最近一次操作，按Ctrl+R组合键恢复撤销的操作   i 在光标所在的位置">
-<meta name="keywords" content="Linux">
+  <meta name="description" content="Java锁体系 线程是否要锁住同步资源 锁住：悲观锁（如Synchronized） 不锁：乐观锁（如CAS）   锁住同步资源失败，线程是否阻塞 阻塞 不阻： 自旋锁 适应性自旋锁     多个线程竞争同步资源的流程细节有没有区别 不锁住资源，多个线程只有一个能修改资源成功，其他线程会重试：无锁 同一个线程执行同步资源时自动获取资源：偏向锁 多个线程竞争同步资源时，没有获取资源的线程自选等待锁释放">
+<meta name="keywords" content="锁">
 <meta property="og:type" content="article">
-<meta property="og:title" content="C编程工具">
-<meta property="og:url" content="http://yoursite.com/2019/07/19/C编程工具/index.html">
+<meta property="og:title" content="锁">
+<meta property="og:url" content="http://yoursite.com/2019/08/31/锁/index.html">
 <meta property="og:site_name" content="Gary&#39;s Blog">
-<meta property="og:description" content="1、编辑工具1.1、编辑工具介绍1、vi 2、vim 3、Emacs 4、Nano 5、Gedit 1.2、vi和vim程序编辑器  vim常用命令：    — —    :w 保持当前文件   :w filename 保持当前文件   :q 退出正在编辑的文件   :q! 强制退出   :wq 保存文件并退出   u 撤销最近一次操作，按Ctrl+R组合键恢复撤销的操作   i 在光标所在的位置">
+<meta property="og:description" content="Java锁体系 线程是否要锁住同步资源 锁住：悲观锁（如Synchronized） 不锁：乐观锁（如CAS）   锁住同步资源失败，线程是否阻塞 阻塞 不阻： 自旋锁 适应性自旋锁     多个线程竞争同步资源的流程细节有没有区别 不锁住资源，多个线程只有一个能修改资源成功，其他线程会重试：无锁 同一个线程执行同步资源时自动获取资源：偏向锁 多个线程竞争同步资源时，没有获取资源的线程自选等待锁释放">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://yoursite.com/2019/07/19/C编程工具/1562394352786.png">
-<meta property="og:updated_time" content="2019-07-19T15:00:48.366Z">
+<meta property="og:image" content="http://yoursite.com/2019/08/31/锁/AQS.png">
+<meta property="og:updated_time" content="2019-08-31T15:16:11.229Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="C编程工具">
-<meta name="twitter:description" content="1、编辑工具1.1、编辑工具介绍1、vi 2、vim 3、Emacs 4、Nano 5、Gedit 1.2、vi和vim程序编辑器  vim常用命令：    — —    :w 保持当前文件   :w filename 保持当前文件   :q 退出正在编辑的文件   :q! 强制退出   :wq 保存文件并退出   u 撤销最近一次操作，按Ctrl+R组合键恢复撤销的操作   i 在光标所在的位置">
-<meta name="twitter:image" content="http://yoursite.com/2019/07/19/C编程工具/1562394352786.png">
+<meta name="twitter:title" content="锁">
+<meta name="twitter:description" content="Java锁体系 线程是否要锁住同步资源 锁住：悲观锁（如Synchronized） 不锁：乐观锁（如CAS）   锁住同步资源失败，线程是否阻塞 阻塞 不阻： 自旋锁 适应性自旋锁     多个线程竞争同步资源的流程细节有没有区别 不锁住资源，多个线程只有一个能修改资源成功，其他线程会重试：无锁 同一个线程执行同步资源时自动获取资源：偏向锁 多个线程竞争同步资源时，没有获取资源的线程自选等待锁释放">
+<meta name="twitter:image" content="http://yoursite.com/2019/08/31/锁/AQS.png">
   
     <link rel="alternative" href="/atom.xml" title="Gary&#39;s Blog" type="application/atom+xml">
   
@@ -157,165 +157,142 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-C编程工具" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-锁" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      C编程工具
+      锁
     </h1>
   
 
         
-        <a href="/2019/07/19/C编程工具/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:56:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
+        <a href="/2019/08/31/锁/" class="archive-article-date">
+  	<time datetime="2019-08-31T15:11:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-31</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="1、编辑工具"><a href="#1、编辑工具" class="headerlink" title="1、编辑工具"></a>1、编辑工具</h2><h3 id="1-1、编辑工具介绍"><a href="#1-1、编辑工具介绍" class="headerlink" title="1.1、编辑工具介绍"></a>1.1、编辑工具介绍</h3><p>1、vi</p>
-<p>2、vim</p>
-<p>3、Emacs</p>
-<p>4、Nano</p>
-<p>5、Gedit</p>
-<h3 id="1-2、vi和vim程序编辑器"><a href="#1-2、vi和vim程序编辑器" class="headerlink" title="1.2、vi和vim程序编辑器"></a>1.2、vi和vim程序编辑器</h3><img src="/2019/07/19/C编程工具/1562394352786.png" title="This is an example image">
+        <h1 id="Java锁体系"><a href="#Java锁体系" class="headerlink" title="Java锁体系"></a>Java锁体系</h1><ul>
+<li>线程是否要锁住同步资源<ul>
+<li>锁住：悲观锁（如Synchronized）</li>
+<li>不锁：乐观锁（如CAS）</li>
+</ul>
+</li>
+<li>锁住同步资源失败，线程是否阻塞<ul>
+<li>阻塞</li>
+<li>不阻：<ul>
+<li>自旋锁</li>
+<li>适应性自旋锁</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>多个线程竞争同步资源的流程细节有没有区别<ul>
+<li>不锁住资源，多个线程只有一个能修改资源成功，其他线程会重试：无锁</li>
+<li>同一个线程执行同步资源时自动获取资源：偏向锁</li>
+<li>多个线程竞争同步资源时，没有获取资源的线程自选等待锁释放：轻量级锁</li>
+<li>多个线程竞争同步资源时，没有获取资源的线程阻塞等待唤醒：重量级锁</li>
+</ul>
+</li>
+<li>多个线程竞争锁时是否要排队<ul>
+<li>排队：公平锁</li>
+<li>先尝试插队，插队失败再排队：非公平锁</li>
+</ul>
+</li>
+<li>一个线程多个流程能不能获取同一把锁<ul>
+<li>能：可重入锁</li>
+<li>不能：非可重入锁</li>
+</ul>
+</li>
+<li>多个线程能不能共享一把锁<ul>
+<li>能：共享锁</li>
+<li>不能：排他锁</li>
+</ul>
+</li>
+</ul>
+<h2 id="悲观锁和乐观锁"><a href="#悲观锁和乐观锁" class="headerlink" title="悲观锁和乐观锁"></a>悲观锁和乐观锁</h2><p>实际上是一种广义的概念，体现的是看待线程同步的不同角度</p>
+<ul>
+<li>悲观锁<ul>
+<li>认为自己使用数据的时候一定有别的线程来修改数据，再获取数据时候会先加锁，确保数据不会被别的线程修改</li>
+<li>锁实现：关键字synchronized、接口Lock的实现类</li>
+<li>适用场景：写操作较多，先加锁可以保证写操作时数据正确</li>
+</ul>
+</li>
+<li>乐观锁<ul>
+<li>认为自己使用数据时不会有别的线程修改数据，所以不会添加锁，只是在更新数据的时候去判断之前有没有别的线程更新了这个数据</li>
+<li>锁实现：CAS算法，例如AtomicInteger类的原子自增是通过<strong><em>CAS自旋</em></strong>实现</li>
+<li>适用场景：读操作较多，不加锁的特点能够使其读操作的性能提高。</li>
+</ul>
+</li>
+</ul>
+<h2 id="CAS算法"><a href="#CAS算法" class="headerlink" title="CAS算法"></a>CAS算法</h2><p>Compare And Swap</p>
+<p>基于硬件原语实现，在<strong><em>不使用锁</em></strong>（没有线程被阻塞）的情况下实现多线程之间的变量同步</p>
+<p>三个操作数：</p>
+<ul>
+<li>需要读写的内存值V</li>
+<li>进行比较的值A</li>
+<li>要写入的新值B</li>
+</ul>
+<p>示例：AtomicInteger中的getAndAdd(int delta)方法实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getAndAddInt</span><span class="params">(Object var1, <span class="keyword">long</span> var2, <span class="keyword">int</span> var4)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> var5;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        var5 = <span class="keyword">this</span>.getIntVolatile(var1, var2);</span><br><span class="line">    &#125; <span class="keyword">while</span>(!<span class="keyword">this</span>.compareAndSwapInt(var1, var2, var5, var5 + var4));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> var5;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>vim常用命令：</p>
-<table>
-<thead>
-<tr>
-<th>—</th>
-<th>—</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>:w</td>
-<td>保持当前文件</td>
-</tr>
-<tr>
-<td>:w filename</td>
-<td>保持当前文件</td>
-</tr>
-<tr>
-<td>:q</td>
-<td>退出正在编辑的文件</td>
-</tr>
-<tr>
-<td>:q!</td>
-<td>强制退出</td>
-</tr>
-<tr>
-<td>:wq</td>
-<td>保存文件并退出</td>
-</tr>
-<tr>
-<td>u</td>
-<td>撤销最近一次操作，按Ctrl+R组合键恢复撤销的操作</td>
-</tr>
-<tr>
-<td>i</td>
-<td>在光标所在的位置前插入字符</td>
-</tr>
-<tr>
-<td>a</td>
-<td>后插入</td>
-</tr>
-<tr>
-<td>o</td>
-<td>在光标所在行的下一行插入新的一行</td>
-</tr>
-<tr>
-<td>O</td>
-<td>上一行插入</td>
-</tr>
-<tr>
-<td>x</td>
-<td>剪贴光标处所在的字符（x前可先按一个数字，则剪切若干个字符）</td>
-</tr>
-<tr>
-<td>dd</td>
-<td>剪贴光标出所在的一行（dd前可先按一个数字，则剪贴若干行）</td>
-</tr>
-<tr>
-<td>yy</td>
-<td>复制光标处所在的一行（yy前~）</td>
-</tr>
-<tr>
-<td>d$</td>
-<td>剪贴光标处（含）开始到行末的所有字符</td>
-</tr>
-<tr>
-<td>d^</td>
-<td>剪贴光标处（不含）开始到行首的所有字符</td>
-</tr>
-<tr>
-<td>y$</td>
-<td>复制光标处（含）开始到行末的所有字符</td>
-</tr>
-<tr>
-<td>y^</td>
-<td>复制光标处（不含）开始到行首的所有字符</td>
-</tr>
-<tr>
-<td>p</td>
-<td>将剪贴板中的资料粘贴到光标所在处</td>
-</tr>
-<tr>
-<td>r</td>
-<td>修改光标所在的字符，r之后跟要修改的字符</td>
-</tr>
-<tr>
-<td>h</td>
-<td>将光标向前移动一个字符</td>
-</tr>
-<tr>
-<td>j</td>
-<td>将光标向下移动一个字符</td>
-</tr>
-<tr>
-<td>k</td>
-<td>将光标向上移动一个字符</td>
-</tr>
-<tr>
-<td>l</td>
-<td>向后~</td>
-</tr>
-<tr>
-<td>gg</td>
-<td>跳到文本的最初一行</td>
-</tr>
-<tr>
-<td>G</td>
-<td>跳到文本的最末一行</td>
-</tr>
-<tr>
-<td>Ctrl+U</td>
-<td>向上up翻页</td>
-</tr>
-<tr>
-<td>Ctrl+D</td>
-<td>向下down翻页</td>
-</tr>
-<tr>
-<td>:%s/old/new</td>
-<td>将文件中所有的old字符串替换成new</td>
-</tr>
-<tr>
-<td>/string</td>
-<td>将光标处往下查找字符串string，输入完药查找的字符串后按回车键，n跳到下一个，N上一个</td>
-</tr>
-<tr>
-<td>?string</td>
-<td>跟上面的是一样的，区别是它从光标出往上查找</td>
-</tr>
-</tbody></table>
-<h2 id="2、gcc编译器"><a href="#2、gcc编译器" class="headerlink" title="2、gcc编译器"></a>2、gcc编译器</h2><p>//TODO</p>
-<h2 id="3、gdb调试器"><a href="#3、gdb调试器" class="headerlink" title="3、gdb调试器"></a>3、gdb调试器</h2><p>//TODO</p>
-<h2 id="4、make和Makefile"><a href="#4、make和Makefile" class="headerlink" title="4、make和Makefile"></a>4、make和Makefile</h2>
+<p>减少线程阻塞而带来的线程上下文切换的问题 </p>
+<p>问题：</p>
+<ul>
+<li>ABA问题：内存中的值有0变1，1变0，认为没有发现变化为更新值。<ul>
+<li>解决：AtomicStampedReference在变量前添加版本号，每次遍历更新时候都会把版本号加1。</li>
+</ul>
+</li>
+<li>循环时间长开销大（自旋-线程一直占用着CPU资源）</li>
+<li>只能保证一个共享变量的原子操作<ul>
+<li>解决：AtomicReference类来保证引用对象直接的原子性，可以把多个变量放在一个对象里来进行CAS操作</li>
+</ul>
+</li>
+</ul>
+<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>自旋锁：会有一定的自旋次数</p>
+<p>适应性自旋：根据前一次自旋的次数判断下次获取锁的概率多大，自适应的调整自适应的次数。</p>
+<p>当一个线程在获取锁的时候，如果锁已经被其他线程获取，那么该线程将<strong><em>循环</em></strong>等待，然后不断的判断锁是否能够被成功获取，自旋直到获取到锁才会退出循环</p>
+<ul>
+<li>阻塞与唤醒线程需要操作系统切换CPU状态，需要消耗一定时间</li>
+<li>同步代码块逻辑简单，执行时间很短</li>
+</ul>
+<p><strong><em>自旋</em></strong>不会放弃CPU时间片，直到获取到锁</p>
+<p><strong><em>非自旋</em></strong>则CPU会切换状态，使当前线程休眠(阻塞)，之后再恢复（唤醒），再次尝试获取锁</p>
+<p>线程阻塞跟唤醒的过程会涉及到CPU的上下文切换</p>
+<h2 id="AQS同步器"><a href="#AQS同步器" class="headerlink" title="AQS同步器"></a>AQS同步器</h2><p>示例：</p>
+<p>ReentrantLock中的公平锁即FairSync继承了Sync，Sync继承了AQS。</p>
+<img src="/2019/08/31/锁/AQS.png" title="This is an example image">
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ReentrantLock中的lock</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      sync.lock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//FairSync中的lock</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      acquire(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//AQS中的acquire，尝试获取锁，失败后排队（同步队列）</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">void</span> <span class="title">acquire</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (!tryAcquire(arg) &amp;&amp;</span><br><span class="line">            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br><span class="line">            selfInterrupt();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//FairSync中的tryQcquire</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryAcquire</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">final</span> Thread current = Thread.currentThread();</span><br><span class="line">            <span class="keyword">int</span> c = getState();</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">//状态为0，通过CAS算法进行上锁，成功则设置独占线程为当前线程</span></span><br><span class="line">                <span class="keyword">if</span> (!hasQueuedPredecessors() &amp;&amp;</span><br><span class="line">                    compareAndSetState(<span class="number">0</span>, acquires)) &#123;</span><br><span class="line">                    setExclusiveOwnerThread(current);</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    		<span class="comment">//状态不为0，但是是同一个线程。由于可重入，所以允许进入，state+1</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (current == getExclusiveOwnerThread()) &#123;</span><br><span class="line">                <span class="keyword">int</span> nextc = c + acquires;</span><br><span class="line">                <span class="keyword">if</span> (nextc &lt; <span class="number">0</span>)</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Maximum lock count exceeded"</span>);</span><br><span class="line">                setState(nextc);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//AQS中</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Node <span class="title">addWaiter</span><span class="params">(Node mode)</span> </span>&#123;</span><br><span class="line">        Node node = <span class="keyword">new</span> Node(Thread.currentThread(), mode);</span><br><span class="line">        <span class="comment">// Try the fast path of enq; backup to full enq on failure</span></span><br><span class="line">        Node pred = tail;</span><br><span class="line">    	<span class="comment">//取tail</span></span><br><span class="line">        <span class="keyword">if</span> (pred != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">//node的前一个=tail</span></span><br><span class="line">            node.prev = pred;</span><br><span class="line">            <span class="comment">//CAS设置node为新的tail</span></span><br><span class="line">            <span class="keyword">if</span> (compareAndSetTail(pred, node)) &#123;</span><br><span class="line">                <span class="comment">//成功设置后将原来的tail的next设置为当前的node（tail）</span></span><br><span class="line">                pred.next = node;</span><br><span class="line">                <span class="keyword">return</span> node;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        enq(node);</span><br><span class="line">        <span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//AQS中 状态既不为0也不是同一个线程，则请求加入队列</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">acquireQueued</span><span class="params">(<span class="keyword">final</span> Node node, <span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> failed = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">boolean</span> interrupted = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">                <span class="comment">//取得该结点的前一个结点，若是head，则去请求获取锁</span></span><br><span class="line">                <span class="keyword">final</span> Node p = node.predecessor();</span><br><span class="line">                <span class="keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;</span><br><span class="line">                    setHead(node);</span><br><span class="line">                    p.next = <span class="keyword">null</span>; <span class="comment">// help GC</span></span><br><span class="line">                    failed = <span class="keyword">false</span>;</span><br><span class="line">                    <span class="keyword">return</span> interrupted;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp;</span><br><span class="line">                    parkAndCheckInterrupt())</span><br><span class="line">                    interrupted = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (failed)</span><br><span class="line">                cancelAcquire(node);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h2><h3 id="1、使用"><a href="#1、使用" class="headerlink" title="1、使用"></a>1、使用</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ReadWriteLock</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns the lock used for reading.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the lock used for reading</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">Lock <span class="title">readLock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns the lock used for writing.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the lock used for writing</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">Lock <span class="title">writeLock</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Can the write lock be downgraded to a read lock without allowing an intervening writer? Can a read lock be upgraded to a write lock,in preference to other waiting readers or writers?</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//        同一个线程中，在没有释放读锁的的情况下，就去申请写锁，会产生死锁，这属于锁升级，</span></span><br><span class="line">        ReentrantReadWriteLock reentrantReadWriteLock = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line">        reentrantReadWriteLock.readLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get readLock."</span>);</span><br><span class="line">        reentrantReadWriteLock.writeLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"blocking"</span>);<span class="comment">//no</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//        写锁降级成读锁，不会死锁，这属于锁降级。</span></span><br><span class="line">        ReentrantReadWriteLock reentrantReadWriteLock = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line">        reentrantReadWriteLock.writeLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get writeLock."</span>);</span><br><span class="line">        reentrantReadWriteLock.readLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get readLock."</span>);<span class="comment">//ok</span></span><br><span class="line"><span class="comment">//        可重入</span></span><br><span class="line">        ReentrantReadWriteLock reentrantReadWriteLock = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line">        reentrantReadWriteLock.writeLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get writeLock."</span>);</span><br><span class="line">        reentrantReadWriteLock.writeLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get writeLock."</span>);<span class="comment">//ok</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>ReetrantReadWriteLock读写锁的实现中，读锁使用共享模式（多个线程可同时拥有），写锁使用独占模式</li>
+<li>当有读锁时，写锁不能获得（锁升级）</li>
+<li>当有写锁时，除了写锁这个线程可以获得读锁（锁降级）、写锁（可重入），其他线程不能获得读锁、写锁。</li>
+</ul>
+<h3 id="2、源码解析"><a href="#2、源码解析" class="headerlink" title="2、源码解析"></a>2、源码解析</h3>
       
 
       
@@ -349,7 +326,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">锁</a>
         		</li>
       		
 		</ul>
@@ -405,7 +382,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/07/19/C编程工具/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/08/31/锁/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -419,18 +396,9 @@
   
 <nav id="article-nav">
   
-    <a href="/2019/07/19/Linux基础知识/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          Linux基础知识
-        
-      </div>
-    </a>
   
-  
-    <a href="/2019/07/19/RocketMQ/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">RocketMQ</div>
+    <a href="/2019/07/19/文件和目录管理/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">文件和目录管理</div>
       <i class="icon-circle-right"></i>
     </a>
   
@@ -457,7 +425,7 @@
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1、编辑工具"><span class="toc-number">1.</span> <span class="toc-text">1、编辑工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-1、编辑工具介绍"><span class="toc-number">1.1.</span> <span class="toc-text">1.1、编辑工具介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#1-2、vi和vim程序编辑器"><span class="toc-number">1.2.</span> <span class="toc-text">1.2、vi和vim程序编辑器</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2、gcc编译器"><span class="toc-number">2.</span> <span class="toc-text">2、gcc编译器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3、gdb调试器"><span class="toc-number">3.</span> <span class="toc-text">3、gdb调试器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4、make和Makefile"><span class="toc-number">4.</span> <span class="toc-text">4、make和Makefile</span></a></li></ol>
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java锁体系"><span class="toc-number">1.</span> <span class="toc-text">Java锁体系</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#悲观锁和乐观锁"><span class="toc-number">1.1.</span> <span class="toc-text">悲观锁和乐观锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CAS算法"><span class="toc-number">1.2.</span> <span class="toc-text">CAS算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自旋锁"><span class="toc-number">1.3.</span> <span class="toc-text">自旋锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AQS同步器"><span class="toc-number">1.4.</span> <span class="toc-text">AQS同步器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#读写锁"><span class="toc-number">1.5.</span> <span class="toc-text">读写锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、使用"><span class="toc-number">1.5.1.</span> <span class="toc-text">1、使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、源码解析"><span class="toc-number">1.5.2.</span> <span class="toc-text">2、源码解析</span></a></li></ol></li></ol></li></ol>
                     </div>
                 </span>
             </div>

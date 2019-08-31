@@ -155,6 +155,194 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-锁" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/31/锁/">锁</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/31/锁/" class="archive-article-date">
+  	<time datetime="2019-08-31T15:11:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-31</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Java锁体系"><a href="#Java锁体系" class="headerlink" title="Java锁体系"></a>Java锁体系</h1><ul>
+<li>线程是否要锁住同步资源<ul>
+<li>锁住：悲观锁（如Synchronized）</li>
+<li>不锁：乐观锁（如CAS）</li>
+</ul>
+</li>
+<li>锁住同步资源失败，线程是否阻塞<ul>
+<li>阻塞</li>
+<li>不阻：<ul>
+<li>自旋锁</li>
+<li>适应性自旋锁</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>多个线程竞争同步资源的流程细节有没有区别<ul>
+<li>不锁住资源，多个线程只有一个能修改资源成功，其他线程会重试：无锁</li>
+<li>同一个线程执行同步资源时自动获取资源：偏向锁</li>
+<li>多个线程竞争同步资源时，没有获取资源的线程自选等待锁释放：轻量级锁</li>
+<li>多个线程竞争同步资源时，没有获取资源的线程阻塞等待唤醒：重量级锁</li>
+</ul>
+</li>
+<li>多个线程竞争锁时是否要排队<ul>
+<li>排队：公平锁</li>
+<li>先尝试插队，插队失败再排队：非公平锁</li>
+</ul>
+</li>
+<li>一个线程多个流程能不能获取同一把锁<ul>
+<li>能：可重入锁</li>
+<li>不能：非可重入锁</li>
+</ul>
+</li>
+<li>多个线程能不能共享一把锁<ul>
+<li>能：共享锁</li>
+<li>不能：排他锁</li>
+</ul>
+</li>
+</ul>
+<h2 id="悲观锁和乐观锁"><a href="#悲观锁和乐观锁" class="headerlink" title="悲观锁和乐观锁"></a>悲观锁和乐观锁</h2><p>实际上是一种广义的概念，体现的是看待线程同步的不同角度</p>
+<ul>
+<li>悲观锁<ul>
+<li>认为自己使用数据的时候一定有别的线程来修改数据，再获取数据时候会先加锁，确保数据不会被别的线程修改</li>
+<li>锁实现：关键字synchronized、接口Lock的实现类</li>
+<li>适用场景：写操作较多，先加锁可以保证写操作时数据正确</li>
+</ul>
+</li>
+<li>乐观锁<ul>
+<li>认为自己使用数据时不会有别的线程修改数据，所以不会添加锁，只是在更新数据的时候去判断之前有没有别的线程更新了这个数据</li>
+<li>锁实现：CAS算法，例如AtomicInteger类的原子自增是通过<strong><em>CAS自旋</em></strong>实现</li>
+<li>适用场景：读操作较多，不加锁的特点能够使其读操作的性能提高。</li>
+</ul>
+</li>
+</ul>
+<h2 id="CAS算法"><a href="#CAS算法" class="headerlink" title="CAS算法"></a>CAS算法</h2><p>Compare And Swap</p>
+<p>基于硬件原语实现，在<strong><em>不使用锁</em></strong>（没有线程被阻塞）的情况下实现多线程之间的变量同步</p>
+<p>三个操作数：</p>
+<ul>
+<li>需要读写的内存值V</li>
+<li>进行比较的值A</li>
+<li>要写入的新值B</li>
+</ul>
+<p>示例：AtomicInteger中的getAndAdd(int delta)方法实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getAndAddInt</span><span class="params">(Object var1, <span class="keyword">long</span> var2, <span class="keyword">int</span> var4)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> var5;</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        var5 = <span class="keyword">this</span>.getIntVolatile(var1, var2);</span><br><span class="line">    &#125; <span class="keyword">while</span>(!<span class="keyword">this</span>.compareAndSwapInt(var1, var2, var5, var5 + var4));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> var5;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>减少线程阻塞而带来的线程上下文切换的问题 </p>
+<p>问题：</p>
+<ul>
+<li>ABA问题：内存中的值有0变1，1变0，认为没有发现变化为更新值。<ul>
+<li>解决：AtomicStampedReference在变量前添加版本号，每次遍历更新时候都会把版本号加1。</li>
+</ul>
+</li>
+<li>循环时间长开销大（自旋-线程一直占用着CPU资源）</li>
+<li>只能保证一个共享变量的原子操作<ul>
+<li>解决：AtomicReference类来保证引用对象直接的原子性，可以把多个变量放在一个对象里来进行CAS操作</li>
+</ul>
+</li>
+</ul>
+<h2 id="自旋锁"><a href="#自旋锁" class="headerlink" title="自旋锁"></a>自旋锁</h2><p>自旋锁：会有一定的自旋次数</p>
+<p>适应性自旋：根据前一次自旋的次数判断下次获取锁的概率多大，自适应的调整自适应的次数。</p>
+<p>当一个线程在获取锁的时候，如果锁已经被其他线程获取，那么该线程将<strong><em>循环</em></strong>等待，然后不断的判断锁是否能够被成功获取，自旋直到获取到锁才会退出循环</p>
+<ul>
+<li>阻塞与唤醒线程需要操作系统切换CPU状态，需要消耗一定时间</li>
+<li>同步代码块逻辑简单，执行时间很短</li>
+</ul>
+<p><strong><em>自旋</em></strong>不会放弃CPU时间片，直到获取到锁</p>
+<p><strong><em>非自旋</em></strong>则CPU会切换状态，使当前线程休眠(阻塞)，之后再恢复（唤醒），再次尝试获取锁</p>
+<p>线程阻塞跟唤醒的过程会涉及到CPU的上下文切换</p>
+<h2 id="AQS同步器"><a href="#AQS同步器" class="headerlink" title="AQS同步器"></a>AQS同步器</h2><p>示例：</p>
+<p>ReentrantLock中的公平锁即FairSync继承了Sync，Sync继承了AQS。</p>
+<img src="/2019/08/31/锁/AQS.png" title="This is an example image">
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ReentrantLock中的lock</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      sync.lock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//FairSync中的lock</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      acquire(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//AQS中的acquire，尝试获取锁，失败后排队（同步队列）</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">void</span> <span class="title">acquire</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (!tryAcquire(arg) &amp;&amp;</span><br><span class="line">            acquireQueued(addWaiter(Node.EXCLUSIVE), arg))</span><br><span class="line">            selfInterrupt();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//FairSync中的tryQcquire</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">tryAcquire</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">final</span> Thread current = Thread.currentThread();</span><br><span class="line">            <span class="keyword">int</span> c = getState();</span><br><span class="line">            <span class="keyword">if</span> (c == <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="comment">//状态为0，通过CAS算法进行上锁，成功则设置独占线程为当前线程</span></span><br><span class="line">                <span class="keyword">if</span> (!hasQueuedPredecessors() &amp;&amp;</span><br><span class="line">                    compareAndSetState(<span class="number">0</span>, acquires)) &#123;</span><br><span class="line">                    setExclusiveOwnerThread(current);</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">    		<span class="comment">//状态不为0，但是是同一个线程。由于可重入，所以允许进入，state+1</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (current == getExclusiveOwnerThread()) &#123;</span><br><span class="line">                <span class="keyword">int</span> nextc = c + acquires;</span><br><span class="line">                <span class="keyword">if</span> (nextc &lt; <span class="number">0</span>)</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> Error(<span class="string">"Maximum lock count exceeded"</span>);</span><br><span class="line">                setState(nextc);</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//AQS中</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Node <span class="title">addWaiter</span><span class="params">(Node mode)</span> </span>&#123;</span><br><span class="line">        Node node = <span class="keyword">new</span> Node(Thread.currentThread(), mode);</span><br><span class="line">        <span class="comment">// Try the fast path of enq; backup to full enq on failure</span></span><br><span class="line">        Node pred = tail;</span><br><span class="line">    	<span class="comment">//取tail</span></span><br><span class="line">        <span class="keyword">if</span> (pred != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">//node的前一个=tail</span></span><br><span class="line">            node.prev = pred;</span><br><span class="line">            <span class="comment">//CAS设置node为新的tail</span></span><br><span class="line">            <span class="keyword">if</span> (compareAndSetTail(pred, node)) &#123;</span><br><span class="line">                <span class="comment">//成功设置后将原来的tail的next设置为当前的node（tail）</span></span><br><span class="line">                pred.next = node;</span><br><span class="line">                <span class="keyword">return</span> node;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        enq(node);</span><br><span class="line">        <span class="keyword">return</span> node;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//AQS中 状态既不为0也不是同一个线程，则请求加入队列</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">boolean</span> <span class="title">acquireQueued</span><span class="params">(<span class="keyword">final</span> Node node, <span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> failed = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">boolean</span> interrupted = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">                <span class="comment">//取得该结点的前一个结点，若是head，则去请求获取锁</span></span><br><span class="line">                <span class="keyword">final</span> Node p = node.predecessor();</span><br><span class="line">                <span class="keyword">if</span> (p == head &amp;&amp; tryAcquire(arg)) &#123;</span><br><span class="line">                    setHead(node);</span><br><span class="line">                    p.next = <span class="keyword">null</span>; <span class="comment">// help GC</span></span><br><span class="line">                    failed = <span class="keyword">false</span>;</span><br><span class="line">                    <span class="keyword">return</span> interrupted;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (shouldParkAfterFailedAcquire(p, node) &amp;&amp;</span><br><span class="line">                    parkAndCheckInterrupt())</span><br><span class="line">                    interrupted = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (failed)</span><br><span class="line">                cancelAcquire(node);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="读写锁"><a href="#读写锁" class="headerlink" title="读写锁"></a>读写锁</h2><h3 id="1、使用"><a href="#1、使用" class="headerlink" title="1、使用"></a>1、使用</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ReadWriteLock</span> </span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns the lock used for reading.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the lock used for reading</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">Lock <span class="title">readLock</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Returns the lock used for writing.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> the lock used for writing</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function">Lock <span class="title">writeLock</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Can the write lock be downgraded to a read lock without allowing an intervening writer? Can a read lock be upgraded to a write lock,in preference to other waiting readers or writers?</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//        同一个线程中，在没有释放读锁的的情况下，就去申请写锁，会产生死锁，这属于锁升级，</span></span><br><span class="line">        ReentrantReadWriteLock reentrantReadWriteLock = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line">        reentrantReadWriteLock.readLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get readLock."</span>);</span><br><span class="line">        reentrantReadWriteLock.writeLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"blocking"</span>);<span class="comment">//no</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//        写锁降级成读锁，不会死锁，这属于锁降级。</span></span><br><span class="line">        ReentrantReadWriteLock reentrantReadWriteLock = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line">        reentrantReadWriteLock.writeLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get writeLock."</span>);</span><br><span class="line">        reentrantReadWriteLock.readLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get readLock."</span>);<span class="comment">//ok</span></span><br><span class="line"><span class="comment">//        可重入</span></span><br><span class="line">        ReentrantReadWriteLock reentrantReadWriteLock = <span class="keyword">new</span> ReentrantReadWriteLock();</span><br><span class="line">        reentrantReadWriteLock.writeLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get writeLock."</span>);</span><br><span class="line">        reentrantReadWriteLock.writeLock().lock();</span><br><span class="line">        System.out.println(<span class="string">"get writeLock."</span>);<span class="comment">//ok</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>ReetrantReadWriteLock读写锁的实现中，读锁使用共享模式（多个线程可同时拥有），写锁使用独占模式</li>
+<li>当有读锁时，写锁不能获得（锁升级）</li>
+<li>当有写锁时，除了写锁这个线程可以获得读锁（锁降级）、写锁（可重入），其他线程不能获得读锁、写锁。</li>
+</ul>
+<h3 id="2、源码解析"><a href="#2、源码解析" class="headerlink" title="2、源码解析"></a>2、源码解析</h3>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">锁</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/31/锁/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-文件和目录管理" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1100,433 +1288,6 @@
 
 
   
-    <article id="post-JavaSPI机制的优点与缺点" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/JavaSPI机制的优点与缺点/">JavaSPI机制的优点与缺点</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/19/JavaSPI机制的优点与缺点/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h1 id="1-SPI是什么"><a href="#1-SPI是什么" class="headerlink" title="1 SPI是什么"></a>1 SPI是什么</h1><p>SPI全称Service Provider Interface，是Java提供的一套用来被第三方实现或者扩展的API，它可以用来启用框架扩展和替换组件。</p>
-<p>整体机制图如下： </p>
-<img src="/2019/07/19/JavaSPI机制的优点与缺点/spi机制.png" title="This is an example image">
-
-<p>Java SPI 实际上是“<strong>基于接口的编程＋策略模式＋配置文件</strong>”组合实现的动态加载机制。</p>
-<p>系统设计的各个抽象，往往有很多不同的实现方案，在面向的对象的设计里，一般推荐模块之间基于接口编程，模块之间不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可拔插的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候能不在程序里动态指明，这就需要一种服务发现机制。 Java SPI就是提供这样的一个机制：为某个接口寻找服务实现的机制。有点类似IOC的思想，就是将装配的控制权移到程序之外，在模块化设计中这个机制尤其重要。所以SPI的核心思想就是<strong>解耦</strong>。</p>
-<h1 id="2-使用场景"><a href="#2-使用场景" class="headerlink" title="2 使用场景"></a>2 使用场景</h1><p>概括地说，适用于：<strong>调用者根据实际使用需要，启用、扩展、或者替换框架的实现策略</strong></p>
-<p>比较常见的例子：</p>
-<ul>
-<li>数据库驱动加载接口实现类的加载 JDBC加载不同类型数据库的驱动</li>
-<li>日志门面接口实现类加载 SLF4J加载不同提供商的日志实现类</li>
-<li>Spring Spring中大量使用了SPI,比如：对servlet3.0规范对ServletContainerInitializer的实现、自动类型转换Type Conversion SPI(Converter SPI、Formatter SPI)等</li>
-<li>Dubbo Dubbo中也大量使用SPI的方式实现框架的扩展, 不过它对Java提供的原生SPI做了封装，允许用户扩展实现Filter接口</li>
-</ul>
-<h1 id="3-使用介绍"><a href="#3-使用介绍" class="headerlink" title="3 使用介绍"></a>3 使用介绍</h1><p>要使用Java SPI，需要遵循如下约定：</p>
-<ul>
-<li>1、当服务提供者提供了接口的一种具体实现后，在jar包的META-INF/services目录下创建一个以“接口全限定名”为命名的文件，内容为实现类的全限定名；</li>
-<li>2、接口实现类所在的jar包放在主程序的classpath中；</li>
-<li>3、主程序通过java.util.ServiceLoder动态装载实现模块，它通过扫描META-INF/services目录下的配置文件找到实现类的全限定名，把类加载到JVM；</li>
-<li>4、SPI的实现类必须携带一个不带参数的构造方法；</li>
-</ul>
-<h2 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h2><p><strong>步骤1</strong>、定义一组接口 (假设是org.foo.demo.IShout)，并写出接口的一个或多个实现，(假设是org.foo.demo.animal.Dog、org.foo.demo.animal.Cat)。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="keyword">implements</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"miao miao"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> <span class="keyword">implements</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"wang wang"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p><strong>步骤2</strong>、在 src/main/resources/ 下建立 /META-INF/services 目录， 新增一个以接口命名的文件 (org.foo.demo.IShout文件)，内容是要应用的实现类（这里是org.foo.demo.animal.Dog和org.foo.demo.animal.Cat，每行一个类）。</p>
-<p>文件位置</p>
-<figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-<span class="ruby"> src</span></span><br><span class="line"><span class="ruby">    -main</span></span><br><span class="line"><span class="ruby">        -resources</span></span><br><span class="line"><span class="ruby">            - META-INF</span></span><br><span class="line"><span class="ruby">                - services</span></span><br><span class="line"><span class="ruby">                    - org.foo.demo.IShout</span></span><br><span class="line"><span class="ruby">复制代码</span></span><br></pre></td></tr></table></figure>
-
-<p>文件内容</p>
-<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">org<span class="selector-class">.foo</span><span class="selector-class">.demo</span><span class="selector-class">.animal</span><span class="selector-class">.Dog</span></span><br><span class="line">org<span class="selector-class">.foo</span><span class="selector-class">.demo</span><span class="selector-class">.animal</span><span class="selector-class">.Cat</span></span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p><strong>步骤3</strong>、使用 ServiceLoader 来加载配置文件中指定的实现。</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SPIMain</span> &#123;</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] args) &#123;</span><br><span class="line">        ServiceLoader&lt;IShout&gt; shouts = ServiceLoader.load(IShout.<span class="keyword">class</span>);</span><br><span class="line">        <span class="keyword">for</span> (IShout <span class="string">s :</span> shouts) &#123;</span><br><span class="line">            s.shout();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>代码输出：</p>
-<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">wang</span> wang</span><br><span class="line"><span class="keyword">miao </span><span class="keyword">miao</span></span><br><span class="line"><span class="keyword">复制代码</span></span><br></pre></td></tr></table></figure>
-
-<h1 id="4-原理解析"><a href="#4-原理解析" class="headerlink" title="4 原理解析"></a>4 原理解析</h1><p>首先看ServiceLoader类的签名类的成员变量：</p>
-<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceLoader</span>&lt;<span class="title">S</span>&gt; <span class="keyword">implements</span> <span class="title">Iterable</span>&lt;<span class="title">S</span>&gt;</span>&#123;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PREFIX = <span class="string">"META-INF/services/"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 代表被加载的类或者接口</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;S&gt; service;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用于定位，加载和实例化providers的类加载器</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ClassLoader loader;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建ServiceLoader时采用的访问控制上下文</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AccessControlContext acc;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 缓存providers，按实例化的顺序排列</span></span><br><span class="line">    <span class="keyword">private</span> LinkedHashMap&lt;String,S&gt; providers = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 懒查找迭代器</span></span><br><span class="line">    <span class="keyword">private</span> LazyIterator lookupIterator;</span><br><span class="line">  </span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<p>参考具体ServiceLoader具体源码，代码量不多，加上注释一共587行，梳理了一下，实现的流程如下：</p>
-<ul>
-<li>1 应用程序调用ServiceLoader.load方法 ServiceLoader.load方法内先创建一个新的ServiceLoader，并实例化该类中的成员变量，包括：<ul>
-<li>loader(ClassLoader类型，类加载器)</li>
-<li>acc(AccessControlContext类型，访问控制器)</li>
-<li>providers(LinkedHashMap&lt;String,S&gt;类型，用于缓存加载成功的类)</li>
-<li>lookupIterator(实现迭代器功能)</li>
-</ul>
-</li>
-<li>2 应用程序通过迭代器接口获取对象实例 ServiceLoader先判断成员变量providers对象中(LinkedHashMap&lt;String,S&gt;类型)是否有缓存实例对象，如果有缓存，直接返回。 如果没有缓存，执行类的装载，实现如下：</li>
-<li>(1) 读取META-INF/services/下的配置文件，获得所有能被实例化的类的名称，值得注意的是，ServiceLoader<strong>可以跨越jar包获取META-INF下的配置文件</strong>，具体加载配置的实现代码如下：</li>
-</ul>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">        try &#123;</span><br><span class="line">            String fullName =<span class="built_in"> PREFIX </span>+ service.getName();</span><br><span class="line">            <span class="keyword">if</span> (loader == <span class="literal">null</span>)</span><br><span class="line">                configs = ClassLoader.getSystemResources(fullName);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                configs = loader.getResources(fullName);</span><br><span class="line">        &#125; catch (IOException x) &#123;</span><br><span class="line">            fail(service, <span class="string">"Error locating configuration files"</span>, x);</span><br><span class="line">        &#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>(2) 通过反射方法Class.forName()加载类对象，并用instance()方法将类实例化。</li>
-<li>(3) 把实例化后的类缓存到providers对象中，(LinkedHashMap&lt;String,S&gt;类型） 然后返回实例对象。</li>
-</ul>
-<h1 id="5-总结"><a href="#5-总结" class="headerlink" title="5 总结"></a>5 总结</h1><p><strong>优点</strong>： 使用Java SPI机制的优势是实现解耦，使得第三方服务模块的装配控制的逻辑与调用者的业务代码分离，而不是耦合在一起。应用程序可以根据实际业务情况启用框架扩展或替换框架组件。</p>
-<p><strong>缺点</strong>：</p>
-<ul>
-<li>虽然ServiceLoader也算是使用的延迟加载，但是基本只能通过遍历全部获取，也就是接口的实现类全部加载并实例化一遍。如果你并不想用某些实现类，它也被加载并实例化了，这就造成了浪费。获取某个实现类的方式不够灵活，只能通过Iterator形式获取，不能根据某个参数来获取对应的实现类。</li>
-<li>多个并发多线程使用ServiceLoader类的实例是不安全的。</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">SPI</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/JavaSPI机制的优点与缺点/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-Feed流系统设计" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/Feed流系统设计/">Feed流系统设计</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/19/Feed流系统设计/" class="archive-article-date">
-  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a><strong>简介</strong></h2><p>差不多十年前，随着功能机的淘汰和智能机的普及，互联网开始进入移动互联网时代，最具代表性的产品就是微博、微信，以及后来的今日头条、快手等。这些移动化联网时代的新产品在过去几年间借着智能手机的风高速成长。</p>
-<p>这些产品都是Feed流类型产品，由于Feed流一般是按照时间“从上往下流动”，非常适合在移动设备端浏览，最终这一类应用就脱颖而出，迅速抢占了上一代产品的市场空间。</p>
-<p>Feed流是Feed + 流，Feed的本意是饲料，Feed流的本意就是有人一直在往一个地方投递新鲜的饲料，如果需要饲料，只需要盯着投递点就可以了，这样就能源源不断获取到新鲜的饲料。在信息学里面，Feed其实是一个信息单元，比如一条朋友圈状态、一条微博、一条咨询或一条短视频等，所以Feed流就是不停更新的信息单元，只要关注某些发布者就能获取到源源不断的新鲜信息，我们的用户也就可以在移动设备上逐条去浏览这些信息单元。</p>
-<p>当前最流行的Feed流产品有微博、微信朋友圈、头条的资讯推荐、快手抖音的视频推荐等，还有一些变种，比如私信、通知等，这些系统都是Feed流系统，接下来我们会介绍如何设计一个Feed流系统架构。</p>
-<h2 id="Feed流系统特点"><a href="#Feed流系统特点" class="headerlink" title="Feed流系统特点"></a><strong>Feed流系统特点</strong></h2><p>Feed流本质上是一个数据流，是将 “N个发布者的信息单元” 通过 “关注关系” 传送给 “M个接收者”。</p>
-<img src="/2019/07/19/Feed流系统设计/关注-粉丝.png" title="This is an example image">
-
-<p>Feed流系统是一个数据流系统，所以我们核心要看数据。从数据层面看，数据分为三类，分别是：</p>
-<ul>
-<li>发布者的数据：发布者产生数据，然后数据需要按照发布者组织，需要根据发布者查到所有数据，比如微博的个人页面、朋友圈的个人相册等。</li>
-<li>关注关系：系统中个体间的关系，微博中是关注，是单向流，朋友圈是好友，是双向流。不管是单向还是双向，当发布者发布一条信息时，该条信息的流动永远是单向的。</li>
-<li>接收者的数据：从不同发布者那里获取到的数据，然后通过某种顺序（一般为时间）组织在一起，比如微博的首页、朋友圈首页等。这些数据具有时间热度属性，越新的数据越有价值，越新的数据就要排在最前面。</li>
-</ul>
-<p>针对这三类数据，我们可以有如下定义：</p>
-<ul>
-<li>存储库：存储发布者的数据，永久保存。</li>
-<li>关注表：用户关系表，永久保存。</li>
-<li>同步库：存储接收者的时间热度数据，只需要保留最近一段时间的数据即可。</li>
-</ul>
-<ul>
-<li><p>设计Feed流系统时最核心的是确定清楚产品层面的定义，需要考虑的因素包括：</p>
-</li>
-<li><p>产品用户规模：用户规模在十万、千万、十亿级时，设计难度和侧重点会不同。</p>
-</li>
-<li><p>关注关系（单向、双写）：如果是双向，那么就不会有大V，否则会有大V存在。<br>上述是选择数据存储系统最核心的几个考虑点，除此之外，还有一些需要考虑的：</p>
-</li>
-<li><p>如何实现Meta和Feed内容搜索？</p>
-<p>虽然Feed流系统本身可以不需要搜索，但是一个Feed流产品必须要有搜索，否则信息发现难度会加大，用户留存率会大幅下降。</p>
-</li>
-<li><p>Feed流的顺序是时间还是其他分数，比如个人的喜好程度？</p>
-<p>双向关系时由于关系很紧密，一定是按时间排序，就算一个关系很紧密的人发了一条空消息或者低价值消息，那我们也会需要关注了解的。</p>
-<p>单向关系时，那么可能就会存在大V，大V的粉丝数量理论极限就是整个系统的用户数，有一些产品会让所有用户都默认关注产品负责人，这种产品中，该负责人就是最大的大V，粉丝数就是用户规模。<br>接下来，我们看看整个Feed流系统如何设计。</p>
-</li>
-</ul>
-<h2 id="Feed流系统设计"><a href="#Feed流系统设计" class="headerlink" title="Feed流系统设计"></a><strong>Feed流系统设计</strong></h2><p>上一节，我们提前思考了Feed流系统的几个关键点，接下来，在这一节，我们自顶向下来设计一个Feed流系统。</p>
-<h3 id="1-产品定义"><a href="#1-产品定义" class="headerlink" title="1. 产品定义"></a><strong>1. 产品定义</strong></h3><p>第一步，我们首先需要定义产品，我们要做的产品是哪一种类型，常见的类型有：</p>
-<ul>
-<li>微博类</li>
-<li>朋友圈类</li>
-<li>抖音类</li>
-<li>私信类</li>
-</ul>
-<p>接着，再详细看一下这几类产品的异同：</p>
-
-
-<p>上述对比中，只对比各类产品最核心、或者最根本特点，其他次要的不考虑。比如微博中互相关注后就是双向关注了，但是这个不是微博的立命之本，只是补充，无法撼动根本。</p>
-<p>从上面表格可以看出来，主要分为两种区分：</p>
-<ul>
-<li><p>关注关系是单向还是双向：</p>
-<p>如果是单向，那么可能就会存在大V效应，同时时效性可以低一些，比如到分钟级别；</p>
-<p>如果是双向，那就是好友，好友的数量有限，那么就不会有大V，因为每个人的精力有限，他不可能主动加几千万的好友，这时候因为关系更精密，时效性要求会更高，需要都秒级别。</p>
-</li>
-<li><p>排序是时间还是推荐：</p>
-<p>用户对feed流最容易接受的就是时间，目前大部分都是时间。</p>
-<p>但是有一些场景，是从全网数据里面根据用户的喜好给用户推荐和用户喜好度最匹配的内容，这个时候就需要用推荐了，这种情况一般也会省略掉关注了，相对于关注了全网所有用户，比如抖音、头条等。<br>确定了产品类型后，还需要继续确定的是系统设计目标：需要支持的最大用户数是多少？十万、百万、千万还是亿？</p>
-</li>
-</ul>
-<p>用户数很少的时候，就比较简单，这里我们主要考虑 亿级用户 的情况，因为如果系统能支持亿级，那么其他量级也能支持。为了支持亿级规模的用户，主要子系统选型时需要考虑水平扩展能力以及一些子系统的可用性和可靠性了，因为系统大了后，任何一个子系统的不稳定都很容易波及整个系统。</p>
-<h3 id="2-存储"><a href="#2-存储" class="headerlink" title="2. 存储"></a><strong>2. 存储</strong></h3><p>我们先来看看最重要的存储，不管是哪种同步模式，在存储上都是一样的，我们定义用户消息的存储为存储库。存储库主要满足三个需求：</p>
-<ul>
-<li>可靠存储用户发送的消息，不能丢失。否则就找不到自己曾经发布到朋友圈状态了。</li>
-<li>读取某个人发布过的所有消息，比如个人主页等。</li>
-<li>数据永久保存。</li>
-</ul>
-<p>所以，存储库最重要的特征就是两点：</p>
-<ul>
-<li>数据可靠、不丢失。</li>
-<li>由于数据要永久保存，数据会一直增长，所以要易于水平扩展。</li>
-</ul>
-<p>综上，可以选为存储库的系统大概有两类：</p>
-
-
-<ul>
-<li>对于可靠性，分布式NoSQL的可靠性要高于关系型数据库，这个可能有违很多人的认知。主要是关系型数据库发展很长时间了，且很成熟了，数据放在上面大家放心，而分布式NoSQL数据库发展晚，使用的并不多，不太信任。但是，分布式NoSQL需要存储的数据量更多，对数据可靠性的要求也加严格，所以一般都是存储三份，可靠性会更高。目前在一些云厂商中的关系型数据库因为采用了和分布式NoSQL类似的方式，所以可靠性也得到了大幅提高。</li>
-<li>水平扩展能力：对于分布式NoSQL数据库，数据天然是分布在多台机器上，当一台机器上的数据量增大后，可以通过自动分裂两部分，然后将其中一半的数据迁移到另一台机器上去，这样就做到了线性扩展。而关系型数据库需要在扩容时再次分库分表。</li>
-</ul>
-<p>所以，结论是：</p>
-<ul>
-<li>如果是自建系统，且不具备分布式NoSQL数据库运维能力，且数据规模不大，那么可以使用MySQL，这样可以撑一段时间。</li>
-<li>如果是基于云服务，那么就用分布式NoSQL，比如Tablestore或Bigtable。</li>
-<li>如果数据规模很大，那么也要用分布式NoSQL，否则就是走上一条不归路。</li>
-</ul>
-<p>如果使用Tablestore，那么存储库表设计结构如下：</p>
-<img src="/2019/07/19/Feed流系统设计/Tablestore表设计.png" title="This is an example image">
-
-<p>到此，我们确定了存储库的选型，那么系统架构的轮廓有了：</p>
-<img src="/2019/07/19/Feed流系统设计/系统架构.png" title="This is an example image">
-
-<h3 id="3-同步"><a href="#3-同步" class="headerlink" title="3. 同步"></a><strong>3. 同步</strong></h3><p>系统规模和产品类型，以及存储系统确定后，我们可以确定同步方式，常见的方式有三种：</p>
-<ul>
-<li>推模式（也叫写扩散）：和名字一样，就是一种推的方式，发送者发送了一个消息后，立即将这个消息推送给接收者，但是接收者此时不一定在线，那么就需要有一个地方存储这个数据，这个存储的地方我们称为：同步库。推模式也叫写扩散的原因是，一个消息需要发送个多个粉丝，那么这条消息就会复制多份，写放大，所以也叫写扩散。这种模式下，对同步库的要求就是写入能力极强和稳定。读取的时候因为消息已经发到接收者的收件箱了，只需要读一次自己的收件箱即可，读请求的量极小，所以对读的QPS需求不大。归纳下，推模式中对同步库的要求只有一个：写入能力强。</li>
-<li>拉模式（也叫读扩散）：这种是一种拉的方式，发送者发送了一条消息后，这条消息不会立即推送给粉丝，而是写入自己的发件箱，当粉丝上线后再去自己关注者的发件箱里面去读取，一条消息的写入只有一次，但是读取最多会和粉丝数一样，读会放大，所以也叫读扩散。拉模式的读写比例刚好和写扩散相反，那么对系统的要求是：读取能力强。另外这里还有一个误区，很多人在最开始设计feed流系统时，首先想到的是拉模式，因为这种和用户的使用体感是一样的，但是在系统设计上这种方式有不少痛点，最大的是每个粉丝需要记录自己上次读到了关注者的哪条消息，如果有1000个关注者，那么这个人需要记录1000个位置信息，这个量和关注量成正比的，远比用户数要大的多，这里要特别注意，虽然在产品前期数据量少的时候这种方式可以应付，但是量大了后就会事倍功半，得不偿失，切记切记。</li>
-<li>推拉结合模式：推模式在单向关系中，因为存在大V，那么一条消息可能会扩散几百万次，但是这些用户中可能有一半多是僵尸，永远不会上线，那么就存在资源浪费。而拉模式下，在系统架构上会很复杂，同时需要记录的位置信息是天量，不好解决，尤其是用户量多了后会成为第一个故障点。基于此，所以有了推拉结合模式，大部分用户的消息都是写扩散，只有大V是读扩散，这样既控制了资源浪费，又减少了系统设计复杂度。但是整体设计复杂度还是要比推模式复杂。</li>
-</ul>
-<p>用图表对比：</p>
-<img src="/2019/07/19/Feed流系统设计/推拉模式.png" title="This is an example image">
-
-<p>介绍完同步模式中所有场景和模式后，我们归纳下：</p>
-<ul>
-<li>如果产品中是双向关系，那么就采用推模式。</li>
-<li>如果产品中是单向关系，且用户数少于1000万，那么也采用推模式，足够了。</li>
-<li>如果产品是单向关系，单用户数大于1000万，那么采用推拉结合模式，这时候可以从推模式演进过来，不需要额外重新推翻重做。</li>
-<li>永远不要只用拉模式。</li>
-<li>如果是一个初创企业，先用推模式，快速把系统设计出来，然后让产品去验证、迭代，等客户数大幅上涨到1000万后，再考虑升级为推拉集合模式。</li>
-<li>如果是按推荐排序，那么是另外的考虑了，架构会完全不一样，这个后面专门文章介绍。</li>
-</ul>
-<p>如果选择了Tablestore，那么同步库表设计结构如下：</p>
-<img src="/2019/07/19/Feed流系统设计/同步库表.png" title="This is an example image">
-
-<p>确定了同步库的架构如下：</p>
-<img src="/2019/07/19/Feed流系统设计/系统架构2.png" title="This is an example image">
-
-
-
-<h3 id="4-元数据"><a href="#4-元数据" class="headerlink" title="4. 元数据"></a><strong>4. 元数据</strong></h3><p>前面介绍了同步和存储后，整个Feed流系统的基础功能完成了，但是对于一个完整Feed流产品而言，还缺元数据部分，接下来，我们看元数据如何处理：</p>
-<p>Feed流系统中的元数据主要包括：</p>
-<ul>
-<li>用户详情和列表。</li>
-<li>关注或好友关系。</li>
-<li>推送session池。</li>
-</ul>
-<p>我们接下来逐一来看。</p>
-<h4 id="4-1-用户详情和列表"><a href="#4-1-用户详情和列表" class="headerlink" title="4.1 用户详情和列表"></a><strong>4.1 用户详情和列表</strong></h4><p>主要是用户的详情，包括用户的各种自定义属性和系统附加的属性，这部分的要求只需要根据用户ID查询到就可以了。</p>
-<p>可以采用的分布式NoSQL系统或者关系型数据库都可以。</p>
-<p>如果使用NoSQL数据库Tablestore，那么用户详情表设计结构如下：</p>
-<img src="/2019/07/19/Feed流系统设计/用户详情表.png" title="This is an example image">
-
-<h4 id="4-2-关注或好友关系"><a href="#4-2-关注或好友关系" class="headerlink" title="4.2 关注或好友关系"></a><strong>4.2 关注或好友关系</strong></h4><p>这部分是存储关系，查询的时候需要支持查询关注列表或者粉丝列表，或者直接好友列表，这里就需要根据多个属性列查询需要索引能力，这里，存储系统也可以采用两类，关系型、分布式NoSQL数据库。</p>
-<ul>
-<li>如果已经有了关系型数据库了，且数据量较少，则选择关系型数据库，比如MySQL等。</li>
-<li>如果数据量比较大，这个时候就有两种选择：</li>
-</ul>
-<ol>
-<li>使用具有索引的系统，比如云上的Tablestore，更简单，吞吐更高，扩容能力也一并解决了。</li>
-<li>需要分布式事务，可以采用支持分布式事务的系统，比如分布式关系型数据库。</li>
-</ol>
-<p>如果使用Tablestore，那么关注关系表设计结构如下：</p>
-<p>Table：user_relation_table</p>
-<img src="/2019/07/19/Feed流系统设计/用户关系表.png" title="This is an example image">
-
-<p>多元索引的索引结构：</p>
-<img src="/2019/07/19/Feed流系统设计/多元索引表.png" title="This is an example image">
-
-<p>查询的时候：</p>
-<ul>
-<li>如果需要查询某个人的粉丝列表：使用TermQuery查询固定user_id，且按照timestamp排序。</li>
-<li>如果需要查询某个人的关注列表：使用TermQuery查询固定follow_user_id，且按照timestamp排序。</li>
-<li>当前数据写入Table后，需要5~10秒钟延迟后会在多元索引中查询到，未来会优化到2秒以内。</li>
-</ul>
-<p>除了使用多元索引外，还可以使用GlobalIndex。</p>
-<h4 id="4-3-推送session池"><a href="#4-3-推送session池" class="headerlink" title="4.3 推送session池"></a><strong>4.3 推送session池</strong></h4><p>思考一个问题，发送者将消息发送后，接收者如何知道自己有新消息来了？客户端周期性去刷新？如果是这样子，那么系统的读请求压力会随着客户端增长而增长，这时候就会有一个风险，比如平时的设备在线率是20%~30%，突然某天平台爆发了一个热点消息，大量休眠设备登陆，这个时候就会出现“查询风暴”，一下子就把系统打垮了，所有的用户都不能用了。</p>
-<p>解决这个问题的一个思路是，在服务端维护一个推送session池，这个里面记录哪些用户在线，然后当用户A发送了一条消息给用户B后，服务端在写入存储库和同步库后，再通知一下session池中的用户B的session，告诉他：你有新消息了。然后session-B再去读消息，然后有消息后将消息推送给客户端。或者有消息后给客户端推送一下有消息了，客户端再去拉。</p>
-<p>这个session池使用在同步中，但是本质还是一个元数据，一般只需要存在于内存中即可，但是考虑到failover情况，那就需要持久化，这部分数据由于只需要指定单Key查询，用分布式NoSQL或关系型数据库都可以，一般复用当前的系统即可。</p>
-<p>如果使用Tablestore，那么session表设计结构如下：</p>
-<img src="/2019/07/19/Feed流系统设计/session表.png" title="This is an example image">
-
-
-
-<h3 id="5-评论"><a href="#5-评论" class="headerlink" title="5. 评论"></a><strong>5. 评论</strong></h3><p>除了私信类型外，其他的feed流类型中，都有评论功能，评论的属性和存储库差不多，但是多了一层关系：被评论的消息，所以只要将评论按照被被评论消息分组组织即可，然后查询时也是一个范围查询就行。这种查询方式很简单，用不到关系型数据库中复杂的事务、join等功能，很适合用分布式NoSQL数据库来存储。</p>
-<p>所以，一般的选择方式就是：</p>
-<ul>
-<li>如果系统中已经有了分布式NoSQL数据库，比如Tablestore、Bigtable等，那么直接用这些即可。</li>
-<li>如果没有上述系统，那么如果有MySQL等关系型数据库，那就选关系型数据库即可。</li>
-<li>如果选择了Tablestore，那么“评论表”设计结构如下：</li>
-</ul>
-<img src="/2019/07/19/Feed流系统设计/评论表.png" title="This is an example image">
-
-<p>如果需要搜索评论内容，那么对这张表建立多元索引即可。</p>
-<h3 id="6-赞"><a href="#6-赞" class="headerlink" title="6. 赞"></a><strong>6. 赞</strong></h3><p>最近几年，“赞”或“like”功能很流行，赞功能的实现和评论类似，只是比评论少了一个内容，所以选择方式和评论一样。</p>
-<p>如果选择了Tablestore，那么“赞表”设计结构同评论表，这里就不再赘述了。</p>
-<p>系统架构中加了元数据系统后的架构如下：</p>
-<img src="/2019/07/19/Feed流系统设计/系统架构4.png" title="This is an example image">
-
-
-
-<h3 id="7-搜索"><a href="#7-搜索" class="headerlink" title="7. 搜索"></a><strong>7. 搜索</strong></h3><p>到此，我们已经介绍完了Feed流系统的主题架构，Feed流系统算是完成了。但是Feed流产品上还未结束，对于所有的feed流产品都需要有搜索能力，比如下面场景：</p>
-<ul>
-<li>微博中的搜索用户。</li>
-<li>搜索微博内容。</li>
-<li>微信中搜索好友等。</li>
-</ul>
-<p>这些内容搜索只需要字符匹配到即可，不需要非常复杂的相关性算法，所以只需要有能支持分词的检索功能即可，所以一般有两种做法：</p>
-<p>使用搜索引擎，将存储库的内容和用户信息表内容推送给搜索系统，搜索的时候直接访问搜索系统。</p>
-<p>使用具备全文检索能力的数据库，比如最新版的MySQL、MongoDB或者Tablestore。</p>
-<p>所以，选择的原则如下：</p>
-<ul>
-<li>如果存储库使用了MySQL或者Tablestore，那么直接选择这两个系统就可以了。</li>
-<li>如果整个系统都没使用MySQL、Tablestore，且已经使用了搜索系统，那么可以直接复用搜索系统，其他场景都不应该再额外加一个搜索系统进来，徒添复杂度。</li>
-</ul>
-<p>如果使用Tablestore，那么只需要在相应表上建立多元索引即可：</p>
-<ul>
-<li>如果需要对用户名支持搜索，那么需要对user_table建立多元索引，其中的nick_name需要是Text类型，且单字分词。</li>
-<li>如果需要对Feed流内容支持搜索，那么需要对存储库表：store_table建立多元索引，这样就能直接对Feed流内容进行各种复杂查询了，包括多条件筛选、全文检索等。</li>
-</ul>
-<p>系统架构中加了搜索功能后的架构如下：</p>
-<img src="/2019/07/19/Feed流系统设计/系统架构5.png" title="This is an example image">
-
-
-
-<h3 id="8-排序"><a href="#8-排序" class="headerlink" title="8. 排序"></a><strong>8. 排序</strong></h3><p>目前的Feed流系统中的排序方式有两种，一种是时间，一种是分数。</p>
-<p>我们常用的微博、朋友圈、私信这些都是时间线类型的，因为这些产品定义中，需要我们主动关注某些人后才会看到这些人发表的内容，这个时候，最重要的是实时性，而不是发布质量，就算关注人发布了一条垃圾信息，我们也会被动看到。这种类型的产品适用于按照时间线排序。这一篇我们介绍的架构都是基于时间类型的。</p>
-<p>另外一种是不需要关注任何人，我们能看到的都是系统希望我们看到的，系统在后台会分析我们的每个人的爱好，然后给每个人推送差异化的、各自喜欢的内容，这一种的架构和基于时间的完全不一样，我们在后续的推荐类型中专门介绍。</p>
-<h3 id="9-删除Feed内容"><a href="#9-删除Feed内容" class="headerlink" title="9. 删除Feed内容"></a><strong>9. 删除Feed内容</strong></h3><p>在Feed流应用中有一个问题，就是如果用户删除了之前发表的内容，系统该如何处理？因为系统里面有写扩散，那么删除的时候是不是也要写扩散一遍？这样的话，删除就不及时了，很难应对法律法规要求的快速删除。</p>
-<p>针对这个问题，我们在之前设计的时候，同步表中只有消息ID，没有消息内容，在用户读取的时候需要到存储库中去读消息内容，那么我们可以直接删除存储库中的这一条消息，这样用户读取的时候使用消息ID是读不到数据的，也就相当于删除的内容，而且删除速度会很快。除了直接删除外，另外一种办法是逻辑删除，对于删除的feed内容，只做标记，当查询到带有标记的数据时就认为删除了。</p>
-<h3 id="10-更新Feed内容"><a href="#10-更新Feed内容" class="headerlink" title="10. 更新Feed内容"></a><strong>10. 更新Feed内容</strong></h3><p>更新和删除Feed处理逻辑一样，如果使用了支持多版本的存储系统，比如Tablestore，那么也可以支持编辑版本，和现在的微博一样。</p>
-<h3 id="11-总结"><a href="#11-总结" class="headerlink" title="11. 总结"></a><strong>11. 总结</strong></h3><p>上面介绍了不同子功能的特点和系统要求，能满足需求的系统主要有两类，一类是阿里云的Tablestore单系统，一类是开源组件组成的组合系统。</p>
-<ul>
-<li><p>开源组件组成的组合系统：包括MySQL、Redis、HBase等，这些系统单个都不能解决Feed流系统中遇到的问题，需要组合在一起，各司其职才能完成一个Feed流系统，适用于热衷开源系统，人多且喜欢运维操作的团队。</p>
-</li>
-<li><p>Tablestore单系统：只使用Tablestore单个系统就能解决上述的所有问题，这时候肯定有人要问？你是不是在吹牛？这里不是吹牛，Tablestore在三年前就已经开始重视Feed流类型业务，之前也发表过多篇文章介绍，功能上也在专门为Feed流系统特别定制设计，所以到今天，只使用Tablestore一款产品，是可以满足上述需求的。选择Tablestore做Feed流系统的用户具有以下一些特征：</p>
-<p>产品设计目标规模大，千万级或亿级。</p>
-<p>不喜欢运维，喜欢专注于开发。</p>
-<p>高效率团队，希望尽快将产品实现落地。</p>
-<p>希望一劳永逸，未来系统随着用户规模增长可以自动扩容。</p>
-<p>希望能按量付费，用户少的时候费用低，等用户增长起来后费用在跟随用户数增长。<br>如果具有上述四个特征的任何一个，那么都是适合于用Tablestore。</p>
-</li>
-</ul>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">feed</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/Feed流系统设计/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="post-RocketMQ" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1548,6 +1309,10 @@
     <div class="article-entry" itemprop="articleBody">
       
         <h2 id="RocketMQ"><a href="#RocketMQ" class="headerlink" title="RocketMQ"></a>RocketMQ</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>RocketMQ是从阿里内部的MetaQ演化而来</p>
+<h3 id="为什么RocetMQ"><a href="#为什么RocetMQ" class="headerlink" title="为什么RocetMQ"></a>为什么RocetMQ</h3><blockquote>
+<p>Based on our research, with increased queues and virtual topics in use, ActiveMQ IO module reaches a bottleneck. We tried our best to solve this problem through throttling, circuit breaker or degradation, but it did not work well. So we begin to focus on the popular messaging solution Kafka at that time. Unfortunately, Kafka can not meet our requirements especially in terms of <strong><em>low latency</em></strong> and <strong><em>high reliability</em></strong>, see <a href="http://rocketmq.apache.org/rocketmq/how-to-support-more-queues-in-rocketmq/" target="_blank" rel="noopener">here</a> for details.</p>
+</blockquote>
+<p>根据研究，随着使用的队列和虚拟主题的增加，ActiveMQ IO模块遇到了瓶颈。我们尽力通过节流、断路器或降级解决这个问题，但效果不佳。因此，我们开始关注当时流行的消息传递解决方案Kafka。不幸的是，Kafka无法满足我们的要求，特别是在<strong><em>低延迟</em></strong>和<strong><em>高可靠</em></strong>性方面</p>
 <h3 id="特性"><a href="#特性" class="headerlink" title="特性"></a>特性</h3><ul>
 <li>高吞吐低延迟</li>
 <li>抗海量消息堆积</li>
@@ -1730,9 +1495,7 @@
 </ul>
 </li>
 </ul>
-<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><p>RocketMQ会丢消息吗？消息会重复消费么？</p>
-<p>Broker丢消息的场景：</p>
-<ul>
+<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h3><h4 id="RocketMQ会丢消息吗？消息会重复消费么？"><a href="#RocketMQ会丢消息吗？消息会重复消费么？" class="headerlink" title="RocketMQ会丢消息吗？消息会重复消费么？"></a>RocketMQ会丢消息吗？消息会重复消费么？</h4><h5 id="Broker丢消息的场景："><a href="#Broker丢消息的场景：" class="headerlink" title="Broker丢消息的场景："></a>Broker丢消息的场景：</h5><ul>
 <li>消息还未消费，存放消息的磁盘发生不可逆损坏</li>
 <li>消息在系统PageCache内，且未被消费，服务器发生断电</li>
 </ul>
@@ -1741,13 +1504,144 @@
 <li>启用同步复制 - &gt; Master和Slave磁盘同事发生不可逆损坏</li>
 <li>启用同步刷盘</li>
 </ul>
-<p>消息重复消费的场景：</p>
-<ul>
+<h5 id="消息重复消费的场景："><a href="#消息重复消费的场景：" class="headerlink" title="消息重复消费的场景："></a>消息重复消费的场景：</h5><ul>
 <li>直接终止Consumer进程，消费进度未被提交到Broker时</li>
 <li>有Consumer重启，Group内发生Rebalance时，部分消息消费进度未提交时</li>
 <li>生产者发送了多次同一消息时</li>
 </ul>
-<p>待续……</p>
+<h4 id="生产者发送失败会重试么？"><a href="#生产者发送失败会重试么？" class="headerlink" title="生产者发送失败会重试么？"></a>生产者发送失败会重试么？</h4><h5 id="同步发送失败的场景"><a href="#同步发送失败的场景" class="headerlink" title="同步发送失败的场景"></a>同步发送失败的场景</h5><ul>
+<li>连接失败 - RemotingConnectException，关闭连接，重试，抛出异常</li>
+<li>网络异常，消息发送失败 - RemotingSendRequestException，关闭连接，重试，抛出异常</li>
+<li>消息响应超时 - RemotingTimeoutException，重试，抛出异常</li>
+<li>Broker消息处理失败，返回失败Result - BrokerException，以下错误重试，俩次后抛出异常<ul>
+<li>TOPIX NOT EXIST</li>
+<li>SERVICE NOT AVAILABLE</li>
+<li>SYSTEM ERROR</li>
+<li>NO_PERMISSION</li>
+</ul>
+</li>
+</ul>
+<h5 id="异步发送失败的场景"><a href="#异步发送失败的场景" class="headerlink" title="异步发送失败的场景"></a>异步发送失败的场景</h5><ul>
+<li>连接失败 - RemotingConnectException，无重试，抛出异常</li>
+<li>网络异常，消息发送失败  - RemotingSendRequestException，无重试，抛出异常</li>
+<li>网络异常，消息发送失败 - MQClientException，重试，Callback.onEcxeption</li>
+<li>消息响应超时 - MQClientException，重试，Callback.onEcxeption</li>
+<li>BrkBroker消息处理失败，返回失败Result - BrokerException，无重试，Callback.onEcxeption</li>
+</ul>
+<h4 id="消费者Pull-Consume失败会重试么"><a href="#消费者Pull-Consume失败会重试么" class="headerlink" title="消费者Pull/Consume失败会重试么"></a>消费者Pull/Consume失败会重试么</h4><h5 id="Pull失败的场景"><a href="#Pull失败的场景" class="headerlink" title="Pull失败的场景"></a>Pull失败的场景</h5><ul>
+<li>连接失败 - 3秒后重新提交PullRequest</li>
+<li>Pull请求发送失败 - 3秒后重新提交</li>
+<li>响应返回，没找到消息 - 立刻重新提交<ul>
+<li>NO_NEW_MESAGE</li>
+<li>NO_MATCHED_MESSAGE</li>
+</ul>
+</li>
+<li>响应返回，offset不合法 - 纠正offset</li>
+</ul>
+<h5 id="Consume失败的场景"><a href="#Consume失败的场景" class="headerlink" title="Consume失败的场景"></a>Consume失败的场景</h5><ul>
+<li>RECONSUME_LATER 发送回Broker，若发送失败，重新提交ConsumeRequest</li>
+<li>Null - 重置为RECONSUME_LATER</li>
+<li>throw Exception - 重置为RECONSUME LATER</li>
+</ul>
+<h4 id="消费者从哪里开始消费"><a href="#消费者从哪里开始消费" class="headerlink" title="消费者从哪里开始消费"></a>消费者从哪里开始消费</h4><p>对于一个新的ConsumerGroup，订阅已经存在的Topic后，可以选择从以下三个地方开始消费</p>
+<ul>
+<li>CONSUME_FROM_LAST_OFFSET 从队列末尾开始消费</li>
+<li>CONSUME_FROM_FIRTST_OFFSET 从队列最初开始消费</li>
+<li>CONSUME_FROM_YTIMESTAMP 从指定时间戳开始消费</li>
+</ul>
+<h4 id="InsyanceName是什么？什么时候需要设置？"><a href="#InsyanceName是什么？什么时候需要设置？" class="headerlink" title="InsyanceName是什么？什么时候需要设置？"></a>InsyanceName是什么？什么时候需要设置？</h4><p>ClientID构造规则：IP@InstanceName</p>
+<p>默认ClientID为：IP@PID</p>
+<ul>
+<li>对于Broker而言<ul>
+<li>客户端的表示，Cahnnel的附属信息</li>
+</ul>
+</li>
+<li>对于客户端而言<ul>
+<li>作为key，对应一个MQClientInstance（对象包含底层网络连接，定时任务，线程池等）。</li>
+<li>影响Rebalance时，接口中俩个参数（ClientIDList，CurrentClientID）。</li>
+</ul>
+</li>
+</ul>
+<p>例子：Docker的IP和PID很容易重复，如果不设置InstanceName，多个Docker内从消费者会有一样的ClientID，在Rebalance时候，会分配错误，造成重复消费。</p>
+<h3 id="比较选型"><a href="#比较选型" class="headerlink" title="比较选型"></a>比较选型</h3><h4 id="相比ActiveMQ"><a href="#相比ActiveMQ" class="headerlink" title="相比ActiveMQ"></a>相比ActiveMQ</h4><p>抗堆积、易扩展、原生支持消费组消费，组和组互不影响</p>
+<p>相比Kafka：完善的消息失败重试、按Key或者ID查询消息、消息回溯、服务端消息过滤、消费状态查询，JAVA写的。</p>
+<h3 id="RocketMQ-vs-ActiveMQ-vs-Kafka"><a href="#RocketMQ-vs-ActiveMQ-vs-Kafka" class="headerlink" title="RocketMQ vs. ActiveMQ vs. Kafka"></a>RocketMQ vs. ActiveMQ vs. Kafka</h3><p>The table below is a handy quick reference for spotting the differences among RocketMQ and its most popular alternatives at a glance.</p>
+<table>
+<thead>
+<tr>
+<th align="left">Messaging Product</th>
+<th align="left">Client SDK</th>
+<th align="left">Protocol and Specification</th>
+<th align="left">Ordered Message（有序消息）</th>
+<th align="left">Scheduled Message（计划消息）</th>
+<th align="left">Batched Message（批量消息）</th>
+<th align="left">BroadCast Message（广播消息）</th>
+<th align="left">Message Filter（消息过滤）</th>
+<th align="left">Server Triggered Redelivery</th>
+<th align="left">Message Storage</th>
+<th align="left">Message Retroactive（回溯）</th>
+<th align="left">Message Priority</th>
+<th align="left">High Availability and Failover（高可用和容错）</th>
+<th align="left">Message Track（消息追踪）</th>
+<th align="left">Configuration</th>
+<th align="left">Management and Operation Tools</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">ActiveMQ</td>
+<td align="left">Java, .NET, C++ etc.</td>
+<td align="left">Push model, support OpenWire, STOMP, AMQP, MQTT, JMS</td>
+<td align="left">Exclusive Consumer or Exclusive Queues can ensure ordering</td>
+<td align="left">Supported</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported</td>
+<td align="left">Supported</td>
+<td align="left">Not Supported</td>
+<td align="left">Supports very fast persistence using JDBC along with a high performance journal，such as levelDB, kahaDB</td>
+<td align="left">Supported</td>
+<td align="left">Supported</td>
+<td align="left">Supported, depending on storage,if using kahadb it requires a ZooKeeper server</td>
+<td align="left">Not Supported</td>
+<td align="left">The default configuration is low level, user need to optimize the configuration parameters</td>
+<td align="left">Supported</td>
+</tr>
+<tr>
+<td align="left">Kafka</td>
+<td align="left">Java, Scala etc.</td>
+<td align="left">Pull model, support TCP</td>
+<td align="left">Ensure ordering of messages within a partition</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported, with async producer</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported, you can use Kafka Streams to filter messages</td>
+<td align="left">Not Supported</td>
+<td align="left">High performance file storage</td>
+<td align="left">Supported offset indicate</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported, requires a ZooKeeper server</td>
+<td align="left">Not Supported</td>
+<td align="left">Kafka uses key-value pairs format for configuration. These values can be supplied either from a file or programmatically.</td>
+<td align="left">Supported, use terminal command to expose core metrics</td>
+</tr>
+<tr>
+<td align="left">RocketMQ</td>
+<td align="left">Java, C++, Go</td>
+<td align="left">Pull model, support TCP, JMS, OpenMessaging</td>
+<td align="left">Ensure strict ordering of messages,and can scale out gracefully</td>
+<td align="left">Supported</td>
+<td align="left">Supported, with sync mode to avoid message loss</td>
+<td align="left">Supported</td>
+<td align="left">Supported, property filter expressions based on SQL92</td>
+<td align="left">Supported</td>
+<td align="left">High performance and low latency file storage</td>
+<td align="left">Supported timestamp and offset two indicates</td>
+<td align="left">Not Supported</td>
+<td align="left">Supported, Master-Slave model, without another kit</td>
+<td align="left">Supported</td>
+<td align="left">Work out of box,user only need to pay attention to a few configurations</td>
+<td align="left">Supported, rich web and terminal command to expose core metrics</td>
+</tr>
+</tbody></table>
 
       
 
@@ -2055,19 +1949,19 @@
 
 
   
-    <article id="post-数据库读写分离" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-消息队列常见问题示例" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/数据库读写分离/">数据库读写分离</a>
+      <a class="article-title" href="/2019/07/19/消息队列常见问题示例/">消息队列常见问题示例</a>
     </h1>
   
 
         
-        <a href="/2019/07/19/数据库读写分离/" class="archive-article-date">
+        <a href="/2019/07/19/消息队列常见问题示例/" class="archive-article-date">
   	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
 </a>
         
@@ -2075,46 +1969,58 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="1、数据库读写分离"><a href="#1、数据库读写分离" class="headerlink" title="1、数据库读写分离"></a>1、数据库读写分离</h2><p>一般来说，写库有叫主库，读库也叫从库，即主从架构，比如常见的架构：一主多从。</p>
-<h3 id="1-1、主从"><a href="#1-1、主从" class="headerlink" title="1.1、主从"></a>1.1、主从</h3><img src="/2019/07/19/数据库读写分离/主从.png" title="This is an example image">
+        <h2 id="一、如何解决消息队列数据丢失问题？"><a href="#一、如何解决消息队列数据丢失问题？" class="headerlink" title="一、如何解决消息队列数据丢失问题？"></a>一、如何解决消息队列数据丢失问题？</h2><p>面试官心理剖析：<br>生产上肯定会出现数据丢失问题，面试官主要是想看看你是否了解？有没有做过相应的措施来解决这个问题？如果你不知道有这个问题，那么你生产环境可能存在数据丢失问题。如果你的MQ用在核心场景下，如订单，扣费等，那么数据是万万不能丢的。</p>
+<p>回答：</p>
+<h3 id="为什么会出现数据丢失？"><a href="#为什么会出现数据丢失？" class="headerlink" title="为什么会出现数据丢失？"></a>为什么会出现数据丢失？</h3><p>分析：</p>
+<img src="/2019/07/19/消息队列常见问题示例/mq消息丢失问题.png" title="This is an example image">
 
-<p>当数据写入Master时，需要把数据同步给Slave，即 <strong>主从复制</strong> 。</p>
-<p>主从复制期间，Slave的数据会和Master不一致，即 <strong>主从延迟</strong> 。</p>
-<p>由于主从延迟的存在，当Master宕机时，需要优先保证数据强一致性还是服务可用性，这就是 <strong>主从切换</strong> 时要考虑的问题了。</p>
-<h3 id="1-2、为什么要主从"><a href="#1-2、为什么要主从" class="headerlink" title="1.2、为什么要主从"></a>1.2、为什么要主从</h3><ul>
-<li>防止SPOF（single point of failure）</li>
-<li>读写分离</li>
-</ul>
-<h3 id="1-3、主从复制"><a href="#1-3、主从复制" class="headerlink" title="1.3、主从复制"></a>1.3、主从复制</h3><p>Master写入数据后，需要把数据同步给Slave。</p>
-<p>由于不同系统的功能不同，他们用于存储数据的数据结构也不同，所以，她们之间的复制方式也各有差异。</p>
-<p>如Redis，发的就是RDB或者AOF文件，而MySQL，则发的是bin log。bin log也三种格式：statement/row/mixed。</p>
-<p>MySQL用了三个线程，来实现这个过程，一个在Master，两个在Slave：</p>
-<ul>
-<li>Binlog dump thread：负责把bin log发给slave</li>
-<li>Slave I/O thread：负责接收master发过来的bin log，并把它暂时存在在一个叫relay log的日志文件</li>
-<li>Slave SQL thread：负责读取relay log，执行里面的内容。</li>
-</ul>
-<p>MySQL这样设计，有点像消息中间件处理消息的过程。</p>
-<h3 id="1-4、主从延迟"><a href="#1-4、主从延迟" class="headerlink" title="1.4、主从延迟"></a>1.4、主从延迟</h3><p>有主从的系统，都会有延迟，在Master写入后，Slave马上同步发生变化的事情，不存在的。</p>
-<p>原因：Slave机器性能、查询业务过多放于Slave、Slave执行时间长的事务。</p>
-<h3 id="1-5、主从切换"><a href="#1-5、主从切换" class="headerlink" title="1.5、主从切换"></a>1.5、主从切换</h3><img src="/2019/07/19/数据库读写分离/主从切换.png" title="This is an example image">
+<p>丢数据一般会有3种情况：<br>1）生产者往MQ写数据丢失了<br>可能因为网络原因数据传输丢失。<br>2）MQ本身数据丢失了<br>数据放在内存中，MQ机器宕机了，那么内存中的数据丢失了。<br>3）消费者消费的时候丢失了<br>消费者接受到消息，马上给MQ返回已经接受到消息的回复，消费者接着处理逻辑，在处理过程中，消费者宕机了；下次重启的时候消费者会获取到下一条数据消费，这样数据就丢失了。</p>
+<p>问题解决：</p>
+<h3 id="1、解决rabbitmq生产者丢数据"><a href="#1、解决rabbitmq生产者丢数据" class="headerlink" title="1、解决rabbitmq生产者丢数据"></a>1、解决rabbitmq生产者丢数据</h3><p>1）事务机制<br>在生产者发送消息的时候，加上事务，以下是伪代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">channel.txSelect</span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="comment">//发送消息 如果MQ接收失败会抛异常，那么对事务进行回滚</span></span><br><span class="line">&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">channel.txRollback</span><br><span class="line">&#125;</span><br><span class="line">channel.txCommit</span><br></pre></td></tr></table></figure>
 
-<p>当Master宕机时，我们在一致性和可用性之间寻求优先级的纠结。</p>
-<p>也就是CAP理论，在P（分区容忍性）必须满足的情况下，到底是选择C（强一致性）还是A（可用性）。</p>
-<p>如果要保证强一致性，那么切换就有这几个步骤：</p>
-<ul>
-<li>把原来的Master，设置为read-only = true，这个时刻记为time1；</li>
-<li>等待Slave执行完Master发给它的bin log，直至Slave和Master一致，这个时刻记为time2；</li>
-<li>现在一致了，可以把slave设为read-only = false，即可写入</li>
+<p>改方案完全保证发送消息时成功的，但是缺点是：使用了事务之后，消息变成同步了，影响吞吐量。比较耗性能。</p>
+<p>2）confirm模式<br>在生产者开启confirm模式，每个消息分配唯一id；生产者发送完消息之后就不用管了，rabbitmq如果成功接收到消息，那么会调用生产者的ack(String messageId)方法；rabbitmq如果接收失败，那么会调用生产者nack(String messageId)方法，生产者根据情况判断是否要重试；</p>
+<p>小结：一般情况下，使用confirm模式，性能、吞吐量都要比事务机制高。confirm是异步的，不会阻塞。</p>
+<h3 id="2、解决rabbitmq弄丢了数据"><a href="#2、解决rabbitmq弄丢了数据" class="headerlink" title="2、解决rabbitmq弄丢了数据"></a>2、解决rabbitmq弄丢了数据</h3><p>就是开启持久化，把内存中的数据刷到磁盘中。如果在写入磁盘的时候挂了，这样的话还是会有数据丢失，但是概率很小，你可以等数据持久化到磁盘，在通知生产者ack方法，如果没有持久化成功，生产者长时间没收到消息可以尝试在重试一次。</p>
+<h3 id="3、解决rabbitmq消费端弄丢了数据"><a href="#3、解决rabbitmq消费端弄丢了数据" class="headerlink" title="3、解决rabbitmq消费端弄丢了数据"></a>3、解决rabbitmq消费端弄丢了数据</h3><p>在消费端这边，需要关闭autoAck，等自己处理完之后在发送ack给MQ。</p>
+<p>其他的MQ，无外乎也都是这些原因，只要在各自端进行一些配置就可以解决数据丢失问题。</p>
+<h2 id="二、在消息队列里面有一批数据需要顺序执行，如何来保证？"><a href="#二、在消息队列里面有一批数据需要顺序执行，如何来保证？" class="headerlink" title="二、在消息队列里面有一批数据需要顺序执行，如何来保证？"></a>二、在消息队列里面有一批数据需要顺序执行，如何来保证？</h2><p>面试官心理剖析：<br>主要看你有没有思考过这个问题？这个是常见的问题，看你有没有解决思路？</p>
+<p>回答：<br>这里讲讲几个MQ是如何来保证消息的顺序性的。</p>
+<h3 id="1、rabbitMq"><a href="#1、rabbitMq" class="headerlink" title="1、rabbitMq"></a>1、rabbitMq</h3><ul>
+<li>问题分析：</li>
+<li><img src="/2019/07/19/消息队列常见问题示例/rabbitmq消息顺序.png" title="This is an example image">
+如图，data1和data2是有顺序的，必须data1先执行，data2后执行；这两个数据被不同的消费者消费到了，可能data2先执行，data1后执行，这样原来的顺序就错乱了。</li>
+<li>解决方案：</li>
+<li><img src="/2019/07/19/消息队列常见问题示例/rabbitmq消息顺序问题解决.png" title="This is an example image">
+如图，在MQ里面创建多个queue，同一规则的数据（对唯一标识进行hash），有顺序的放入MQ的queue里面，消费者只取一个queue里面获取数据消费，这样执行的顺序是有序的。或者还是只有一个queue但是对应一个消费者，然后这个消费者内部用内存队列做排队，然后分发给底层不同的worker来处理。</li>
 </ul>
-<p>在这个过程中，从time1到time2的时间，系统是无法被写入的，即不可用。</p>
-<p>这个不可用时间取决于切换的时，Slave和Master的延迟时间。</p>
-<p>保证强一致性就会牺牲可用性。如果想保证可用性那必须牺牲强一致性，必须在Slave和Master还没有完全同步时，就把Slave切换成Master。</p>
-<h3 id="1-6、何时分库分表"><a href="#1-6、何时分库分表" class="headerlink" title="1.6、何时分库分表"></a>1.6、何时分库分表</h3><p>MySQL单表数据不超过500行？</p>
-<p>这个数值和实际记录的条数无关，而与 MySQL 的配置以及机器的硬件有关。因为，MySQL 为了提高性能，会将表的索引装载到内存中。InnoDB buffer size 足够的情况下，其能完成全加载进内存，查询不会有问题。但是，当单表数据库到达某个量级的上限时，导致内存无法存储其索引，使得之后的 SQL 查询会产生磁盘 IO，从而导致性能下降。当然，这个还有具体的表结构的设计有关，最终导致的问题都是内存限制。这里，增加硬件配置，可能会带来立竿见影的性能提升哈。</p>
-<p>我对于分库分表的观点是，需要结合实际需求，不宜过度设计，在项目一开始不采用分库与分表设计，而是随着业务的增长，在无法继续优化的情况下，再考虑分库与分表提高系统的性能。对此，阿里巴巴《Java 开发手册》补充到：如果预计三年后的数据量根本达不到这个级别，请不要在创建表时就分库分表。那么，回到一开始的问题，你觉得这个数值多少才合适呢？我的建议是，根据自身的机器的情况综合评估，如果心里没有标准，那么暂时以 500 万行作为一个统一的标准，相对而言算是一个比较折中的数值。</p>
-<h2 id="2、分布式数据库中间件"><a href="#2、分布式数据库中间件" class="headerlink" title="2、分布式数据库中间件"></a>2、分布式数据库中间件</h2><h3 id="2-1、MyCat"><a href="#2-1、MyCat" class="headerlink" title="2.1、MyCat"></a>2.1、MyCat</h3><p>MyCat 是一个开源的分布式数据库中间件，它实现了 MySQL 协议，在开发者眼里，他就是一个数据库代理，我们甚至可以使用 MySQL 的客户端工具以及命令行来访问 MyCat。</p>
-<p>MyCat 现在已经不仅仅只支持 MySQL 了，同时也支持 MSSQL、Oracle、DB2、以及 PostgreSQL等主流数据库。甚至像 MongoDB 这种 NoSQL 也支持。</p>
+<h3 id="2、kafka"><a href="#2、kafka" class="headerlink" title="2、kafka"></a>2、kafka</h3><p>问题分析：</p>
+<img src="/2019/07/19/消息队列常见问题示例/kafka正常流程.png" title="This is an example image">
+<p>如图，在kafka中，你对数据指定某个key，那么这些数据会到同一个partition里面，在partition里面这些数据是有顺序的。从这里看没啥问题，插入到数据库的数据都是有序的。</p>
+<p>但是，我们在消费端可能会使用多线程来处理，因为单线程的处理速度慢，为了加快处理时间和吞吐量，会使用thread来处理。在消费端加入线程之后，就会出现顺序不一致的情况。</p>
+<img src="/2019/07/19/消息队列常见问题示例/kafka顺序不一致情况.png" title="This is an example image">
+<p>如图，就是使用了多线程之后，数据顺序不一致情况。</p>
+<p>在使用了多线程之后，如何来解决数据顺序问题？</p>
+<img src="/2019/07/19/消息队列常见问题示例/kafaka顺序问题解决.png" title="This is an example image">
+<p>如图，在消费端使用内存队列，队列里的数据使用hash进行分发，每个线程对应一个队列，这样可以保证数据的顺序。</p>
+<h3 id="3、rocketMq"><a href="#3、rocketMq" class="headerlink" title="3、rocketMq"></a>3、rocketMq</h3><img src="/2019/07/19/消息队列常见问题示例/rocketmq消息书匈奴.png" title="This is an example image">
+
+<p>如图，生产者中把orderId进行取模，把相同模的数据放到messagequeue里面，消费者消费同一个messagequeue，只要消费者这边有序消费，那么可以保证数据被顺序消费。</p>
+<h3 id="4、activeMq"><a href="#4、activeMq" class="headerlink" title="4、activeMq"></a>4、activeMq</h3><img src="/2019/07/19/消息队列常见问题示例/activemq消息顺序.png" title="This is an example image">
+<p>如图，activeMq里面有messageGroups属性，可以指定JMSXGroupID，消费者会消费指定的JMSXGroupID。即保证了顺序性，又解决负载均衡的问题。</p>
+<h2 id="三、如何保证消息队列的幂等性？"><a href="#三、如何保证消息队列的幂等性？" class="headerlink" title="三、如何保证消息队列的幂等性？"></a>三、如何保证消息队列的幂等性？</h2><p>面试官心理剖析：<br>主要是看你对消息队列数据重复消费的问题，是否有了解，是否知道怎么解决？如果这块不知道，那么面试官会觉得如果交给你做功能，可能会出现多次消费的情况。</p>
+<p>回答：</p>
+<p>为什么会出现重复消费？<br>分析：</p>
+<img src="/2019/07/19/消息队列常见问题示例/kafaka重复消费场景.png" title="This is an example image">
+<p>如图，在什么场景会出现消息重复消费？比如说消费端已经消费了offset=2，offset=3，offset=4的三条数据，正准备把这个offset的值传给kafka，这时候消费端机器宕机了，这个数据没传过去；重启之后，消费端同步kafka，kafka那边消费的记录offset还是1，那么kafka会认为之前的2、3、4都没有消费过，会把这几个数据在传给消费端；这样消费端这边就重复对这几条数据进行消费了。在数据库里面可能就多了很多重复的数据。<br>像其他的MQ，也是一样，消费端再返回给MQ的时候，当机了或者重启了，那么都会出现重复消费的问题。</p>
+<p>问题解决：</p>
+<h3 id="幂等性：一个请求，不管重复来多少次，结果是不会改变的。"><a href="#幂等性：一个请求，不管重复来多少次，结果是不会改变的。" class="headerlink" title="幂等性：一个请求，不管重复来多少次，结果是不会改变的。"></a>幂等性：一个请求，不管重复来多少次，结果是不会改变的。</h3><p>每个消息都会有唯一的消息id。</p>
+<h4 id="1、先查再保存"><a href="#1、先查再保存" class="headerlink" title="1、先查再保存"></a>1、先查再保存</h4><p>每次保存数据的时候，都先查一下，如果数据存在了那么就不保存。这个情况是并发不高的情况。</p>
+<h4 id="2、业务表添加约束条件"><a href="#2、业务表添加约束条件" class="headerlink" title="2、业务表添加约束条件"></a>2、业务表添加约束条件</h4><p>如果你的数据库将来都不会分库分表，那么可以在业务表字段加上唯一约束条件（UNIQUE），这样相同的数据就不会保存为多份。</p>
+<h4 id="3、添加消息表"><a href="#3、添加消息表" class="headerlink" title="3、添加消息表"></a>3、添加消息表</h4><p>再数据库里面，添加一张消息消费记录表，表字段加上唯一约束条件（UNIQUE），消费完之后就往表里插入一条数据。因为加了唯一约束条件，第二次保存的时候，mysql就会报错，就插入不进去；通过数据库可以限制重复消费。</p>
+<h4 id="4、redis"><a href="#4、redis" class="headerlink" title="4、redis"></a>4、redis</h4><p>如果你的系统是分布式的，又做了分库分表，那么可以使用redis来做记录，把消息id存在redis里，下次再有重复消息id在消费的时候，如果发现redis里面有了就不能进行消费。</p>
+<h4 id="5、高并发"><a href="#5、高并发" class="headerlink" title="5、高并发"></a>5、高并发</h4><p>如果你的系统并发很高，那么可以使用redis或者zookeeper的分布式对消息id加锁，然后使用上面的几个方法进行幂等性控制。</p>
 
       
 
@@ -2128,7 +2034,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">数据库</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">消息队列</a>
         		</li>
       		
 		</ul>
@@ -2138,7 +2044,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/数据库读写分离/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/07/19/消息队列常见问题示例/">展开全文 >></a>
         </p>
       
 
@@ -2168,19 +2074,19 @@
 
 
   
-    <article id="post-分布式锁" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-JavaSPI机制的优点与缺点" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/19/分布式锁/">分布式锁</a>
+      <a class="article-title" href="/2019/07/19/JavaSPI机制的优点与缺点/">JavaSPI机制的优点与缺点</a>
     </h1>
   
 
         
-        <a href="/2019/07/19/分布式锁/" class="archive-article-date">
+        <a href="/2019/07/19/JavaSPI机制的优点与缺点/" class="archive-article-date">
   	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
 </a>
         
@@ -2188,171 +2094,70 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>前言：随着计算机技术和工程架构的发展，微服务变得越来越热。如今，绝大多数服务都处于分布式环境中，其中，数据一致性是我们一直关注的重点。分布式锁到底是什么？经过了哪些发展演进？工程上有哪些实现方案？各种方案的利弊权衡又有哪些？希望这篇文章能够对你有一些帮助。</p>
-<p>▍阅读索引</p>
-<p>[TOC]</p>
-<h2 id="0-名词定义"><a href="#0-名词定义" class="headerlink" title="0. 名词定义"></a>0. 名词定义</h2><p>分布式锁：顾名思义，是指在分布式环境下的锁，重点在锁。所以我们先从锁开始讲起。</p>
-<h2 id="1-问题引入"><a href="#1-问题引入" class="headerlink" title="1. 问题引入"></a>1. 问题引入</h2><p>举个例子：</p>
-<p>某服务记录数据X，当前值为100。A请求需要将X增加200；同时，B请求需要将X减100。 在理想的情况下，A先读取到X=100，然后X增加200，最后写入X=300。B请求接着读取到X=300，减少100，最后写入X=200。 然而在真实情况下，如果不做任何处理，则可能会出现：A和B同时读取到X=100；A写入之前B读取到X；B比A先写入等等情况。</p>
-<p>上面这个例子相信大家都非常熟悉。出现不符合预期的结果本质上是对临界资源没有做好互斥操作。互斥性问题通俗来讲，就是对共享资源的抢占问题。对于共享资源争抢的正确性，锁是最常用的方式，其他的如CAS（compare and swap）等，这里不展开。</p>
-<h2 id="2-分布式环境的特点"><a href="#2-分布式环境的特点" class="headerlink" title="2. 分布式环境的特点"></a>2. 分布式环境的特点</h2><p>我们的绝大部分服务都处于分布式环境中。那么，分布式系统有哪些特点呢？大致如下：</p>
+        <h1 id="1-SPI是什么"><a href="#1-SPI是什么" class="headerlink" title="1 SPI是什么"></a>1 SPI是什么</h1><p>SPI全称Service Provider Interface，是Java提供的一套用来被第三方实现或者扩展的API，它可以用来启用框架扩展和替换组件。</p>
+<p>整体机制图如下： </p>
+<img src="/2019/07/19/JavaSPI机制的优点与缺点/spi机制.png" title="This is an example image">
+
+<p>Java SPI 实际上是“<strong>基于接口的编程＋策略模式＋配置文件</strong>”组合实现的动态加载机制。</p>
+<p>系统设计的各个抽象，往往有很多不同的实现方案，在面向的对象的设计里，一般推荐模块之间基于接口编程，模块之间不对实现类进行硬编码。一旦代码里涉及具体的实现类，就违反了可拔插的原则，如果需要替换一种实现，就需要修改代码。为了实现在模块装配的时候能不在程序里动态指明，这就需要一种服务发现机制。 Java SPI就是提供这样的一个机制：为某个接口寻找服务实现的机制。有点类似IOC的思想，就是将装配的控制权移到程序之外，在模块化设计中这个机制尤其重要。所以SPI的核心思想就是<strong>解耦</strong>。</p>
+<h1 id="2-使用场景"><a href="#2-使用场景" class="headerlink" title="2 使用场景"></a>2 使用场景</h1><p>概括地说，适用于：<strong>调用者根据实际使用需要，启用、扩展、或者替换框架的实现策略</strong></p>
+<p>比较常见的例子：</p>
 <ul>
-<li>可扩展性：可通过横向水平扩展提高系统的性能和吞吐量。</li>
-<li>高可靠性：高容错，即使系统中一台或几台故障，系统仍可提供服务。</li>
-<li>高并发性：各机器并行独立处理和计算。</li>
-<li>廉价高效：多台小型机而非单台高性能机。</li>
+<li>数据库驱动加载接口实现类的加载 JDBC加载不同类型数据库的驱动</li>
+<li>日志门面接口实现类加载 SLF4J加载不同提供商的日志实现类</li>
+<li>Spring Spring中大量使用了SPI,比如：对servlet3.0规范对ServletContainerInitializer的实现、自动类型转换Type Conversion SPI(Converter SPI、Formatter SPI)等</li>
+<li>Dubbo Dubbo中也大量使用SPI的方式实现框架的扩展, 不过它对Java提供的原生SPI做了封装，允许用户扩展实现Filter接口</li>
 </ul>
-<h2 id="3-锁"><a href="#3-锁" class="headerlink" title="3.锁"></a>3.锁</h2><p>我们先来看下非分布式情况下的锁方案（多线程和多进程的情况），然后再演进到分布式锁。</p>
-<h3 id="多线程下的锁机制："><a href="#多线程下的锁机制：" class="headerlink" title="多线程下的锁机制："></a>多线程下的锁机制：</h3><p>各种语言有不同的实现方式，比较成熟。比如，go语言中的sync.RWMutex（读写锁）、sync.Mutex（互斥锁）；JAVA中的ReentrantLock、synchronized；在php中没有找到原生的支持锁的方式，只能通过外部来间接实现，比如文件锁，借助外部存储的锁等。</p>
-<h3 id="多进程下的锁机制："><a href="#多进程下的锁机制：" class="headerlink" title="多进程下的锁机制："></a>多进程下的锁机制：</h3><p>对于临界资源的访问已经超出了单个进程的控制范围。在多进程的情况下，主要是利用操作系统层面的进程间通信原理来解决临界资源的抢占问题。比较常见的一种方法便是使用信号量（Semaphores）。</p>
-<p>▍对信号量的操作，主要是P操作（wait）和V操作（signal）：</p>
+<h1 id="3-使用介绍"><a href="#3-使用介绍" class="headerlink" title="3 使用介绍"></a>3 使用介绍</h1><p>要使用Java SPI，需要遵循如下约定：</p>
 <ul>
-<li>P操作 ( wait ) ：</li>
+<li>1、当服务提供者提供了接口的一种具体实现后，在jar包的META-INF/services目录下创建一个以“接口全限定名”为命名的文件，内容为实现类的全限定名；</li>
+<li>2、接口实现类所在的jar包放在主程序的classpath中；</li>
+<li>3、主程序通过java.util.ServiceLoder动态装载实现模块，它通过扫描META-INF/services目录下的配置文件找到实现类的全限定名，把类加载到JVM；</li>
+<li>4、SPI的实现类必须携带一个不带参数的构造方法；</li>
 </ul>
-<p>先检查信号量的大小，若值大于零，则将信号量减1，同时进程获得共享资源的访问权限，继续执行；若小于或者等于零，则该进程被阻塞后，进入等待队列。</p>
+<h2 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a>示例代码</h2><p><strong>步骤1</strong>、定义一组接口 (假设是org.foo.demo.IShout)，并写出接口的一个或多个实现，(假设是org.foo.demo.animal.Dog、org.foo.demo.animal.Cat)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Cat</span> <span class="keyword">implements</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"miao miao"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dog</span> <span class="keyword">implements</span> <span class="title">IShout</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"wang wang"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤2</strong>、在 src/main/resources/ 下建立 /META-INF/services 目录， 新增一个以接口命名的文件 (org.foo.demo.IShout文件)，内容是要应用的实现类（这里是org.foo.demo.animal.Dog和org.foo.demo.animal.Cat，每行一个类）。</p>
+<p>文件位置</p>
+<figure class="highlight haml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-<span class="ruby"> src</span></span><br><span class="line"><span class="ruby">    -main</span></span><br><span class="line"><span class="ruby">        -resources</span></span><br><span class="line"><span class="ruby">            - META-INF</span></span><br><span class="line"><span class="ruby">                - services</span></span><br><span class="line"><span class="ruby">                    - org.foo.demo.IShout</span></span><br><span class="line"><span class="ruby">复制代码</span></span><br></pre></td></tr></table></figure>
+
+<p>文件内容</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">org<span class="selector-class">.foo</span><span class="selector-class">.demo</span><span class="selector-class">.animal</span><span class="selector-class">.Dog</span></span><br><span class="line">org<span class="selector-class">.foo</span><span class="selector-class">.demo</span><span class="selector-class">.animal</span><span class="selector-class">.Cat</span></span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤3</strong>、使用 ServiceLoader 来加载配置文件中指定的实现。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SPIMain</span> &#123;</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] args) &#123;</span><br><span class="line">        ServiceLoader&lt;IShout&gt; shouts = ServiceLoader.load(IShout.<span class="keyword">class</span>);</span><br><span class="line">        <span class="keyword">for</span> (IShout <span class="string">s :</span> shouts) &#123;</span><br><span class="line">            s.shout();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>代码输出：</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">wang</span> wang</span><br><span class="line"><span class="keyword">miao </span><span class="keyword">miao</span></span><br><span class="line"><span class="keyword">复制代码</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="4-原理解析"><a href="#4-原理解析" class="headerlink" title="4 原理解析"></a>4 原理解析</h1><p>首先看ServiceLoader类的签名类的成员变量：</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceLoader</span>&lt;<span class="title">S</span>&gt; <span class="keyword">implements</span> <span class="title">Iterable</span>&lt;<span class="title">S</span>&gt;</span>&#123;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PREFIX = <span class="string">"META-INF/services/"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 代表被加载的类或者接口</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Class&lt;S&gt; service;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用于定位，加载和实例化providers的类加载器</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ClassLoader loader;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建ServiceLoader时采用的访问控制上下文</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AccessControlContext acc;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 缓存providers，按实例化的顺序排列</span></span><br><span class="line">    <span class="keyword">private</span> LinkedHashMap&lt;String,S&gt; providers = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 懒查找迭代器</span></span><br><span class="line">    <span class="keyword">private</span> LazyIterator lookupIterator;</span><br><span class="line">  </span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>参考具体ServiceLoader具体源码，代码量不多，加上注释一共587行，梳理了一下，实现的流程如下：</p>
 <ul>
-<li>V操作 ( signal ) ：</li>
+<li>1 应用程序调用ServiceLoader.load方法 ServiceLoader.load方法内先创建一个新的ServiceLoader，并实例化该类中的成员变量，包括：<ul>
+<li>loader(ClassLoader类型，类加载器)</li>
+<li>acc(AccessControlContext类型，访问控制器)</li>
+<li>providers(LinkedHashMap&lt;String,S&gt;类型，用于缓存加载成功的类)</li>
+<li>lookupIterator(实现迭代器功能)</li>
 </ul>
-<p>该操作将信号量的值加1，如果有进程阻塞着等待该信号量，那么其中一个进程将被唤醒。</p>
-<p>可看出，多进程锁方案跟多线程的锁方案实现思路大同小异。</p>
-<p>我们将互斥的级别拉高，分布式环境下不同节点不同进程或线程之间的互斥，就是分布式锁的挑战之一。后面再细讲。</p>
-<p>另外，在传统的基于数据库的架构中，对于数据的抢占问题也可以通过数据库事务（ACID）来保证。在分布式环境中，出于对性能以及一致性敏感度的要求，使得分布式锁成为了一种比较常见而高效的解决方案。</p>
-<p>▍从上面对于多线程和多进程锁的概括，可以总结出锁的抽象条件：</p>
-<p>1）“需要有存储锁的空间，并且锁的空间是可以访问到的”：</p>
-<p>对于多线程就是内存（进程中不同的线程都可以读写），多进程中通过共享内存的方式，也是提供一块地方，供不同进程读写。主要目的是保证不同的进线程改动对于其他进线程可见，进而满足互斥性需求。</p>
-<p>2）“锁需要被唯一标识”：</p>
-<p>不同的共享资源，必然需要用不同的锁进行保护，因此相应的锁必须有唯一的标识。在多线程环境中，锁可以是一个对象，那么对这个对象的引用便是这个唯一标识。多进程下，比如有名信号量，便是用硬盘中的文件名作为唯一标识。</p>
-<p>3）“锁要有至少两种状态”：</p>
-<p>有锁，没锁。存在，不存在等等。很好理解。</p>
-<p>满足上述三个条件就可以实现基础的分布式锁了。但是随着技术的演进，</p>
-<p>▍相应地，对锁也提出了更高级的条件：</p>
-<p>1）可重入：</p>
-<p>外层函数获得锁之后，内层函数还可以获得锁。原因是随着软件复杂性增加，方法嵌套获取锁已经很难避免。但是从代码层面很难分析出这个问题，因此我们要使用可重入锁。导致锁需要支持可重入的场景。对于可重入的思考，每种语言有自己的哲学和取舍，如go就舍弃了支持重入：Recursive locking in Go [ <a href="https://stackoverflow.com/questions/14670979/recursive-locking-in-go" target="_blank" rel="noopener">https://stackoverflow.com/que…</a> ]以后go又会不会认为“可重入真香”呢？哈哈，我们拭目以待。</p>
-<p>2）避免产生惊群效应（Herd Effect）：</p>
-<p>惊群效应指，在有多个请求等待获取锁的时候，一旦占有锁的线程释放之后，所有等待方都同时被唤醒，尝试抢占锁。但是绝大多数的抢占都是不必要的。这种情况在多线程和多进程中开销同样很大。要尽量避免这种情况出现。</p>
-<p>3）公平锁和非公平锁：</p>
-<p>公平锁：优先把锁给等待时间最长的一方；非公平锁：不保证等待线程拿锁的顺序。公平锁的实现成本较高。</p>
-<p>4）阻塞锁和自旋锁：</p>
-<p>主要是效率的考虑。自旋锁适用于临界区操作耗时短的场景；阻塞锁适用于临界区操作耗时长的场景。</p>
-<p>5）锁超时：</p>
-<p>防止释放锁失败，出现死锁的情况。</p>
-<p>6）高效，高可用：</p>
-<p>加锁和解锁需要高效，同时也需要保证高可用防止分布式锁失效，可以增加降级。</p>
-<p>还有很多其他更高要求的条件，不一一列举了。有兴趣的小伙伴可以看看编程史上锁的演进过程。</p>
-<h2 id="4-分布式锁"><a href="#4-分布式锁" class="headerlink" title="4. 分布式锁"></a>4. 分布式锁</h2><p>▍使用分布式锁的必要性：</p>
-<p>1）服务要求：部署的服务本身就处于分布式环境中</p>
-<p>2）效率：使用分布式锁可以避免不同节点重复相同的工作，这些工作会浪费资源。比如用户付了钱之后有可能不同节点会发出多封短信</p>
-<p>3）正确性：跟2）类似。如果两个节点在同一条数据上面操作，比如多个节点机器对同一个订单操作不同的流程有可能会导致该笔订单最后状态出现错误，造成损失</p>
-<p>包括但不限于这些必要性，在强烈地呼唤我们今天的主角—“分布式锁”闪亮登场。</p>
-<h2 id="5-分布式锁实现方案"><a href="#5-分布式锁实现方案" class="headerlink" title="5. 分布式锁实现方案"></a>5. 分布式锁实现方案</h2><p>有了非分布式锁的实现思路，和分布式环境的挑战，我们来看看分布式锁的实现策略。<br>分布式锁本质上还是要实现一个简单的目标—占一个“坑”，当别的节点机器也要来占时，发现已经有人占了，就只好放弃或者稍后再试。</p>
-<p>▍大体分为4种</p>
-<p>1）使用数据库实现<br>2）使用朴素Redis等缓存系统实现<br>3）使用ZooKeeper等分布式协调系统实现<br>4）使用Redisson来实现（本质上基于Redis）</p>
-<p>因为利用mysql实现分布式锁的性能低以及改造大，我们这里重点讲一下下面3种实现分布式锁的方案。</p>
-<h3 id="5-1-朴素Redis实现方案"><a href="#5-1-朴素Redis实现方案" class="headerlink" title="5.1 朴素Redis实现方案"></a>5.1 朴素Redis实现方案</h3><p>我们循序渐进，对比几种实现方式，找出优雅的方式：</p>
-<p>方案1：setnx+delete</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>setnx lock_key lock_value</span><br><span class="line"><span class="symbol">2 </span>// do sth</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
+</li>
+<li>2 应用程序通过迭代器接口获取对象实例 ServiceLoader先判断成员变量providers对象中(LinkedHashMap&lt;String,S&gt;类型)是否有缓存实例对象，如果有缓存，直接返回。 如果没有缓存，执行类的装载，实现如下：</li>
+<li>(1) 读取META-INF/services/下的配置文件，获得所有能被实例化的类的名称，值得注意的是，ServiceLoader<strong>可以跨越jar包获取META-INF下的配置文件</strong>，具体加载配置的实现代码如下：</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">        try &#123;</span><br><span class="line">            String fullName =<span class="built_in"> PREFIX </span>+ service.getName();</span><br><span class="line">            <span class="keyword">if</span> (loader == <span class="literal">null</span>)</span><br><span class="line">                configs = ClassLoader.getSystemResources(fullName);</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                configs = loader.getResources(fullName);</span><br><span class="line">        &#125; catch (IOException x) &#123;</span><br><span class="line">            fail(service, <span class="string">"Error locating configuration files"</span>, x);</span><br><span class="line">        &#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
 
-<p>缺点：一旦服务挂掉，锁无法被删除释放，会导致死锁。硬伤，pass！2</p>
-<p>方案2：setnx + setex</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>setnx lock_key lock_value</span><br><span class="line"><span class="symbol">2 </span>setex lock_key N lock_value  // N s超时</span><br><span class="line"><span class="symbol">3 </span>// do sth</span><br><span class="line"><span class="symbol">4 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
-
-<p>在方案1的基础上设置了超时时间。但是还是会出现跟1一样的问题。如果setnx之后、setex之前服务挂掉，一样会陷入死锁。本质原因是，setnx/setex分为了两个步骤，非原子操作。硬伤，pass！</p>
-<p>方案3：set ex nx</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>SET lock_key lock_value EX N NX //N s超时</span><br><span class="line"><span class="symbol">2 </span>// do sth</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">delete</span> lock_key</span><br></pre></td></tr></table></figure>
-
-<p>将加锁、设置超时两个步骤合并为一个原子操作，从而解决方案1、2的问题。（Redis原生命令支持，Redis version需要&gt;=2.6.12，滴滴生产环境Redis version一般为3.2，所以日常能够使用）。</p>
-<p>优点：此方案目前大多数sdk、Redis部署方案都支持，实现简单<br>缺点：会存在锁被错误的释放，被错误的抢占的情况。如下图：</p>
-<img src="/2019/07/19/分布式锁/朴素redis实现分布式锁.png" title="This is an example image">
-
-<p>这块有2个问题：</p>
-<p>1）GC期间，client1超时时间已到，导致将client2错误地放进来</p>
-<p>2）client1执行完逻辑后会显式调用del，将所有的锁都释放了（正确的情况应该只释放自己的锁，错误地释放了client2的锁）</p>
-<p>方案4：</p>
-<p>在3的基础上，对于问题1，将client的超时时间设置长一些，保证只能通过显式del来释放锁，而超时时间只是作为一种最终兜底的方案。针对问题2，增加对 value 的检查，只解除自己加的锁，为保证原子性，只能需要通过lua脚本实现。</p>
-<p>lua脚本：<a href="https://redis.io/commands/eval" target="_blank" rel="noopener">https://redis.io/commands/eval</a></p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span><span class="keyword">if</span> redis.<span class="keyword">call</span>(<span class="string">"get"</span>,KEYS[<span class="number">1</span>]) == ARGV[<span class="number">1</span>] <span class="keyword">then</span></span><br><span class="line"><span class="symbol">2 </span>  <span class="keyword">return</span> redis.<span class="keyword">call</span>(<span class="string">"del"</span>,KEYS[<span class="number">1</span>])</span><br><span class="line"><span class="symbol">3 </span><span class="keyword">else</span></span><br><span class="line"><span class="symbol">4 </span>  <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line"><span class="symbol">5 </span><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
-
-<p>如果超时时间设置长，只能通过显式的del来释放锁，就不会出现问题2（错误释放掉其他client的锁）。跟滴滴KV store的王斌同学讨论过，目前没有找到方案4优于方案3（只要超时时间设置的长一些）的场景。所以，在我的认知中，方案4跟方案3的优势一样，但是方案3的实现成本明显要低很多。</p>
-<p>朴素Redis方案小结</p>
-<p>方案3用的最多，实现成本小，对于大部分场景，将超时时间设置的长一些，极少出现问题。同时本方案对不同语言的友好度极高。</p>
-<h3 id="5-2-ZooKeeper实现方案"><a href="#5-2-ZooKeeper实现方案" class="headerlink" title="5.2 ZooKeeper实现方案"></a>5.2 ZooKeeper实现方案</h3><p>我们先简要介绍一些ZooKeeper（以下简称ZK）：</p>
-<p>ZooKeeper是一种“分布式协调服务”。所谓分布式协调服务，可以在分布式系统中共享配置，协调锁资源，提供命名服务等。为读多写少的场景所设计，ZK中的节点（以下简称ZNode）非常适合用于存储少量的状态和配置信息。</p>
-<p>对ZK常见的操作：</p>
-<p>create：创建节点<br>delete：删除节点<br>exists：判断一个节点的数据<br>setdata：设置一个节点的数据<br>getchildren：获取节点下的所有子节点</p>
-<p>这其中，exists，getData，getChildren属于读操作。Zookeeper客户端在请求读操作的时候，可以选择是否设置Watch（监听机制）。</p>
-<p>什么是Watch？</p>
-<p>Watch机制是zk中非常有用的功能。我们可以理解成是注册在特定Znode上的触发器。当这个Znode发生改变，也就是调用了create，delete，setData方法的时候，将会触发Znode上注册的对应事件，请求Watch的客户端会接收到异步通知。<br>我们在实现分布式锁的时候，正是通过Watch机制，来通知正在等待的session相关锁释放的信息。</p>
-<p>什么是ZNode？</p>
-<p>ZNode就是ZK中的节点。ZooKeeper节点是有生命周期的，这取决于节点的类型。在 ZooKeeper 中，节点类型可以分为临时节点（EPHEMERAL），时序节点（SEQUENTIAL ），持久节点（PERSISTENT ）。</p>
-<p>临时节点（EPHEMERAL）：</p>
-<p>节点的生命周期跟session绑定，session创建的节点，一旦该session失效，该节点就会被删除。</p>
-<p>临时顺序节点（EPHEMERAL_SEQUENTIAL）：</p>
-<p>在临时节点的基础上增加了顺序。每个父结点会为自己的第一级子节点维护一份时序。在创建子节点的时候，会自动加上数字后缀，越后创建的节点，顺序越大，后缀越大。</p>
-<p>持久节点（PERSISTENT ）：</p>
-<p>节点创建之后就一直存在，不会因为session失效而消失。</p>
-<p>持久顺序节点（PERSISTENT_SEQUENTIAL）：</p>
-<p>与临时顺序节点同理。</p>
-<p>ZNode中的数据结构：</p>
-<p>data（znode存储的数据信息），acl（记录znode的访问权限，即哪些人或哪些ip可以访问本节点），stat（包含znode的各种元数据，比如事务id，版本号，时间戳，大小等等），child（当前节点的子节点引用）。</p>
-<p>利用ZK实现分布式锁，主要得益于ZK保证了数据的强一致性。</p>
-<p>下面说说通过zk简单实现一个保持独占的锁（利用临时节点的特性）：</p>
-<p>我们可以将ZK上的ZNode看成一把锁（类似于Redis方案中的key）。多个session都去创建同一个distribute_lock节点，只会有一个创建成功的session。相当于只有该session获取到锁，其他session没有获取到锁。在该成功获锁的session失效前，锁将会一直阻塞住。session失效时，节点会自动被删除，锁被解除。（类似于Redis方案中的expire）。</p>
-<p>上述实现方案跟Redis方案3的实现效果一样。</p>
-<p>但是，这样的锁有没有改进的地方？当然！</p>
-<p>1）我们可能会有可重入的需求，因此希望能有可重入的锁机制。</p>
-<p>2）有些场景下，在争抢锁的时候，我们既不想一次争抢不到就pass，也不想一直阻塞住直到获取到锁。一个朴素的需求是，我们希望有超时时间来控制是否去上锁。更进一步，我们不想主动的去查到底是否能够加锁，我们希望能够有事件机制来通知是否能够上锁。（这里，你是不是想到了ZK的Watch机制呢？）</p>
-<p>要满足这样的需求就需要控制时序。利用顺序临时节点和Watch机制的特性，来实现：</p>
-<p>我们事先创建/distribute_lock节点，多个session在它下面创建临时有序节点。由于zk的特性，/distribute_lock该节点会维护一份sequence，来保证子节点创建的时序性。</p>
-<p>具体实现如下：</p>
-<p>1）客户端调用create()方法在/distribute_lock节点下创建EPHEMERAL_SEQUENTIAL节点。</p>
-<p>2）客户端调用getChildren(“/distribute_lock”)方法来获取所有已经创建的子节点。</p>
-<p>3）客户端获取到所有子节点path之后，如果发现自己在步骤1中创建的节点序号最小，那么就认为这个客户端获得了锁。</p>
-<p>4）如果在步骤3中发现自己并非所有子节点中最小的，说明自己还没有获取到锁。此时客户端需要找到比自己小的那个节点，然后对其调用exist()方法，同时注册事件监听。需要注意是，只在比自己小一号的节点上注册Watch事件。如果在比自己都小的节点上注册Watch事件，将会出现惊群效应，要避免。</p>
-<p>5）之后当这个被关注的节点被移除了，客户端会收到相应的通知。这个时候客户端需要再次调用getChildren(“/distribute_lock”)方法来获取所有已经创建的子节点，确保自己确实是最小的节点了，然后进入步骤3）。</p>
-<p>Curator框架封装了对ZK的api操作。以Java为例来进行演示：<br>引入依赖：</p>
-<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">1 </span>&lt;dependency&gt;</span><br><span class="line"><span class="symbol">2 </span>  &lt;groupId&gt;org.apache.curator&lt;/groupId&gt;</span><br><span class="line"><span class="symbol">3 </span>  &lt;artifactId&gt;curator-recipes&lt;/artifactId&gt;</span><br><span class="line"><span class="symbol">4 </span>  &lt;version&gt;<span class="number">2.11.1</span>&lt;/version&gt;</span><br><span class="line"><span class="symbol">5 </span>&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
-
-<p>使用的时候需要注意Curator框架和ZK的版本兼容问题。<br>以排他锁为例，看看怎么使用：</p>
-<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"> <span class="number">1</span> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestLock</span> </span>&#123;</span><br><span class="line"> <span class="number">2</span></span><br><span class="line"> <span class="number">3</span>    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) throws Exception &#123;</span><br><span class="line"> <span class="number">4</span>        <span class="comment">//创建zookeeper的客户端</span></span><br><span class="line"> <span class="number">5</span>        RetryPolicy retryPolicy = <span class="keyword">new</span> <span class="type">ExponentialBackoffRetry</span>(<span class="number">1000</span>, <span class="number">3</span>);</span><br><span class="line"> <span class="number">6</span>        CuratorFramework client = CuratorFrameworkFactory.<span class="keyword">new</span><span class="type">Client</span>(“ip:<span class="type">port</span>", retryPolicy);</span><br><span class="line"> <span class="number">7</span>        client.start();</span><br><span class="line"> <span class="number">8</span></span><br><span class="line"> <span class="number">9</span>        <span class="comment">//创建分布式锁, 锁空间的根节点路径为/sunnyzengqi/curator/lock</span></span><br><span class="line"><span class="number">10</span>        InterProcessMutex mutex = <span class="keyword">new</span> <span class="type">InterProcessMutex</span>(client, <span class="string">"/sunnyzengqi/curator/lock"</span>);</span><br><span class="line"><span class="number">11</span>        mutex.acquire();</span><br><span class="line"><span class="number">12</span>        <span class="comment">//获得了锁, 进行业务流程</span></span><br><span class="line"><span class="number">13</span>        System.out.println(<span class="string">"Enter mutex"</span>);</span><br><span class="line"><span class="number">14</span>        Thread.sleep(<span class="number">10000</span>);</span><br><span class="line"><span class="number">15</span>        <span class="comment">//完成业务流程, 释放锁</span></span><br><span class="line"><span class="number">16</span>        mutex.release();</span><br><span class="line"><span class="number">17</span>        <span class="comment">//关闭客户端</span></span><br><span class="line"><span class="number">18</span>        client.close();</span><br><span class="line"><span class="number">19</span>    &#125;</span><br><span class="line"><span class="number">20</span> &#125;</span><br><span class="line"><span class="number">21</span></span><br></pre></td></tr></table></figure>
-
-<p>上面代码在业务执行的过程中，在ZK的/sunnyzengqi/curator/lock路径下，会创建一个临时节点来占位。相同的代码，在两个机器节点上运行，可以看到该路径下创建了两个临时节点：</p>
-<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案1.png" title="This is an example image">
-
-<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案2.png" title="This is an example image">
-
-<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案3.png" title="This is an example image">
-
-<p>运行命令echo wchc | nc localhost 2181查看watch信息：</p>
-<img src="/2019/07/19/分布式锁/zookeeep分布式锁方案4.png" title="This is an example image">
-
-<p>可以看到lock1节点的session在监听节点lock0的变动。此时是lock0获取到锁。等到lock0执行完，session会失效，触发Watch机制，通知lock1的session说锁已经被释放了。这时，lock1可以来抢占锁，进而执行自己的操作。</p>
-<p>除了简单的排它锁的实现，还可以利用ZK的特性来实现更高级的锁（比如信号量，读写锁，联锁）等，这里面有很多的玩法。</p>
-<p>ZooKeeper方案小结</p>
-<p>能够实现很多具有更高条件的锁机制，并且由于ZK优越的session和watch机制，适用于复杂的场景。因为有久经检验的Curator框架，集成了很多基于ZK的分布式锁的api，对于Java语言非常友好。对于其他语言，虽然也有一些开源项目封装了它的api，但是稳定性和效率需要自己去实际检验。</p>
-<h3 id="5-3-Redisson实现方案"><a href="#5-3-Redisson实现方案" class="headerlink" title="5.3 Redisson实现方案"></a>5.3 Redisson实现方案</h3><p>我们先简要介绍一下Redisson：</p>
-<p>Redisson是Java语言编写的基于Redis的client端。功能也非常强大，功能包括：分布式对象，分布式集合，分布式锁和同步器，分布式服务等。被大家熟知的场景还是在分布式锁的场景。</p>
-<p>为了解决加锁线程在没有解锁之前崩溃进而出现死锁的问题，不同于朴素Redis中通过设置超时时间来处理。Redisson采用了新的处理方式：Redisson内部提供了一个监控锁的看门狗，它的作用是在Redisson实例被关闭前，不断的延长锁的有效期。<br>跟Zookeeper类似，Redisson也提供了这几种分布式锁：可重入锁，公平锁，联锁，红锁，读写锁等。具体怎么用这里不展开，感兴趣的朋友可以自己去实验。</p>
-<p>Redisson方案小结</p>
-<p>跟ZK一样，都能够实现很多具有更高条件的锁机制，适用于复杂的场景。但对语言非常挑剔，目前只能支持Java语言。</p>
-<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><p>上一节，我们讨论了三种实现的方案：朴素Redis实现方案，ZooKeeper实现方案，Redisson实现方案。由于第1种与第3种都是基于Redis，所以主要是ZK和基于Redis两种。我们不禁想问，在实现分布式锁上，基于ZK与基于Redis的方案，有什么不同呢？</p>
-<p>1）锁的时长设置上：</p>
-<p>得益于ZK的session机制，客户端可以持有锁任意长的时间，这可以确保它做完所有需要的资源访问操作之后再释放锁。避免了基于Redis的锁对于有效时间到底设置多长的两难问题。实际上，基于ZooKeeper的锁是依靠Session（心跳）来维持锁的持有状态的，而Redis不支持Sesion。</p>
-<p>优势：ZK&gt;Redisson&gt;朴素Redis。</p>
-<p>2）监听机制上：</p>
-<p>得益于ZK的watch机制，在获取锁失败之后可以等待锁重新释放的事件。这让客户端对锁的使用更加灵活。避免了Redis方案主要去轮询的方式。</p>
-<p>优势：ZK&gt;Redisson=朴素Redis。</p>
-<p>3）使用便利性上：</p>
-<p>由于生产环境都有稳定的Redis和ZooKeeper集群，有专业的同学维护，这两者差别不大。在语言局限性上，朴素Redis从不挑食。ZK和Redisson都偏向于Java语言。在开发难度上，Redis最简单，几乎不用写什么代码；ZK和Redisson次之，依赖于使用的语言是否有集成的api以及集成稳定性等。</p>
-<p>优势：朴素Redis&gt;ZK&gt;Redisson。</p>
-<p>4）支持锁形式的多样性上：</p>
-<p>上面有提及，ZK和Redisson都支持了各种花样的分布锁。朴素Redis就比较捉急了，在实现更高要求的锁方面，如果自己造轮子，往往费时费力，力不从心。</p>
-<p>优势：ZK=Redisson&gt;Redis。</p>
-<h2 id="7-结束语"><a href="#7-结束语" class="headerlink" title="7. 结束语"></a>7. 结束语</h2><p>分布式锁在日常Coding中已经很常用。但是分布式锁这方面的知识依然非常深奥。2016年，Martin Kleppmann与Antirez两位分布式领域非常有造诣的前辈还针对“Redlock算法”在分布式锁上面的应用炒得沸沸扬扬。</p>
-<p><em>最后借助这场历史闹剧中Martin的话来结束我们今天的分享。与诸君共勉！将学习当成一生的主题！</em></p>
-<p><em>对我来说最重要的一点在于：我并不在乎在这场辩论中谁对谁错 —— 我只关心从其他人的工作中学到的东西，以便我们能够避免重蹈覆辙，并让未来更加美好。前人已经为我们创造出了许多伟大的成果：站在巨人的肩膀上，我们得以构建更棒的软件。</em><br>……<br><em>对于任何想法，务必要详加检验，通过论证以及检查它们是否经得住别人的详细审查。那是学习过程的一部分。但目标应该是为了获得知识，而不应该是为了说服别人相信你自己是对的。有时候，那只不过意味着停下来，好好地想一想。</em></p>
-<p>由于时间仓促，自己水平有限，文中必定存在诸多疏漏与理解不当的地方。非常希望得到各位指正，畅谈技术。</p>
-<p>▍Reference</p>
-<p><a href="https://zookeeper.apache.org/" target="_blank" rel="noopener">0.Apache ZooKeeper</a><br><a href="https://github.com/redisson/redisson" target="_blank" rel="noopener">1.Redisson</a><br><a href="https://redis.io/" target="_blank" rel="noopener">2.Redis</a><br>3.Redis分布式锁进化史<br><a href="https://tech.meituan.com/2016/09/29/distributed-system-mutually-exclusive-idempotence-cerberus-gtis.html" target="_blank" rel="noopener">4.分布式系统互斥性与幂等性问题的分析与解决</a><br>5.浅谈可重入性及其他<br><a href="https://redis.io/topics/distlock" target="_blank" rel="noopener">6.Distributed locks with Redis</a><br><a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html" target="_blank" rel="noopener">7.How to do distributed locking</a><br><a href="http://antirez.com/news/101" target="_blank" rel="noopener">8.Is Redlock safe?</a><br>9.Note on fencing and distributed locks</p>
+<ul>
+<li>(2) 通过反射方法Class.forName()加载类对象，并用instance()方法将类实例化。</li>
+<li>(3) 把实例化后的类缓存到providers对象中，(LinkedHashMap&lt;String,S&gt;类型） 然后返回实例对象。</li>
+</ul>
+<h1 id="5-总结"><a href="#5-总结" class="headerlink" title="5 总结"></a>5 总结</h1><p><strong>优点</strong>： 使用Java SPI机制的优势是实现解耦，使得第三方服务模块的装配控制的逻辑与调用者的业务代码分离，而不是耦合在一起。应用程序可以根据实际业务情况启用框架扩展或替换框架组件。</p>
+<p><strong>缺点</strong>：</p>
+<ul>
+<li>虽然ServiceLoader也算是使用的延迟加载，但是基本只能通过遍历全部获取，也就是接口的实现类全部加载并实例化一遍。如果你并不想用某些实现类，它也被加载并实例化了，这就造成了浪费。获取某个实现类的方式不够灵活，只能通过Iterator形式获取，不能根据某个参数来获取对应的实现类。</li>
+<li>多个并发多线程使用ServiceLoader类的实例是不安全的。</li>
+</ul>
 
       
 
@@ -2366,7 +2171,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">分布式</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">SPI</a>
         		</li>
       		
 		</ul>
@@ -2376,7 +2181,149 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/19/分布式锁/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/07/19/JavaSPI机制的优点与缺点/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-EventBus" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/19/EventBus/">EventBus</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/19/EventBus/" class="archive-article-date">
+  	<time datetime="2019-07-19T14:00:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-19</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h2><p><code>EventBus</code> 是Google.Guava提供的消息发布-订阅类库，它实现了观察者设计模式，消息通知负责人通过EventBus去注册/注销观察者，最后由消息通知负责人给观察者发布消息。</p>
+<h2 id="二、观察者设计模式"><a href="#二、观察者设计模式" class="headerlink" title="二、观察者设计模式"></a>二、观察者设计模式</h2><h3 id="1、目的"><a href="#1、目的" class="headerlink" title="1、目的"></a>1、目的</h3><blockquote>
+<p>定义对象间的一种一对多依赖关系，当一个对象的状态发生改变时候，所有依赖于它的对象都得到通知并被自动更新。</p>
+</blockquote>
+<h3 id="2、应用实例"><a href="#2、应用实例" class="headerlink" title="2、应用实例"></a>2、应用实例</h3><ol>
+<li>接水的时候，接水的人观察水位，当水位到一定程度时候便停止接水；</li>
+<li>老师一布置任务，学生听到都得做。</li>
+</ol>
+<h3 id="3、代码"><a href="#3、代码" class="headerlink" title="3、代码"></a>3、代码</h3><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">package com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="markdown">/**</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>观察者接口IListenner</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>定义一个update()方法，当被观察者调用notifyListenner()方法时，观察者的update（）方法会被回调</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"><span class="bullet"> * </span>@author gary</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"> *</span></span></span><br><span class="line"><span class="comment"><span class="markdown"></span></span></span><br><span class="line"><span class="comment"><span class="markdown"> */</span></span></span><br><span class="line"></span><br><span class="line">public <span class="class"><span class="keyword">interface</span> <span class="title">IListenner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    public <span class="keyword">void</span> update(<span class="built_in">String</span> info);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> * 被观察者接口ISpeaker</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> * 声明添加删除通知观察者方法</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> gary</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ISpeaker</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addListenner</span><span class="params">(IListenner listenner)</span></span>;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeListenner</span><span class="params">(IListennerlistenner)</span></span>;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">notifyListenner</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">implements</span> <span class="title">IListenner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String info;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Student</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">this</span>.name = name;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(String info)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">this</span>.info = info ;</span><br><span class="line"></span><br><span class="line">         read();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">read</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         System.out.println(<span class="string">"学生:"</span> + name + <span class="string">" 接收到老师的消息 :"</span> + info);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Teacher</span> <span class="keyword">implements</span> <span class="title">ISpeaker</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;IListenner&gt; listennerList;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String info;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Teacher</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         listennerList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addListenner</span><span class="params">(IListenner listenner)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         listennerList.add(listenner);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeListenner</span><span class="params">(IListennerlistenner)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         listennerList.remove(listenner);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">notifyListenner</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; listennerList.size();i++) &#123;</span><br><span class="line"></span><br><span class="line">             IListenner lis = listennerList.get(i);</span><br><span class="line"></span><br><span class="line">             lis.update(info);</span><br><span class="line"></span><br><span class="line">         &#125;            </span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setInfo</span><span class="params">(String info)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">         System.out.println(<span class="string">"老师发送消息 ： "</span> +info);</span><br><span class="line"></span><br><span class="line">         <span class="keyword">this</span>.info = info;</span><br><span class="line"></span><br><span class="line">         notifyListenner();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>测试：</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.gary.designpattern.observe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line"></span><br><span class="line">         Teacher teacher = <span class="keyword">new</span> <span class="type">Teacher</span>();</span><br><span class="line"></span><br><span class="line">         teacher.addListenner(<span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"张三"</span>));</span><br><span class="line"></span><br><span class="line">         teacher.addListenner(<span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"李四"</span>));</span><br><span class="line"></span><br><span class="line">         teacher.addListenner(<span class="keyword">new</span> <span class="type">Student</span>(<span class="string">"王五"</span>));</span><br><span class="line"></span><br><span class="line">         teacher.setInfo(<span class="string">"大家好"</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动"></p>
+<p>结果：</p>
+<p>老师发送消息 ： 大家好</p>
+<p>学生:张三 接收到老师的消息 :大家好</p>
+<p>学生:李四 接收到老师的消息 :大家好</p>
+<p>学生:王五 接收到老师的消息 :大家好</p>
+<h2 id="三、EventBus使用"><a href="#三、EventBus使用" class="headerlink" title="三、EventBus使用"></a>三、EventBus使用</h2><h3 id="1、引入依赖"><a href="#1、引入依赖" class="headerlink" title="1、引入依赖"></a>1、引入依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.google.guava<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>guava<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span>  </span><br><span class="line">        <span class="tag">&lt;<span class="name">version</span>&gt;</span>19.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span>  </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2、示例"><a href="#2、示例" class="headerlink" title="2、示例"></a>2、示例</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EventBusCenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> EventBus eventBus = <span class="keyword">new</span> EventBus();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">EventBusCenter</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> EventBus <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> eventBus;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">        eventBus.register(object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">unregister</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">        eventBus.unregister(object);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">post</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">        eventBus.post(object);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataListenerTwo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Subscribe</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">(Integer msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Two fun Integer msg: "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Subscribe</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun2</span><span class="params">(Integer msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Two fun2 Integer msg: "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataListenerOne</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Subscribe</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"One fun String msg: "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Subscribe</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fun2</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"One fun2 String msg: "</span> + msg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestForEventBus</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        DataListenerOne one = <span class="keyword">new</span> DataListenerOne();</span><br><span class="line">        DataListenerTwo two = <span class="keyword">new</span> DataListenerTwo();</span><br><span class="line"></span><br><span class="line">        EventBusCenter.register(one);</span><br><span class="line">        EventBusCenter.register(two);</span><br><span class="line"></span><br><span class="line">        EventBusCenter.post(<span class="string">"post string"</span>);</span><br><span class="line">        EventBusCenter.post(<span class="number">123</span>);</span><br><span class="line"></span><br><span class="line">        EventBusCenter.unregister(two);</span><br><span class="line"></span><br><span class="line">        EventBusCenter.post(<span class="string">"post string"</span>);</span><br><span class="line">        EventBusCenter.post(<span class="number">123</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">One fun2 String <span class="symbol">msg:</span> post string</span><br><span class="line">One <span class="function"><span class="keyword">fun</span> <span class="title">String</span></span> <span class="symbol">msg:</span> post string</span><br><span class="line">Two <span class="function"><span class="keyword">fun</span> <span class="title">Integer</span></span> <span class="symbol">msg:</span> <span class="number">123</span></span><br><span class="line">Two fun2 Integer <span class="symbol">msg:</span> <span class="number">123</span></span><br><span class="line">One fun2 String <span class="symbol">msg:</span> post string</span><br><span class="line">One <span class="function"><span class="keyword">fun</span> <span class="title">String</span></span> <span class="symbol">msg:</span> post string</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、注意事项"><a href="#3、注意事项" class="headerlink" title="3、注意事项"></a>3、注意事项</h3><ul>
+<li>只有通过@Subscribe注解的方法才会被注册金EventBus</li>
+<li>方法只能有1个参数</li>
+<li>使用基本数据类型的包装类，否则会无法匹配</li>
+</ul>
+<h3 id="4、带来的问题"><a href="#4、带来的问题" class="headerlink" title="4、带来的问题"></a>4、带来的问题</h3><p>由于EventBus是将消息队列放入到内存中的，listener消费这个消息队列，所以系统重启之后，保存或者堆积在队列中的消息丢失。</p>
+<p>解决思路：把内存中的数据持久化到磁盘中。</p>
+<h3 id="5、原理图"><a href="#5、原理图" class="headerlink" title="5、原理图"></a>5、原理图</h3><img src="/2019/07/19/EventBus/EventBus-Publish-Subscribe.png" title="This is an example image">
+
+<h3 id="6、注意"><a href="#6、注意" class="headerlink" title="6、注意"></a>6、注意</h3><p>每次register后都需要进行一次unregister，因为如果不unregister，会让对象无法得到内存回收，导致内存泄漏。所以必须在unregister方法中释放对象所占的内存。</p>
+<h2 id="四、源码分析"><a href="#四、源码分析" class="headerlink" title="四、源码分析"></a>四、源码分析</h2><h3 id="1、构造方法"><a href="#1、构造方法" class="headerlink" title="1、构造方法"></a>1、构造方法</h3><p>默认构造方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Creates a new EventBus named "default".</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">EventBus</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>(<span class="string">"default"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Creates a new EventBus with the given &#123;<span class="doctag">@code</span> identifier&#125;.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> identifier  a brief name for this bus, for logging purposes.  Should</span></span><br><span class="line"><span class="comment"> *                    be a valid Java identifier.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">EventBus</span><span class="params">(String identifier)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>(identifier, MoreExecutors.directExecutor(),</span><br><span class="line">      Dispatcher.perThreadDispatchQueue(), 			LoggingHandler.INSTANCE);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EventBus(String identifier, Executor executor, Dispatcher dispatcher,</span><br><span class="line">    SubscriberExceptionHandler exceptionHandler) &#123;</span><br><span class="line">  <span class="keyword">this</span>.identifier = checkNotNull(identifier);</span><br><span class="line">  <span class="keyword">this</span>.executor = checkNotNull(executor);</span><br><span class="line">  <span class="keyword">this</span>.dispatcher = checkNotNull(dispatcher);</span><br><span class="line">  <span class="keyword">this</span>.exceptionHandler = checkNotNull(exceptionHandler);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、订阅者（register）"><a href="#2、订阅者（register）" class="headerlink" title="2、订阅者（register）"></a>2、订阅者（register）</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Object object)</span> </span>&#123;</span><br><span class="line">  subscribers.register(object);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">  * 添加订阅者</span></span><br><span class="line"><span class="comment">  * Registers all subscriber methods on the given listener object.</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"> <span class="function"><span class="keyword">void</span> <span class="title">register</span><span class="params">(Object listener)</span> </span>&#123;</span><br><span class="line">   <span class="comment">//找到该对象下的所有订阅者</span></span><br><span class="line">   Multimap&lt;Class&lt;?&gt;, Subscriber&gt; listenerMethods = findAllSubscribers(listener);</span><br><span class="line"><span class="comment">//遍历订阅者map</span></span><br><span class="line">   <span class="keyword">for</span> (Map.Entry&lt;Class&lt;?&gt;, Collection&lt;Subscriber&gt;&gt; entry : listenerMethods.asMap().entrySet()) &#123;</span><br><span class="line">     Class&lt;?&gt; eventType = entry.getKey();</span><br><span class="line">     Collection&lt;Subscriber&gt; eventMethodsInListener = entry.getValue();</span><br><span class="line">     <span class="comment">//将遍历得到的每一个订阅者添加到对应事件类型的Copy-On-Write容器中</span></span><br><span class="line">     </span><br><span class="line">     CopyOnWriteArraySet&lt;Subscriber&gt; eventSubscribers = subscribers.get(eventType);</span><br><span class="line"></span><br><span class="line">     <span class="keyword">if</span> (eventSubscribers == <span class="keyword">null</span>) &#123;</span><br><span class="line">       CopyOnWriteArraySet&lt;Subscriber&gt; newSet = <span class="keyword">new</span> CopyOnWriteArraySet&lt;Subscriber&gt;();</span><br><span class="line">       <span class="comment">//putIfAbsent将新事件类型对应set加到map，如果map中存在则返回原来的value，如果不存在加入新的后则返回null</span></span><br><span class="line">       <span class="comment">//如果返回值为null，那么使用newSet</span></span><br><span class="line">       eventSubscribers = MoreObjects.firstNonNull(</span><br><span class="line">           subscribers.putIfAbsent(eventType, newSet), newSet);</span><br><span class="line">     &#125;</span><br><span class="line">  <span class="comment">//把该事件所有订阅者加入该事件的set中</span></span><br><span class="line">     eventSubscribers.addAll(eventMethodsInListener);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 返回map，以事件类型（方法第一个参数类型）为键，订阅者（以eventBus，listener对象，以及method封装而成的订阅者对象）为值</span></span><br><span class="line"><span class="comment"> * Returns all subscribers for the given listener grouped by the type of event they subscribe to.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> Multimap&lt;Class&lt;?&gt;, Subscriber&gt; findAllSubscribers(Object listener) &#123;</span><br><span class="line">  Multimap&lt;Class&lt;?&gt;, Subscriber&gt; methodsInListener = HashMultimap.create();</span><br><span class="line">  Class&lt;?&gt; clazz = listener.getClass();</span><br><span class="line">  <span class="comment">//将订阅者加入事件对应的multimap中 （Multimap k唯一 v可以放多个）</span></span><br><span class="line">  <span class="keyword">for</span> (Method method : getAnnotatedMethods(clazz)) &#123;</span><br><span class="line">    Class&lt;?&gt;[] parameterTypes = method.getParameterTypes();</span><br><span class="line">    Class&lt;?&gt; eventType = parameterTypes[<span class="number">0</span>];</span><br><span class="line">    methodsInListener.put(eventType, Subscriber.create(bus, listener, method));</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> methodsInListener;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * All registered subscribers, indexed by event type.</span></span><br><span class="line"><span class="comment"> * 事件类型 对应的 所有订阅者</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;The &#123;<span class="doctag">@link</span> CopyOnWriteArraySet&#125; values make it easy and relatively lightweight to get an</span></span><br><span class="line"><span class="comment"> * immutable snapshot of all current subscribers to an event without any locking.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> ConcurrentMap&lt;Class&lt;?&gt;, CopyOnWriteArraySet&lt;Subscriber&gt;&gt; subscribers =</span><br><span class="line">    Maps.newConcurrentMap();</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、发布者（post）"><a href="#3、发布者（post）" class="headerlink" title="3、发布者（post）"></a>3、发布者（post）</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 将事件发部给所有的订阅者</span></span><br><span class="line"><span class="comment"> * Posts an event to all registered subscribers.  This method will return</span></span><br><span class="line"><span class="comment"> * successfully after the event has been posted to all subscribers, and</span></span><br><span class="line"><span class="comment"> * regardless of any exceptions thrown by subscribers.</span></span><br><span class="line"><span class="comment"> * 如果没有订阅者订阅该事件，那么将会用一个DeadEvent事件包装该事件，重发布</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;If no subscribers have been subscribed for &#123;<span class="doctag">@code</span> event&#125;'s class, and</span></span><br><span class="line"><span class="comment"> * &#123;<span class="doctag">@code</span> event&#125; is not already a &#123;<span class="doctag">@link</span> DeadEvent&#125;, it will be wrapped in a</span></span><br><span class="line"><span class="comment"> * DeadEvent and reposted.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> event  event to post.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">post</span><span class="params">(Object event)</span> </span>&#123;</span><br><span class="line">  <span class="comment">//获取事件对应的所有订阅者  </span></span><br><span class="line">  Iterator&lt;Subscriber&gt; eventSubscribers = subscribers.getSubscribers(event);</span><br><span class="line">  <span class="comment">//遍历订阅者  </span></span><br><span class="line">  <span class="keyword">if</span> (eventSubscribers.hasNext()) &#123;</span><br><span class="line">    <span class="comment">//将事件分发给订阅者</span></span><br><span class="line">    <span class="comment">//dispatcher在构造中已经初始化为PerThreadQueuedDispatcher</span></span><br><span class="line">    dispatcher.dispatch(event, eventSubscribers);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!(event <span class="keyword">instanceof</span> DeadEvent)) &#123;</span><br><span class="line">    <span class="comment">// the event had no subscribers and was not itself a DeadEvent</span></span><br><span class="line">    post(<span class="keyword">new</span> DeadEvent(<span class="keyword">this</span>, event));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>PerThreadQueuedDispatcher中的dispatch方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dispatch</span><span class="params">(Object event, Iterator&lt;Subscriber&gt; subscribers)</span> </span>&#123;</span><br><span class="line">  checkNotNull(event);</span><br><span class="line">  checkNotNull(subscribers);</span><br><span class="line">  Queue&lt;Event&gt; queueForThread = queue.get();</span><br><span class="line">  queueForThread.offer(<span class="keyword">new</span> Event(event, subscribers));</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (!dispatching.get()) &#123;</span><br><span class="line">    dispatching.set(<span class="keyword">true</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      Event nextEvent;</span><br><span class="line">      <span class="keyword">while</span> ((nextEvent = queueForThread.poll()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">while</span> (nextEvent.subscribers.hasNext()) &#123;</span><br><span class="line">          <span class="comment">//分发事件给订阅者执行</span></span><br><span class="line">          nextEvent.subscribers.next().dispatchEvent(nextEvent.event);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">      dispatching.remove();</span><br><span class="line">      queue.remove();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Dispatches &#123;<span class="doctag">@code</span> event&#125; to this subscriber using the proper executor.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">dispatchEvent</span><span class="params">(<span class="keyword">final</span> Object event)</span> </span>&#123;</span><br><span class="line">  executor.execute(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//订阅者执行事件（反射执行方法，即订阅者为方法，事件为参数）  </span></span><br><span class="line">        invokeSubscriberMethod(event);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">        bus.handleSubscriberException(e.getCause(), context(event));</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">事件总线</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/19/EventBus/">展开全文 >></a>
         </p>
       
 
@@ -2503,15 +2450,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">容器</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">数据库</a>
+                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2519,11 +2462,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
+                <a href="javascript:void(0)" class="js-tag color4">数据库</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">消息队列</a>
+                <a href="javascript:void(0)" class="js-tag color1">MySQL</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -2535,6 +2478,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">消息队列</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">JVM</a>
               </li>
              
@@ -2543,11 +2490,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Zookeeper</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Java8</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Zookeeper</a>
+                <a href="javascript:void(0)" class="js-tag color2">锁</a>
               </li>
              
               <li class="article-tag-list-item">
